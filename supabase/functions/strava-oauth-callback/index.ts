@@ -1,0 +1,22 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const redirectToApp = (status:string) => Response.redirect(`${Deno.env.get("APP_REDIRECT_URL")}?strava=${encodeURIComponent(status)}#activites`,303);
+const hex = (bytes: Uint8Array) => [...bytes].map(b=>b.toString(16).padStart(2,"0")).join("");
+Deno.serve(async (req) => {
+  const url = new URL(req.url);
+  const code=url.searchParams.get("code"), state=url.searchParams.get("state"), error=url.searchParams.get("error");
+  if(error || !code || !state) return redirectToApp("error");
+  const service=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const stateHash=hex(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(state))));
+  const {data:record,error:stateError}=await service.from("strava_oauth_states").select("user_id,expires_at").eq("state_hash",stateHash).maybeSingle();
+  if(stateError || !record || new Date(record.expires_at).getTime()<Date.now()) return redirectToApp("invalid-state");
+  await service.from("strava_oauth_states").delete().eq("state_hash",stateHash);
+  const clientId=Deno.env.get("STRAVA_CLIENT_ID"), clientSecret=Deno.env.get("STRAVA_CLIENT_SECRET");
+  if(!clientId||!clientSecret) return redirectToApp("config-error");
+  const response=await fetch("https://www.strava.com/oauth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_id:clientId,client_secret:clientSecret,code,grant_type:"authorization_code"})});
+  if(!response.ok) return redirectToApp("token-error");
+  const token=await response.json();
+  if(!token.access_token||!token.refresh_token||!token.athlete?.id) return redirectToApp("token-error");
+  const {error:saveError}=await service.from("strava_connections").upsert({user_id:record.user_id,athlete_id:token.athlete.id,access_token:token.access_token,refresh_token:token.refresh_token,expires_at:token.expires_at,scopes:"read,activity:read_all",updated_at:new Date().toISOString()});
+  if(saveError) return redirectToApp("save-error");
+  return redirectToApp("connected");
+});
