@@ -335,6 +335,90 @@
       min-height: 137px
     }
 
+    .week-summary-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-bottom: 4px;
+      padding: 14px 16px;
+      min-width: 0
+    }
+
+    .week-summary-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 7px;
+      min-width: 0;
+      padding: 2px 12px
+    }
+
+    .week-summary-label,
+    .week-summary-value {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0
+    }
+
+    .week-summary-label small,
+    .week-summary-value small {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25
+    }
+
+    .week-summary-value {
+      flex-wrap: wrap;
+      gap: 5px 7px
+    }
+
+    .week-summary-item:first-child {
+      padding-left: 0;
+      border-right: 1px solid var(--line)
+    }
+
+    .week-summary-item:last-child {
+      padding-right: 0;
+      padding-left: 18px
+    }
+
+    .week-summary-item .stat-icon {
+      font-size: 17px;
+      line-height: 1.1;
+      flex-shrink: 0
+    }
+
+    .week-summary-item strong {
+      font-size: 26px;
+      letter-spacing: -.7px;
+      line-height: 1.15
+    }
+
+    .week-summary-item strong em {
+      font-size: 14px;
+      color: var(--muted);
+      font-style: normal
+    }
+
+    @media(max-width:380px) {
+      .week-summary-card {
+        padding: 12px 13px
+      }
+
+      .week-summary-item {
+        padding-right: 8px
+      }
+
+      .week-summary-item:last-child {
+        padding-left: 12px
+      }
+
+      .week-summary-item strong {
+        font-size: 23px
+      }
+    }
+
     .stat-icon {
       color: var(--accent);
       font-size: 19px
@@ -736,8 +820,116 @@
     }
 
     .nav-item span {
-      font-size: 21px;
-      line-height: 1
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 24px;
+    }
+
+    .nav-item span svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .theme-select {
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel2);
+      color: var(--text);
+      padding: 12px;
+      font: inherit;
+    }
+
+    .theme-swatches {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .theme-swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #ffffff40;
+      cursor: pointer;
+    }
+
+    .theme-swatch[aria-pressed="true"] {
+      outline: 2px solid var(--text);
+      outline-offset: 3px;
+    }
+
+    .hr-type-chart {
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+    }
+
+    .hr-type-chart svg {
+      display: block;
+      width: 100%;
+      min-width: 280px;
+      height: auto;
+    }
+
+    .hr-evolution-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      touch-action: pan-x pan-y;
+    }
+
+    .hr-evolution-scroll svg {
+      display: block;
+      height: auto;
+      max-width: none;
+    }
+
+    .hr-evolution-point {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .hr-evolution-tooltip-bg {
+      fill: var(--accent);
+    }
+
+    .hr-evolution-tooltip-text {
+      fill: #10120f;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .hr-evolution-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-top: 10px;
+    }
+
+    .hr-evolution-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .hr-evolution-legend i {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
     }
 
     .nav-item small {
@@ -802,6 +994,73 @@
 
       .form-grid label:last-of-type {
         grid-column: 1/-1
+      }
+    }
+
+    .detail-main-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .detail-hr-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 0;
+    }
+
+    .detail-stats .stat-card {
+      min-width: 0;
+    }
+
+    .detail-stats .stat-card strong {
+      font-size: clamp(17px, 4.8vw, 23px);
+    }
+
+    .chart-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .chart-title-row h3 {
+      margin: 0 0 10px;
+    }
+
+    .chart-mode-toggle {
+      flex-shrink: 0;
+      padding: 6px 2px 8px;
+      font-size: 10px;
+    }
+
+    .line-chart-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 10px;
+      touch-action: pan-x pan-y;
+    }
+
+    .line-chart-scroll svg {
+      display: block;
+      max-width: none;
+      height: auto;
+    }
+
+    .line-chart-hint {
+      margin-top: 6px;
+    }
+
+    @media(max-width:380px) {
+      .detail-main-stats .stat-card {
+        padding: 9px 7px;
+      }
+
+      .detail-main-stats .stat-card strong {
+        font-size: 16px;
+      }
+
+      .detail-hr-stats .stat-card strong {
+        font-size: 21px;
       }
     }
 
@@ -1143,18 +1402,57 @@
       overflow-wrap: anywhere
     }
 
-    .plan-actions {
+    .plan-workout-title-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 8px
+      align-items: center;
+      gap: 7px;
+      min-width: 0
     }
 
-    .plan-actions button {
-      font-size: 10px;
-      min-height: 30px;
-      padding: 5px 8px;
-      border-radius: 8px
+    .plan-workout-title-row>strong {
+      flex: 1;
+      min-width: 0
+    }
+
+    .plan-calendar-button {
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel2);
+      color: var(--accent);
+      cursor: pointer;
+      vertical-align: middle
+    }
+
+    .plan-calendar-button svg {
+      width: 16px;
+      height: 16px;
+      display: block
+    }
+
+    .plan-detected {
+      margin-left: auto;
+      flex-shrink: 0;
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--accent);
+      white-space: nowrap
+    }
+
+    .plan-date-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+      width: 100%;
+      margin-top: 7px;
+      font-size: 11px;
+      color: var(--muted)
     }
 
     .plan-date-picker {
@@ -1273,12 +1571,17 @@
         <div class="section-heading">
           <h2>Ta semaine</h2><span id="week-range" class="muted small"></span>
         </div>
-        <div class="stats-grid">
-          <article class="stat-card"><span class="stat-icon">↗</span><small>Distance</small><strong
-              id="week-distance">—</strong><span class="muted small">km cette semaine</span></article>
-          <article class="stat-card"><span class="stat-icon">✓</span><small>Séances</small><strong id="week-sessions">0
-              <em>/ 3</em></strong><span class="muted small">lundi · mercredi · samedi</span></article>
-        </div>
+        <article class="panel week-summary-card" aria-label="Bilan de la semaine">
+          <div class="week-summary-item">
+            <div class="week-summary-label"><span class="stat-icon">↗</span><small>Distance</small></div>
+            <div class="week-summary-value"><strong id="week-distance">—</strong><small>km cette semaine</small></div>
+          </div>
+          <div class="week-summary-item">
+            <div class="week-summary-label"><span class="stat-icon">✓</span><small>Séances</small></div>
+            <div class="week-summary-value"><strong id="week-sessions">0 <em>/ 3</em></strong><small>lundi · mercredi ·
+                samedi</small></div>
+          </div>
+        </article>
         <div class="section-heading">
           <h2>Préparation</h2><span id="plan-progress-label" class="muted small">0 %</span>
         </div>
@@ -1341,18 +1644,27 @@
               type="button">Fermer ✕</button>
           </div>
           <p id="detail-meta" class="muted small"></p>
-          <div class="stats-grid detail-stats">
+          <div class="stats-grid detail-stats detail-main-stats">
             <article class="stat-card"><small>Distance</small><strong id="detail-distance">—</strong></article>
             <article class="stat-card"><small>Durée</small><strong id="detail-duration">—</strong></article>
             <article class="stat-card"><small>Allure moyenne</small><strong id="detail-pace">—</strong></article>
+          </div>
+          <div class="stats-grid detail-stats detail-hr-stats">
             <article class="stat-card"><small>FC max</small><strong id="detail-max-hr">—</strong></article>
+            <article class="stat-card"><small>FC moyenne</small><strong id="detail-avg-hr">—</strong></article>
           </div>
           <div class="chart-panel">
-            <h3>Fréquence cardiaque par kilomètre</h3>
+            <div class="chart-title-row">
+              <h3>Fréquence cardiaque</h3><button class="text-button chart-mode-toggle" data-chart="hr"
+                type="button">Vue précise GPS</button>
+            </div>
             <div id="detail-hr-chart" class="detail-chart"></div>
           </div>
           <div class="chart-panel">
-            <h3>Allure par kilomètre</h3>
+            <div class="chart-title-row">
+              <h3>Allure</h3><button class="text-button chart-mode-toggle" data-chart="pace" type="button">Vue précise
+                GPS</button>
+            </div>
             <div id="detail-pace-chart" class="detail-chart"></div>
           </div>
           <p id="detail-no-gpx" class="tiny"></p>
@@ -1361,7 +1673,7 @@
 
       <section id="performances" class="page">
         <div class="eyebrow">FAITS & ESTIMATIONS</div>
-        <h1>Performances</h1>
+        <h1>Statistiques</h1>
 
         <div class="stats-grid">
           <article class="stat-card"><small>Meilleur 5 km détecté</small><strong id="pr-5k-display">—</strong><span
@@ -1370,9 +1682,12 @@
               class="tag neutral">Données GPS</span></article>
         </div>
         <article class="panel">
-          <h2>Activités analysées</h2>
-          <p class="muted small">Les meilleurs temps sont calculés automatiquement à partir des kilomètres complets consécutifs présents dans les fichiers GPS importés. Les activités sans splits GPS exploitables ne permettent pas de détecter un record.</p>
-          <div id="performance-summary" class="performance-summary">Importe des activités GPS pour détecter tes meilleurs temps.
+          <h2>Évolution de la FC moyenne</h2>
+          <p class="muted small">Une courbe chronologique, avec chaque sortie classée selon la séance prévue à sa date.
+            Les activités antérieures au 19/10/2026 sont exclues. Fais glisser le graphique horizontalement et touche un
+            point pour voir les détails.</p>
+          <div id="hr-type-chart" class="hr-type-chart">
+            <div class="chart-empty">Importe des activités avec des données de FC à partir du 19/10/2026.</div>
           </div>
         </article>
         <article class="panel">
@@ -1407,9 +1722,23 @@
         <div class="eyebrow">CONFIGURATION</div>
         <h1>Réglages</h1>
         <article class="panel">
-          <h2>Mode simple</h2>
-          <p class="muted small">Pas de compte, pas de serveur : tes activités sont conservées dans le stockage local de
-            Safari. Utilise régulièrement l’export JSON pour sauvegarder tes données dans Fichiers ou iCloud Drive.</p>
+          <h2>Couleur d’accentuation</h2>
+          <p class="muted small">Personnalise la couleur des éléments actifs, des boutons et des graphiques. Le choix
+            est conservé sur cet appareil.</p>
+          <div class="theme-swatches" role="group" aria-label="Choisir une couleur d’accentuation">
+            <button class="theme-swatch" type="button" data-accent="#c5f36a" style="background:#c5f36a"
+              aria-label="Vert citron" aria-pressed="true"></button>
+            <button class="theme-swatch" type="button" data-accent="#67e8c0" style="background:#67e8c0"
+              aria-label="Turquoise" aria-pressed="false"></button>
+            <button class="theme-swatch" type="button" data-accent="#7fc8ff" style="background:#7fc8ff"
+              aria-label="Bleu" aria-pressed="false"></button>
+            <button class="theme-swatch" type="button" data-accent="#c4a1ff" style="background:#c4a1ff"
+              aria-label="Violet" aria-pressed="false"></button>
+            <button class="theme-swatch" type="button" data-accent="#ff9fbd" style="background:#ff9fbd"
+              aria-label="Rose" aria-pressed="false"></button>
+            <button class="theme-swatch" type="button" data-accent="#ffbd66" style="background:#ffbd66"
+              aria-label="Orange" aria-pressed="false"></button>
+          </div>
         </article>
         <article class="panel">
           <h2>Confidentialité</h2>
@@ -1425,11 +1754,35 @@
       </section>
     </main>
     <nav class="bottom-nav" aria-label="Navigation principale">
-      <button class="nav-item active" data-go="accueil"><span>⌂</span><small>Accueil</small></button>
-      <button class="nav-item" data-go="activites"><span>↗</span><small>Activités</small></button>
-      <button class="nav-item" data-go="performances"><span>◷</span><small>Records</small></button>
-      <button class="nav-item" data-go="plan"><span>▦</span><small>Plan</small></button>
-      <button class="nav-item" data-go="reglages"><span>⚙</span><small>Réglages</small></button>
+      <button class="nav-item active" data-go="accueil"><span><svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m3 10 9-7 9 7" />
+            <path d="M5 9v11h14V9M9 20v-6h6v6" />
+          </svg></span><small>Accueil</small></button>
+      <button class="nav-item" data-go="activites"><span><svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V5M4 19h17" />
+            <path d="m7 15 4-5 3 2 5-7" />
+            <circle cx="19" cy="5" r="1" />
+          </svg></span><small>Activités</small></button>
+      <button class="nav-item" data-go="performances"><span><svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V5M4 19h16" />
+            <rect x="7" y="12" width="3" height="4" rx=".5" />
+            <rect x="12" y="8" width="3" height="8" rx=".5" />
+            <rect x="17" y="5" width="3" height="11" rx=".5" />
+          </svg></span><small>Stats</small></button>
+      <button class="nav-item" data-go="plan"><span><svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="5" width="16" height="16" rx="2" />
+            <path d="M8 3v4M16 3v4M4 10h16M8 14h2M14 14h2M8 17h2" />
+          </svg></span><small>Plan</small></button>
+      <button class="nav-item" data-go="reglages"><span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
+            <circle cx="9" cy="6" r="2" />
+            <circle cx="15" cy="12" r="2" />
+            <circle cx="10" cy="18" r="2" />
+          </svg>
+        </span><small>Réglages</small></button>
     </nav>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
@@ -1445,6 +1798,16 @@
       const dateFmt = v => { const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(d) };
       const pace = (km, min) => { if (!(km > 0 && min > 0)) return "—"; const s = Math.round(min * 60 / km); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` };
       const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const ACCENT_KEY = "moapp-run-accent-v1";
+      function applyAccent(color) {
+        const allowed = ["#c5f36a", "#67e8c0", "#7fc8ff", "#c4a1ff", "#ff9fbd", "#ffbd66"];
+        const chosen = allowed.includes(color) ? color : allowed[0];
+        document.documentElement.style.setProperty("--accent", chosen);
+        localStorage.setItem(ACCENT_KEY, chosen);
+        document.querySelectorAll(".theme-swatch").forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.accent === chosen)));
+      }
+      applyAccent(localStorage.getItem(ACCENT_KEY) || "#c5f36a");
+      document.querySelectorAll(".theme-swatch").forEach(btn => btn.addEventListener("click", () => applyAccent(btn.dataset.accent)));
       function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2800) }
       function save() { localStorage.setItem(KEY, JSON.stringify(activities)); render() }
       function navigate(id) { document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id)); document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.go === id)); history.replaceState(null, "", "#" + id); window.scrollTo({ top: 0, behavior: "smooth" }) }
@@ -1468,6 +1831,89 @@
         }
         return best;
       }
+      const HR_CHART_START = "2026-10-19";
+      const HR_CATEGORY_COLORS = {
+        "Endurance facile": "#c5f36a",
+        "Séance qualité": "#7fc8ff",
+        "Sortie longue": "#c4a1ff",
+        "Non planifiée": "#ffbd66"
+      };
+      function plannedCategoryForDate(day) {
+        if (!day || !Array.isArray(planWeeks)) return "Non planifiée";
+        for (let i = 0; i < planWeeks.length; i++) {
+          for (let j = 0; j < planWeeks[i][1].length; j++) {
+            if (isoDay(sessionDate(i, j)) === day) {
+              if (i === 21 && j === 2) return "Sortie longue";
+              return ["Endurance facile", "Séance qualité", "Sortie longue"][j] || "Non planifiée";
+            }
+          }
+        }
+        return "Non planifiée";
+      }
+      function activityAverageHR(a) {
+        if (Number(a.avg_hr) > 0) return Number(a.avg_hr);
+        const samples = (a.track_samples || []).map(s => Number(s.hr)).filter(v => Number.isFinite(v) && v > 0);
+        if (samples.length) return samples.reduce((sum, v) => sum + v, 0) / samples.length;
+        const splits = (a.km_splits || []).map(s => Number(s.avg_hr)).filter(v => Number.isFinite(v) && v > 0);
+        return splits.length ? splits.reduce((sum, v) => sum + v, 0) / splits.length : null;
+      }
+      function renderHrTypeChart() {
+        const el = $("#hr-type-chart"); if (!el) return;
+        const rows = activities.map(a => {
+          const date = sessionActivityDate(a);
+          return { activity: a, date, hr: activityAverageHR(a), category: plannedCategoryForDate(date) };
+        }).filter(r => r.date >= HR_CHART_START && r.hr > 0)
+          .sort((a, b) => a.date.localeCompare(b.date) || new Date(a.activity.start_date) - new Date(b.activity.start_date));
+        if (!rows.length) {
+          el.innerHTML = '<div class="chart-empty">Aucune FC moyenne disponible à partir du 19/10/2026. Importe des fichiers GPX ou CSV contenant la fréquence cardiaque.</div>';
+          return;
+        }
+        const W = Math.max(340, rows.length * 66 + 52), H = 230, L = 42, R = 18, T = 24, B = 48;
+        const iw = W - L - R, ih = H - T - B;
+        const minHR = Math.min(...rows.map(r => r.hr)), maxHR = Math.max(...rows.map(r => r.hr));
+        const lo = Math.max(40, Math.floor((minHR - 8) / 10) * 10), hi = Math.ceil((maxHR + 8) / 10) * 10;
+        const span = Math.max(10, hi - lo);
+        const xAt = i => L + (rows.length === 1 ? iw / 2 : i / (rows.length - 1) * iw);
+        const yAt = v => T + (hi - v) / span * ih;
+        const grid = [0, 1, 2, 3].map(i => {
+          const y = T + i * ih / 3, value = hi - i * span / 3;
+          return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#394034"/><text x="${L - 7}" y="${y + 3}" fill="#a0a79a" font-size="10" text-anchor="end">${Math.round(value)}</text>`;
+        }).join("");
+        const points = rows.map((r, i) => `${xAt(i).toFixed(1)},${yAt(r.hr).toFixed(1)}`).join(" ");
+        const labels = rows.map((r, i) => {
+          const x = xAt(i), label = r.date.slice(8, 10) + "/" + r.date.slice(5, 7);
+          return `<text x="${x}" y="${H - 23}" fill="#a0a79a" font-size="9" text-anchor="middle" transform="rotate(-42 ${x} ${H - 23})">${label}</text>`;
+        }).join("");
+        const dots = rows.map((r, i) => {
+          const x = xAt(i), y = yAt(r.hr), color = HR_CATEGORY_COLORS[r.category] || HR_CATEGORY_COLORS["Non planifiée"];
+          const name = r.activity.name || "Course à pied";
+          const value = `${Math.round(r.hr)} bpm · ${r.category}`;
+          return `<circle class="hr-evolution-point" tabindex="0" role="button" aria-label="${esc(r.date + " · " + name + " · " + value)}" data-value="${esc(value)}" data-detail="${esc(r.date + " · " + name)}" data-x="${x.toFixed(1)}" data-y="${Math.max(15, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${color}" stroke="#10120f" stroke-width="1"><title>${esc(r.date + " · " + name + " · " + value)}</title></circle>`;
+        }).join("");
+        const usedCategories = [...new Set(rows.map(r => r.category))];
+        const legend = `<div class="hr-evolution-legend">${usedCategories.map(c => `<span><i style="background:${HR_CATEGORY_COLORS[c] || HR_CATEGORY_COLORS["Non planifiée"]}"></i>${esc(c)}</span>`).join("")}</div>`;
+        el.innerHTML = `<div class="hr-evolution-scroll"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="Évolution chronologique de la fréquence cardiaque moyenne en battements par minute">${grid}<polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${labels}${dots}</svg></div>${legend}<p class="tiny">Axe vertical : bpm · axe horizontal : date de sortie. La couleur correspond au type de séance planifié à cette date. Les sorties sans séance prévue sont indiquées « Non planifiée ».</p>`;
+        const svg = el.querySelector("svg");
+        const clearTip = () => svg.querySelector(".hr-evolution-tooltip")?.remove();
+        let tipTimer;
+        const showTip = point => {
+          clearTimeout(tipTimer); clearTip();
+          const x = Number(point.dataset.x), y = Number(point.dataset.y), value = point.dataset.value || "", detail = point.dataset.detail || "";
+          const text = `${detail} · ${value}`;
+          const width = Math.min(245, Math.max(90, text.length * 5.3 + 18));
+          const tx = Math.max(width / 2 + 4, Math.min(W - width / 2 - 4, x));
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "hr-evolution-tooltip");
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); rect.setAttribute("class", "hr-evolution-tooltip-bg"); rect.setAttribute("x", tx - width / 2); rect.setAttribute("y", Math.max(1, y - 28)); rect.setAttribute("width", width); rect.setAttribute("height", 22); rect.setAttribute("rx", 4);
+          const txt = document.createElementNS("http://www.w3.org/2000/svg", "text"); txt.setAttribute("class", "hr-evolution-tooltip-text"); txt.setAttribute("x", tx); txt.setAttribute("y", Math.max(15, y - 13)); txt.setAttribute("text-anchor", "middle"); txt.textContent = text.length > 44 ? text.slice(0, 41) + "…" : text;
+          g.append(rect, txt); svg.append(g); tipTimer = setTimeout(clearTip, 2400);
+        };
+        svg.querySelectorAll(".hr-evolution-point").forEach(point => {
+          point.addEventListener("pointerdown", () => showTip(point));
+          point.addEventListener("mouseenter", () => showTip(point));
+          point.addEventListener("focus", () => showTip(point));
+          point.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showTip(point); } });
+        });
+      }
       function render() {
         const sorted = [...activities].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         const week = activities.filter(a => new Date(a.start_date) >= monday && new Date(a.start_date) < next);
@@ -1476,15 +1922,12 @@
         $("#activity-count").textContent = `${activities.length} sortie${activities.length > 1 ? "s" : ""}`;
         $("#recent-activities").innerHTML = sorted.slice(0, 3).map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         $("#all-activities").innerHTML = sorted.map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
-        $("#performance-summary").textContent = activities.length ? `${activities.length} activité(s) importée(s). Les estimations détaillées nécessitent des points GPS horodatés.` : "Importe tes activités pour commencer.";
         const best5 = bestDistanceTime(5), best10 = bestDistanceTime(10);
         $("#pr-5k-display").textContent = best5 == null ? "—" : formatRaceTime(best5);
         $("#pr-10k-display").textContent = best10 == null ? "—" : formatRaceTime(best10);
-        $("#performance-summary").textContent = activities.length
-          ? `${activities.length} activité(s) analysée(s). ${best5 == null ? "Aucun temps 5 km détectable pour le moment." : `Meilleur bloc de 5 km : ${formatRaceTime(best5)}.`} ${best10 == null ? "Aucun temps 10 km détectable pour le moment." : `Meilleur bloc de 10 km : ${formatRaceTime(best10)}.`}`
-          : "Importe des activités GPS pour détecter tes meilleurs temps.";
         const km = activities.reduce((s, a) => s + Number(a.distance_km || 0), 0), min = activities.reduce((s, a) => s + Number(a.duration_min || 0), 0);
         $("#pace-summary").textContent = km ? pace(km, min) + " /km" : "—";
+        renderHrTypeChart();
         const raceDate = new Date(2027, 2, 21); raceDate.setHours(0, 0, 0, 0);
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const daysLeft = Math.ceil((raceDate - today) / 86400000);
@@ -1493,6 +1936,7 @@
         renderVolumeChart();
         renderProgress();
         renderNextWorkout();
+        renderHrTypeChart();
       }
       $("#close-detail").addEventListener("click", () => { $("#activity-detail").hidden = true });
       document.addEventListener("click", e => {
@@ -1531,10 +1975,45 @@
           const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "chart-value-bg"); r.setAttribute("x", tx - width / 2); r.setAttribute("y", Math.max(1, y - 22)); r.setAttribute("width", width); r.setAttribute("height", 19); r.setAttribute("rx", 4);
           const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("class", "chart-value-label"); t.setAttribute("x", tx); t.setAttribute("y", Math.max(14, y - 9)); t.setAttribute("text-anchor", "middle"); t.textContent = value; g.append(r, t); svg.append(g); timer = setTimeout(clear, 1600)
         };
-        svg.querySelectorAll(".chart-bar").forEach(bar => { bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("mouseenter", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(bar) } }) });
+        svg.querySelectorAll(".chart-bar, .chart-point").forEach(bar => { bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("mouseenter", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(bar) } }) });
       }
+      function preciseLineSVG(samples, metric) {
+        const vals = samples.map(s => ({ x: Number(s.distance_km), value: Number(metric === "hr" ? s.hr : s.pace_sec_km) })).filter(v => Number.isFinite(v.x) && Number.isFinite(v.value) && v.value > 0);
+        if (vals.length < 2) return '<div class="chart-empty">Pas de données GPS assez détaillées pour cette mesure. Réimporte le fichier GPX pour générer la vue précise.</div>';
+        const W = Math.max(680, vals.length * 5), H = 220, L = 42, R = 16, T = 18, B = 32, iw = W - L - R, ih = H - T - B;
+        const rawMin = Math.min(...vals.map(v => v.value)), rawMax = Math.max(...vals.map(v => v.value));
+        const pad = Math.max(metric === "hr" ? 5 : 12, (rawMax - rawMin) * .12);
+        const lo = Math.max(0, rawMin - pad), hi = rawMax + pad, span = Math.max(1, hi - lo);
+        const xAt = i => L + (vals.length < 2 ? 0 : i / (vals.length - 1) * iw);
+        const yAt = v => T + (hi - v) / span * ih;
+        const label = v => metric === "hr" ? `${Math.round(v)}` : `${Math.floor(Math.round(v) / 60)}:${String(Math.round(v) % 60).padStart(2, "0")}`;
+        const grid = [0, 1, 2, 3].map(i => { const y = T + i * ih / 3, v = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#394034"/><text x="${L - 7}" y="${y + 3}" fill="#a0a79a" font-size="10" text-anchor="end">${label(v)}</text>` }).join("");
+        const kmMarks = []; for (let km = Math.ceil(vals[0].x); km <= vals[vals.length - 1].x; km++) { const idx = vals.findIndex(v => v.x >= km); if (idx >= 0) { const x = xAt(idx); kmMarks.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${H - B}" stroke="#394034" stroke-dasharray="3 4"/><text x="${x}" y="${H - 10}" fill="#a0a79a" font-size="10" text-anchor="middle">${km} km</text>`) } }
+        const pts = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
+        const dots = vals.map((v, i) => { const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${metric === "hr" ? "#c5f36a" : "#7fc8ff"}" stroke="#10120f" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>` }).join("");
+        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise">${grid}${kmMarks.join("")}<polyline points="${pts}" fill="none" stroke="${metric === "hr" ? "#c5f36a" : "#7fc8ff"}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div><p class="tiny line-chart-hint">Mesures GPS par pas d’environ 100 m · fais glisser horizontalement pour parcourir la sortie · survole/touche un point pour voir sa valeur.</p>`;
+      }
+      document.querySelectorAll(".chart-mode-toggle").forEach(button => button.addEventListener("click", () => {
+        const a = activities.find(x => String(x.id) === String(document.querySelector("[data-activity-id][aria-current='true']")?.dataset.activityId));
+        const detailTitle = $("#detail-title").textContent;
+        const activity = activities.find(x => (x.name || "Course à pied") === detailTitle && !$("#activity-detail").hidden) || activities.find(x => !$("#activity-detail").hidden && String(x.id) === String(window.currentDetailActivityId));
+        if (!activity) return;
+        const metric = button.dataset.chart, target = $(metric === "hr" ? "#detail-hr-chart" : "#detail-pace-chart");
+        if (target.dataset.mode === "precise") {
+          target.dataset.mode = "km";
+          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "#c5f36a") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");
+          attachChartInteractions(target); button.textContent = "Vue précise GPS";
+        } else {
+          target.dataset.mode = "precise";
+          target.innerHTML = preciseLineSVG(activity.track_samples || [], metric);
+          attachChartInteractions(target);
+          button.textContent = "Vue par kilomètre";
+        }
+      }));
+
       function openActivityDetail(id) {
         const a = activities.find(x => String(x.id) === String(id)); if (!a) return;
+        window.currentDetailActivityId = a.id;
         $("#activity-detail").hidden = false;
         $("#detail-title").textContent = a.name || "Course à pied";
         $("#detail-meta").textContent = `${dateFmt(a.start_date)} · ${a.source_label || "Import manuel"}`;
@@ -1542,9 +2021,13 @@
         $("#detail-duration").textContent = formatDuration(Number(a.duration_min));
         $("#detail-pace").textContent = pace(Number(a.distance_km), Number(a.duration_min)) + "/km";
         $("#detail-max-hr").textContent = a.max_hr ? `${a.max_hr} bpm` : "—";
+        $("#detail-avg-hr").textContent = a.avg_hr ? `${Math.round(a.avg_hr)} bpm` : "—";
+        $("#detail-hr-chart").dataset.mode = "km";
+        $("#detail-pace-chart").dataset.mode = "km";
         $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "#c5f36a");
         $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
-        $("#detail-no-gpx").textContent = a.km_splits?.length ? "Graphiques calculés à partir des points GPS du fichier. Les kilomètres incomplets en fin de sortie peuvent être exclus." : "Cette activité ne contient pas de détail GPS par kilomètre. Les données moyennes restent disponibles.";
+        document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Vue précise GPS");
+        $("#detail-no-gpx").textContent = a.track_samples?.length ? "Les vues précises utilisent les points GPS, avec une mesure tous les 100 m. Fais défiler horizontalement le graphique pour explorer la sortie." : (a.km_splits?.length ? "Graphiques par kilomètre calculés à partir du GPX. Pour la vue précise, réimporte le fichier GPX après la mise à jour." : "Cette activité ne contient pas de détail GPS. Les données moyennes restent disponibles.");
         $("#activity-detail").scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
@@ -1593,6 +2076,24 @@
         if (times.length < 2) throw Error(`Aucun horodatage GPS exploitable dans ${fileName}.`);
         const duration = (times[times.length - 1] - times[0]) / 60000;
         if (!(duration > 0)) throw Error(`Durée invalide dans ${fileName}.`);
+        // Create a precise track sample approximately every 100 m from the original GPS track.
+        // Interpolate elapsed time and heart rate at each distance mark, then derive pace over each 100 m interval.
+        const rawSamples = []; let cumulativeMeters = 0, elapsedSeconds = 0, nextMark = 100;
+        for (const seg of segments) {
+          const a = seg.from, b = seg.to, dist = seg.meters;
+          const dt = (a.time && b.time) ? Math.max(0, (b.time - a.time) / 1000) : 0;
+          while (nextMark <= cumulativeMeters + dist) {
+            const f = dist ? (nextMark - cumulativeMeters) / dist : 0;
+            const hr = Number.isFinite(a.hr) && a.hr > 0 && Number.isFinite(b.hr) && b.hr > 0 ? a.hr + (b.hr - a.hr) * f : (Number.isFinite(a.hr) && a.hr > 0 ? a.hr : (Number.isFinite(b.hr) && b.hr > 0 ? b.hr : null));
+            rawSamples.push({ distance_km: nextMark / 1000, elapsed_sec: elapsedSeconds + dt * f, hr });
+            nextMark += 100;
+          }
+          cumulativeMeters += dist; elapsedSeconds += dt;
+        }
+        const trackSamples = rawSamples.slice(1).map((sample, i) => {
+          const prev = rawSamples[i];
+          return { distance_km: sample.distance_km, pace_sec_km: sample.elapsed_sec > prev.elapsed_sec ? (sample.elapsed_sec - prev.elapsed_sec) * 10 : null, hr: sample.hr };
+        }).filter(sample => Number.isFinite(sample.pace_sec_km) && sample.pace_sec_km > 0 && sample.pace_sec_km < 1800 || Number.isFinite(sample.hr));
         // Split each GPS segment at exact kilometre boundaries, interpolating elapsed time and heart rate.
         const splits = []; let kmBucket = 0, timeBucket = 0, hrSum = 0, hrCount = 0, hrMax = 0, covered = 0;
         const flushSplit = (km, sec, hs, hc) => splits.push({ km, seconds: Math.round(sec), pace_sec: Math.round(sec), avg_hr: hc ? Math.round(hs / hc) : null });
@@ -1630,6 +2131,7 @@
           duration_min: Math.round(duration * 100) / 100,
           avg_hr: avgHRs.length ? Math.round(avgHRs.reduce((a, b) => a + b, 0) / avgHRs.length) : null,
           max_hr: hrMax || null,
+          track_samples: trackSamples,
           km_splits: splits,
           notes: "Distance recalculée à partir des points GPS du GPX."
         };
@@ -1652,9 +2154,13 @@
           }
           const valid = incoming.filter(a => a.start_date && Number(a.distance_km) > 0 && Number(a.duration_min) > 0);
           if (!valid.length) throw Error("Aucune activité valide trouvée.");
-          const fresh = valid.filter(a => !activities.some(x => (a.source_id && x.source_id && String(x.source_id) === String(a.source_id)) || (Math.abs(new Date(x.start_date) - new Date(a.start_date)) < 120000 && Math.abs(Number(x.distance_km) - Number(a.distance_km)) < .03)));
-          if (!confirm(`${valid.length} activité(s) valide(s), ${fresh.length} nouvelle(s), ${valid.length - fresh.length} doublon(s) probable(s). Ajouter les nouvelles activités ?`)) return;
-          activities.push(...fresh); save(); $("#import-status").textContent = `Import terminé : ${fresh.length} ajoutée(s), ${valid.length - fresh.length} doublon(s) ignoré(s).`; toast("Import terminé.");
+          const duplicates = a => activities.find(x => (a.source_id && x.source_id && String(x.source_id) === String(a.source_id)) || (Math.abs(new Date(x.start_date) - new Date(a.start_date)) < 120000 && Math.abs(Number(x.distance_km) - Number(a.distance_km)) < .03));
+          const fresh = valid.filter(a => !duplicates(a));
+          const upgrades = valid.filter(a => { const old = duplicates(a); return old && a.track_samples?.length && !old.track_samples?.length; });
+          const ignored = valid.length - fresh.length - upgrades.length;
+          if (!confirm(`${valid.length} activité(s) valide(s), ${fresh.length} nouvelle(s), ${upgrades.length} activité(s) existante(s) enrichie(s) avec les points GPS, ${ignored} doublon(s) probable(s). Continuer ?`)) return;
+          upgrades.forEach(a => { const old = duplicates(a); if (old) Object.assign(old, a, { id: old.id }); });
+          activities.push(...fresh); save(); $("#import-status").textContent = `Import terminé : ${fresh.length} ajoutée(s), ${upgrades.length} activité(s) enrichie(s), ${ignored} doublon(s) ignoré(s).`; toast("Import terminé.");
         } catch (err) { $("#import-status").textContent = `Import impossible : ${err.message}` }
         finally { e.target.value = "" }
       });
@@ -1738,7 +2244,7 @@
           const workouts = w[1].map((desc, j) => {
             const d = sessionDate(i, j), date = fmtPlan(d), isRace = i === 21 && j === 2, done = isSessionDone(i, j), key = `${i}-${j}`;
             const paceHint = isRace ? "Objectif indicatif : 5:27/km si confirmé" : desc.toLowerCase().includes("facile") ? "6:35–7:15/km" : desc.includes("5:") ? "Respecte la plage d’allure écrite dans la séance" : "Effort régulier, contrôlé";
-            return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}${done ? '<span class="completed-badge">✓ VALIDÉE</span>' : ""}</strong><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span></p><div class="plan-actions"><button class="button secondary" data-pick-date="${key}" type="button">Choisir une date</button><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label>${done ? '<span class="completed-badge">Activité détectée</span>' : ""}</div></div></div>`;
+            return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
           }).join("");
           return `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${workouts}</article>`;
         }).join("");
