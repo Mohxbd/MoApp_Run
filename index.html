@@ -175,9 +175,9 @@
       background: linear-gradient(145deg, #262e1d, #191d16 72%);
       border: 1px solid #3a472a;
       border-radius: 24px;
-      padding: 21px;
-      margin: 25px 0 27px;
-      box-shadow: 0 16px 40px #0002
+      padding: 14px 16px;
+      margin: 16px 0 18px;
+      box-shadow: 0 10px 26px #0002
     }
 
     .hero-top,
@@ -214,11 +214,11 @@
     }
 
     .hero-time {
-      font-size: clamp(57px, 15vw, 78px);
-      letter-spacing: -4px;
-      line-height: 1.25;
+      font-size: clamp(44px, 11vw, 60px);
+      letter-spacing: -3px;
+      line-height: 1.1;
       font-weight: 750;
-      margin: 10px 0 18px
+      margin: 5px 0 9px
     }
 
     .hero-time span {
@@ -230,9 +230,9 @@
 
     .hero-bottom {
       justify-content: flex-start;
-      gap: 34px;
+      gap: 24px;
       border-top: 1px solid #ffffff17;
-      padding-top: 16px
+      padding-top: 10px
     }
 
     .hero-bottom div {
@@ -254,7 +254,19 @@
     }
 
     .hero-card .tiny {
-      margin: 15px 0 0
+      margin: 8px 0 0
+    }
+
+    .hero-top {
+      font-size: 9px
+    }
+
+    .hero-bottom strong {
+      font-size: 14px
+    }
+
+    .hero-bottom small {
+      font-size: 10px
     }
 
     .section-heading {
@@ -321,6 +333,84 @@
       font-size: 25px;
       color: var(--accent);
       padding-left: 12px
+    }
+
+    .next-workout-carousel {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) 34px;
+      gap: 7px;
+      align-items: stretch;
+      touch-action: pan-y;
+      min-width: 0
+    }
+
+    .next-workout-card {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 15px;
+      min-width: 0;
+      min-height: 136px
+    }
+
+    .next-workout-card .workout-date {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 800;
+      letter-spacing: .6px;
+      text-transform: uppercase
+    }
+
+    .next-workout-card h3 {
+      font-size: 16px;
+      margin: 7px 0
+    }
+
+    .next-workout-card p {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+      overflow-wrap: anywhere
+    }
+
+    .next-workout-card .workout-status {
+      font-size: 10px;
+      margin-top: 9px;
+      color: var(--accent);
+      font-weight: 700
+    }
+
+    .carousel-arrow {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--accent);
+      border-radius: 12px;
+      font-size: 24px;
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      padding: 0;
+      cursor: pointer
+    }
+
+    .carousel-arrow:disabled {
+      opacity: .25
+    }
+
+    .chart-bar {
+      cursor: pointer;
+      touch-action: manipulation
+    }
+
+    .chart-value-label {
+      font-size: 11px;
+      font-weight: 800;
+      fill: #10120f
+    }
+
+    .chart-value-bg {
+      fill: #c5f36a
     }
 
     .text-button {
@@ -1111,6 +1201,15 @@
 
         </article>
         <div class="section-heading">
+          <h2>Prochaine séance</h2><span class="muted small" id="next-workout-counter"></span>
+        </div>
+        <section id="next-workout-carousel" class="next-workout-carousel" aria-label="Séances précédentes et à venir">
+          <button class="carousel-arrow" id="workout-prev" type="button" aria-label="Séance précédente">‹</button>
+          <article id="next-workout-card" class="next-workout-card" aria-live="polite"></article>
+          <button class="carousel-arrow" id="workout-next" type="button" aria-label="Séance suivante">›</button>
+        </section>
+        <p class="tiny">Fais glisser la carte vers la gauche ou la droite pour parcourir les séances.</p>
+        <div class="section-heading">
           <h2>Ta semaine</h2><span id="week-range" class="muted small"></span>
         </div>
         <div class="stats-grid">
@@ -1333,6 +1432,7 @@
         renderPlan();
         renderVolumeChart();
         renderProgress();
+        renderNextWorkout();
       }
       $("#records-form").addEventListener("submit", e => {
         e.preventDefault();
@@ -1367,9 +1467,20 @@
           const h = Math.max(1, (v.value - lo) / span * innerH);
           const y = T + innerH - h;
           const value = label.includes("cardiaque") ? `${Math.round(v.value)} bpm` : `${Math.floor(Math.round(v.value) / 60)}:${String(Math.round(v.value) % 60).padStart(2, "0")} /km`;
-          return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${color}"><title>${v.km} km : ${value}</title></rect><text x="${(x + bw / 2).toFixed(1)}" y="${H - 9}" fill="#a0a79a" font-size="${n > 10 ? 7 : 9}" text-anchor="middle">${v.km}</text>`;
+          return `<rect class="chart-bar" tabindex="0" role="button" aria-label="${esc(`${v.km} km : ${value}`)}" data-value="${esc(value)}" data-x="${(x + bw / 2).toFixed(1)}" data-y="${Math.max(13, y - 7).toFixed(1)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${color}"><title>${v.km} km : ${value}</title></rect><text x="${(x + bw / 2).toFixed(1)}" y="${H - 9}" fill="#a0a79a" font-size="${n > 10 ? 7 : 9}" text-anchor="middle">${v.km}</text>`;
         }).join("");
         return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">${grid}${bars}</svg><p class="tiny">Chaque barre représente un kilomètre · axe horizontal : km · axe vertical : ${esc(label.includes("cardiaque") ? "battements/minute" : "allure (min/km)")}. Pour l’allure, une barre plus basse signifie un km plus rapide.</p>`;
+      }
+      function attachChartInteractions(container) {
+        const svg = container?.querySelector("svg"); if (!svg) return; let timer;
+        const clear = () => svg.querySelector(".chart-value-tip")?.remove();
+        const show = bar => {
+          clearTimeout(timer); clear(); const x = Number(bar.dataset.x), y = Math.max(13, Number(bar.dataset.y)), value = bar.dataset.value || "", width = Math.min(110, Math.max(48, value.length * 6.5 + 16)), tx = Math.max(width / 2 + 3, Math.min(337 - width / 2, x));
+          const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "chart-value-tip");
+          const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "chart-value-bg"); r.setAttribute("x", tx - width / 2); r.setAttribute("y", Math.max(1, y - 22)); r.setAttribute("width", width); r.setAttribute("height", 19); r.setAttribute("rx", 4);
+          const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("class", "chart-value-label"); t.setAttribute("x", tx); t.setAttribute("y", Math.max(14, y - 9)); t.setAttribute("text-anchor", "middle"); t.textContent = value; g.append(r, t); svg.append(g); timer = setTimeout(clear, 1600)
+        };
+        svg.querySelectorAll(".chart-bar").forEach(bar => { bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("mouseenter", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(bar) } }) });
       }
       function openActivityDetail(id) {
         const a = activities.find(x => String(x.id) === String(id)); if (!a) return;
@@ -1381,7 +1492,7 @@
         $("#detail-pace").textContent = pace(Number(a.distance_km), Number(a.duration_min)) + "/km";
         $("#detail-max-hr").textContent = a.max_hr ? `${a.max_hr} bpm` : "—";
         $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "#c5f36a");
-        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");
+        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
         $("#detail-no-gpx").textContent = a.km_splits?.length ? "Graphiques calculés à partir des points GPS du fichier. Les kilomètres incomplets en fin de sortie peuvent être exclus." : "Cette activité ne contient pas de détail GPS par kilomètre. Les données moyennes restent disponibles.";
         $("#activity-detail").scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -1532,6 +1643,33 @@
         ["Semaine de course", ["30 min faciles + 4 × 20 s relâchées", "20 min faciles dont 3 min à allure objectif, arrêter frais", "DIMANCHE 21 MARS : SEMI-MARATHON · départ prudent, viser 5:27/km progressivement"]]
       ];
 
+      let workoutCarouselIndex = -1;
+      function getWorkoutCards() {
+        const cards = [];
+        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => cards.push({ week: i, day: j, date: sessionDate(i, j), desc, isRace: i === 21 && j === 2, done: isSessionDone(i, j) })));
+        return cards.sort((a, b) => a.date - b.date);
+      }
+      function renderNextWorkout() {
+        const cardEl = $("#next-workout-card"); if (!cardEl) return;
+        const cards = getWorkoutCards(); if (!cards.length) return;
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        if (workoutCarouselIndex < 0) { const upcoming = cards.findIndex(c => { const d = new Date(c.date); d.setHours(0, 0, 0, 0); return d >= today }); workoutCarouselIndex = upcoming < 0 ? cards.length - 1 : upcoming }
+        workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex));
+        const c = cards[workoutCarouselIndex], date = c.date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+        const title = c.isRace ? "Semi-marathon d’Hyères" : (["Endurance facile", "Séance qualité", "Sortie longue"][c.day] || "Séance");
+        const day = new Date(c.date); day.setHours(0, 0, 0, 0);
+        const status = c.done ? "✓ Séance validée" : (day < today ? "Séance passée" : "À venir");
+        cardEl.innerHTML = `<div class="workout-date">${esc(date)} · Semaine ${c.week + 1}</div><h3>${esc(title)}</h3><p>${esc(c.desc)}</p><div class="workout-status">${esc(status)}</div>`;
+        $("#next-workout-counter").textContent = `${workoutCarouselIndex + 1} / ${cards.length}`;
+        $("#workout-prev").disabled = workoutCarouselIndex === 0; $("#workout-next").disabled = workoutCarouselIndex === cards.length - 1;
+      }
+      function setupWorkoutCarousel() {
+        $("#workout-prev")?.addEventListener("click", () => { workoutCarouselIndex = Math.max(0, workoutCarouselIndex - 1); renderNextWorkout() });
+        $("#workout-next")?.addEventListener("click", () => { const cards = getWorkoutCards(); workoutCarouselIndex = Math.min(cards.length - 1, workoutCarouselIndex + 1); renderNextWorkout() });
+        const el = $("#next-workout-carousel"); if (!el) return; let startX = null, startY = null;
+        el.addEventListener("touchstart", e => { const t = e.changedTouches[0]; startX = t.clientX; startY = t.clientY }, { passive: true });
+        el.addEventListener("touchend", e => { if (startX === null) return; const t = e.changedTouches[0], dx = t.clientX - startX, dy = t.clientY - startY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { const cards = getWorkoutCards(); workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex + (dx < 0 ? 1 : -1))); renderNextWorkout() } startX = null; startY = null }, { passive: true });
+      }
       const calendarStart = new Date(2026, 9, 19, 12);
       const raceDay = new Date(2027, 2, 21, 12);
       const fmtPlan = d => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
@@ -1598,6 +1736,7 @@
 
 
       const params = new URLSearchParams(location.search); if (params.get("strava")) { history.replaceState(null, "", location.pathname + location.hash) }
+      setupWorkoutCarousel();
       render();
     })();
   </script>
