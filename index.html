@@ -1004,7 +1004,20 @@
         appearance: none;
       }
     }
-  </style>
+  
+    /* iPhone: date fields stay within their card on every page */
+    .field, .card, .formgrid { min-width: 0; }
+    .field input, .field select, .field textarea,
+    input[type="date"], input[type="number"], input[type="text"], select, textarea {
+      box-sizing: border-box; max-width: 100%; min-width: 0;
+    }
+    input[type="date"] { display: block; width: 100%; -webkit-appearance: none; appearance: none; }
+    @media (max-width: 680px) {
+      #page-reglages .card, #page-reglages form, #page-reglages .field { min-width: 0; max-width: 100%; }
+      #page-reglages input[type="date"] { width: 100%; max-width: 100%; font-size: 16px; padding-left: 8px; padding-right: 8px; }
+    }
+
+</style>
 </head>
 
 <body>
@@ -1021,8 +1034,8 @@
     <main>
       <header class="top">
         <div>
-          <div class="eyebrow" id="eyebrow">TON ESPACE RUNNING</div>
-          <h1 id="title">On construit ton sub 1 h 55.</h1>
+          <div class="eyebrow" id="eyebrow">MoApp Run</div>
+          <h1 id="title">Préparation semi-marathon</h1>
           <div class="sub" id="subtitle">Préparation semi-marathon · 3 sorties par semaine</div>
         </div>
         <div class="actions"><button class="btn primary" id="add">＋ <span>Ajouter séance</span></button></div>
