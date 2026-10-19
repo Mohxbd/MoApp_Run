@@ -487,14 +487,6 @@
       color: #b5edbc
     }
 
-    #githubstatus.good {
-      color: var(--green)
-    }
-
-    #githubstatus.notice {
-      color: #ffb18b
-    }
-
     .modalbg {
       position: fixed;
       inset: 0;
@@ -1308,7 +1300,7 @@
       </section>
       <section class="page" id="page-reglages">
         <h2 class="section-title">Réglages & données</h2>
-        <p class="section-intro">Tes données restent sur cet appareil, sauf si tu actives la synchronisation vers un dépôt GitHub privé.</p>
+        <p class="section-intro">Tes données restent dans le navigateur.</p>
         <div class="grid cols">
           <div class="card">
             <h2 style="margin-top:0">Course & objectif</h2>
@@ -1328,7 +1320,7 @@
           </div>
           <div class="card">
             <h2 style="margin-top:0">Sauvegarde</h2>
-            <p class="muted">Exporte régulièrement pour garder une copie indépendante de tes données.</p>
+            <p class="muted">Exporte régulièrement pour transférer tes données sur un autre appareil.</p>
             <div class="grid" style="grid-template-columns:1fr 1fr"><button class="btn" id="jsonout">Exporter
                 JSON</button><button class="btn" id="csvout">Exporter CSV</button><label class="btn"
                 style="text-align:center">Importer JSON<input id="jsonin" type="file" accept="application/json,.json"
@@ -1337,27 +1329,9 @@
           </div>
         </div>
         <div class="card" style="margin-top:15px">
-          <h2 style="margin-top:0">Synchronisation entre appareils</h2>
-          <p class="muted">Crée un dépôt GitHub <b>privé</b> distinct du site, initialise-le avec un README, puis crée un jeton finement limité à ce seul dépôt avec la permission <b>Contents : Read and write</b>. Le jeton est utilisé en mémoire uniquement : il faudra le saisir à nouveau après avoir fermé ou rechargé la page, y compris sur l’iPhone.</p>
-          <p class="footer"><a href="https://github.com/new" target="_blank" rel="noopener noreferrer">Créer le dépôt privé</a> · <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Créer un jeton finement limité</a></p>
-          <form id="githubform">
-            <div class="formgrid">
-              <div class="field"><label for="githubowner">Propriétaire du dépôt</label><input id="githubowner" value="Mohxbd" autocomplete="username" required></div>
-              <div class="field"><label for="githubrepo">Nom du dépôt privé</label><input id="githubrepo" placeholder="MoApp_Run_Donnees" autocomplete="off" required></div>
-              <div class="field wide"><label for="githubtoken">Jeton d’accès finement limité</label><input id="githubtoken" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required></div>
-            </div>
-            <div class="actions" style="flex-wrap:wrap">
-              <button class="btn primary" id="githubconnect" type="submit">Connecter et synchroniser</button>
-              <button class="btn" id="githubsync" type="button" disabled>Synchroniser maintenant</button>
-              <button class="btn" id="githubdisconnect" type="button" disabled>Déconnecter</button>
-            </div>
-          </form>
-          <p id="githubstatus" class="footer" role="status" aria-live="polite">Non connecté. Les modifications restent enregistrées sur cet appareil.</p>
-          <p class="footer">Ne crée pas ce jeton avec un accès à tous tes dépôts. GitHub peut demander une nouvelle autorisation quand le jeton expire. La première connexion sur un appareil charge la sauvegarde distante ou, si elle n’existe pas encore, y envoie les données locales.</p>
-        </div>
-        <div class="card" style="margin-top:15px">
           <h2 style="margin-top:0">À propos</h2>
-          <p class="muted">Sans synchronisation, aucune donnée n'est envoyée à un serveur. Si elle est activée, les données sont enregistrées dans ton dépôt GitHub privé. Les chronos importés sont des références et ne sont pas ajoutés au kilométrage réel. Les estimations sont indicatives.</p>
+          <p class="muted">Aucune donnée n'est envoyée à un serveur. Les chronos importés sont des références et ne sont
+            pas ajoutés au kilométrage réel. Les estimations sont indicatives.</p>
         </div>
       </section>
     </main>
@@ -1438,234 +1412,6 @@
       function renderObjective() { let m = Number(state.settings.goalMinutes); $('goalbig').textContent = duration(m); $('goal2').textContent = duration(m); if (!$('calctime').dataset.user) $('calctime').value = duration(m); calc(); $('checkpoints').innerHTML = state.checkpoints.length ? state.checkpoints.map(c => `<div class="session"><div class="datebox">${fmt(c.date)}</div><div><div class="stitle">${esc(c.title)}</div><div class="smeta">${esc(c.note)}</div></div><button class="btn small" data-delcp="${esc(c.id)}">×</button></div>`).join('') : '<div class="empty">Ajoute un test 5 km, 10 km ou une sortie longue de référence.</div>'; document.querySelectorAll('[data-delcp]').forEach(b => b.onclick = () => { state.checkpoints = state.checkpoints.filter(c => c.id !== b.dataset.delcp); save(); renderObjective() }) }
       function renderRecovery() { let r = [...state.recovery].sort((a, b) => b.date.localeCompare(a.date)); $('rechistory').innerHTML = r.length ? r.slice(0, 10).map(x => `<div class="session"><div class="datebox">${fmt(x.date)}</div><div><div class="stitle">Fatigue ${x.fatigue}/10 · Courbatures ${x.soreness}/10</div><div class="smeta">Sommeil ${x.sleep}/10 · Motivation ${x.motivation}/10 · ${esc(x.pain || 'Pas de douleur signalée')}</div></div><button class="btn small" data-delrec="${esc(x.id)}">×</button></div>`).join('') : '<div class="empty">L’historique apparaîtra ici.</div>'; document.querySelectorAll('[data-delrec]').forEach(b => b.onclick = () => { state.recovery = state.recovery.filter(x => x.id !== b.dataset.delrec); save(); renderAll() }) }
       function renderSettings() { $('racedate').value = state.settings.raceDate; $('goalminutes').value = state.settings.goalMinutes; $('runsperweek').value = state.settings.weeklyRuns; $('rundays').value = state.settings.runDays }
-      const githubConfigKey = 'MoApp Run_github_config_v1';
-      const githubDataPath = 'moapp-run-data.json';
-      let githubToken = '';
-      let githubOwner = 'Mohxbd';
-      let githubRepo = '';
-      let githubBranch = '';
-      let githubFileSha = null;
-      let githubSyncTimer = 0;
-      let githubSyncQueue = Promise.resolve();
-      try {
-        const savedGithubConfig = JSON.parse(localStorage.getItem(githubConfigKey) || '{}');
-        if (typeof savedGithubConfig.owner === 'string') githubOwner = savedGithubConfig.owner;
-        if (typeof savedGithubConfig.repo === 'string') githubRepo = savedGithubConfig.repo;
-      } catch (error) {
-        console.error('Impossible de lire la configuration de synchronisation GitHub.', error);
-      }
-      $('githubowner').value = githubOwner;
-      $('githubrepo').value = githubRepo;
-
-      function setGithubStatus(message, error = false) {
-        $('githubstatus').textContent = message;
-        $('githubstatus').classList.toggle('notice', error);
-        $('githubstatus').classList.toggle('good', !error && !!githubToken);
-      }
-
-      function updateGithubButtons() {
-        $('githubsync').disabled = !githubToken;
-        $('githubdisconnect').disabled = !githubToken;
-        $('githubconnect').disabled = !!githubToken;
-        $('githubtoken').disabled = !!githubToken;
-      }
-
-      function githubRepositoryUrl() {
-        return `https://api.github.com/repos/${encodeURIComponent(githubOwner)}/${encodeURIComponent(githubRepo)}`;
-      }
-
-      async function githubRequest(url, options = {}) {
-        const { allowNotFound = false, ...fetchOptions } = options;
-        const response = await fetch(url, {
-          ...fetchOptions,
-          headers: {
-            Accept: 'application/vnd.github+json',
-            Authorization: `Bearer ${githubToken}`,
-            'X-GitHub-Api-Version': '2022-11-28',
-            ...fetchOptions.headers
-          }
-        });
-        if (allowNotFound && response.status === 404) return null;
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          const message = response.status === 401
-            ? 'Jeton invalide ou expiré. Vérifie-le ou crée-en un nouveau.'
-            : response.status === 403
-              ? 'Accès refusé. Vérifie que le jeton autorise Contents : Read and write sur ce dépôt.'
-              : response.status === 404
-                ? 'Dépôt introuvable ou inaccessible. Vérifie son nom et les dépôts autorisés pour le jeton.'
-                : response.status === 409 || response.status === 422
-                  ? 'Le fichier distant a changé ou est en conflit. Clique sur « Synchroniser maintenant » pour choisir quelle version garder.'
-                : result.message || `Erreur GitHub (${response.status}).`;
-          const error = new Error(message);
-          error.status = response.status;
-          throw error;
-        }
-        return result;
-      }
-
-      function encodeGithubContent(value) {
-        const bytes = new TextEncoder().encode(value);
-        let binary = '';
-        bytes.forEach(byte => { binary += String.fromCharCode(byte) });
-        return btoa(binary);
-      }
-
-      function decodeGithubContent(value) {
-        const binary = atob(value.replace(/\s/g, ''));
-        const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
-        return new TextDecoder().decode(bytes);
-      }
-
-      function normalizeGithubState(value) {
-        if (!value || typeof value !== 'object' ||
-          !value.settings || typeof value.settings !== 'object' || Array.isArray(value.settings) ||
-          (value.profile && (typeof value.profile !== 'object' || Array.isArray(value.profile))) ||
-          !Array.isArray(value.sessions)) {
-          throw new Error('Le fichier distant ne contient pas une sauvegarde MoApp Run valide.');
-        }
-        return {
-          ...defaults(),
-          ...value,
-          profile: { ...defaults().profile, ...value.profile },
-          settings: { ...defaults().settings, ...value.settings },
-          sessions: value.sessions,
-          recovery: Array.isArray(value.recovery) ? value.recovery : [],
-          checkpoints: Array.isArray(value.checkpoints) ? value.checkpoints : []
-        };
-      }
-
-      function currentGithubFileUrl() {
-        return `${githubRepositoryUrl()}/contents/${githubDataPath}?ref=${encodeURIComponent(githubBranch)}`;
-      }
-
-      async function uploadGithubState() {
-        if (!githubToken || !githubBranch) return;
-        const snapshot = JSON.stringify(state, null, 2);
-        setGithubStatus('Synchronisation en cours…');
-        const result = await githubRequest(`${githubRepositoryUrl()}/contents/${githubDataPath}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: 'Synchroniser les données MoApp Run',
-            content: encodeGithubContent(snapshot),
-            ...(githubFileSha ? { sha: githubFileSha } : {}),
-            branch: githubBranch
-          })
-        });
-        githubFileSha = result.content?.sha || null;
-        setGithubStatus('Synchronisé avec le dépôt privé.');
-        if (JSON.stringify(state, null, 2) !== snapshot) scheduleGithubSync();
-      }
-
-      function scheduleGithubSync() {
-        if (!githubToken) return;
-        setGithubStatus('Modifications enregistrées sur cet appareil; synchronisation en attente…');
-        clearTimeout(githubSyncTimer);
-        githubSyncTimer = setTimeout(() => {
-          githubSyncQueue = githubSyncQueue
-            .then(uploadGithubState)
-            .catch(error => setGithubStatus(`Échec de la synchronisation : ${error.message}`, true));
-        }, 900);
-      }
-
-      async function synchronizeGithub() {
-        const repository = await githubRequest(githubRepositoryUrl());
-        githubBranch = repository.default_branch;
-        if (!githubBranch) throw new Error('Impossible de déterminer la branche par défaut du dépôt.');
-        const remoteFile = await githubRequest(currentGithubFileUrl(), { allowNotFound: true });
-        githubFileSha = remoteFile?.sha || null;
-        if (!remoteFile) {
-          await uploadGithubState();
-          return;
-        }
-        const remoteState = normalizeGithubState(JSON.parse(decodeGithubContent(remoteFile.content || '')));
-        const remoteJson = JSON.stringify(remoteState);
-        const localJson = JSON.stringify(state);
-        if (remoteJson !== localJson) {
-          const useRemote = confirm(
-            'Une sauvegarde existe déjà dans le dépôt privé. OK : charger cette sauvegarde et remplacer les données locales. Annuler : conserver les données locales et les envoyer dans le dépôt.'
-          );
-          if (useRemote) {
-            state = remoteState;
-            localStorage.setItem('MoApp Run_hyeres_v1', JSON.stringify(state));
-            renderAll();
-            setGithubStatus('Données du dépôt privé chargées sur cet appareil.');
-            return;
-          }
-          await uploadGithubState();
-          return;
-        }
-        setGithubStatus('Déjà synchronisé avec le dépôt privé.');
-      }
-
-      const saveLocalState = save;
-      save = function () {
-        saveLocalState();
-        scheduleGithubSync();
-      };
-
-      $('githubform').onsubmit = async event => {
-        event.preventDefault();
-        if (githubToken) return;
-        githubOwner = $('githubowner').value.trim();
-        githubRepo = $('githubrepo').value.trim();
-        const token = $('githubtoken').value.trim();
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-          setGithubStatus('Ouvre le site en HTTPS (par exemple via GitHub Pages) pour synchroniser.', true);
-          return;
-        }
-        if (!/^[A-Za-z0-9-]+$/.test(githubOwner) || !/^[A-Za-z0-9_.-]+$/.test(githubRepo) || !token) {
-          setGithubStatus('Vérifie le propriétaire, le nom du dépôt et le jeton.', true);
-          return;
-        }
-        $('githubtoken').value = '';
-        githubToken = token;
-        try {
-          localStorage.setItem(githubConfigKey, JSON.stringify({ owner: githubOwner, repo: githubRepo }));
-          updateGithubButtons();
-          setGithubStatus('Connexion à GitHub…');
-          await synchronizeGithub();
-        } catch (error) {
-          githubToken = '';
-          githubFileSha = null;
-          githubBranch = '';
-          updateGithubButtons();
-          setGithubStatus(`Connexion/synchronisation impossible : ${error.message}`, true);
-        }
-      };
-
-      $('githubsync').onclick = async () => {
-        if (!githubToken) return;
-        clearTimeout(githubSyncTimer);
-        try {
-          await githubSyncQueue;
-          await synchronizeGithub();
-        } catch (error) {
-          setGithubStatus(`Échec de la synchronisation : ${error.message}`, true);
-        }
-      };
-
-      $('githubdisconnect').onclick = () => {
-        clearTimeout(githubSyncTimer);
-        githubToken = '';
-        githubFileSha = null;
-        githubBranch = '';
-        updateGithubButtons();
-        setGithubStatus('Déconnecté. Les modifications restent enregistrées sur cet appareil.');
-      };
-
-      $('reset').addEventListener('click', event => {
-        if (!githubToken) return;
-        event.stopImmediatePropagation();
-        if (!confirm('Réinitialiser les données de cet appareil et remplacer aussi la sauvegarde du dépôt privé ? Cette action est irréversible sans export JSON.')) return;
-        state = defaults();
-        seedPlan();
-        save();
-        renderAll();
-        $('message').textContent = 'Données réinitialisées et synchronisation demandée.';
-      }, true);
-
       function renderAll() { renderDash(); renderPlanning(); renderProfile(); renderObjective(); renderRecovery(); renderSettings() }
       function goto(p) { document.querySelectorAll('.page').forEach(x => x.classList.toggle('active', x.id === 'page-' + p)); document.querySelectorAll('[data-page]').forEach(x => x.classList.toggle('active', x.dataset.page === p)); let m = { dashboard: ['MoApp Run', 'Préparation semi-marathon', 'Semi de Hyères · objectif 1 h 55'], planning: ['PLANNING', 'Plan d’entraînement', '3 sorties par semaine'], objectif: ['OBJECTIF', 'Objectif semi-marathon', '21,0975 km'], profil: ['STATISTIQUES', 'Profil & statistiques', 'Séances réellement validées'], recuperation: ['RÉCUPÉRATION', 'Suivi de récupération', 'Fatigue, sommeil et courbatures'], reglages: ['RÉGLAGES', 'Course & données', 'Préférences du plan'] }[p]; $('eyebrow').textContent = m[0]; $('title').textContent = m[1]; $('subtitle').textContent = m[2]; renderAll(); window.scrollTo(0, 0) } document.querySelectorAll('[data-page]').forEach(b => b.onclick = () => goto(b.dataset.page)); document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => goto(b.dataset.goto));
       function openSession(id, done = false) { let s = state.sessions.find(x => x.id === id); $('sessionform').reset(); $('sid').value = s?.id || ''; $('modaltitle').textContent = s ? 'Modifier la séance' : 'Nouvelle séance'; $('sdate').value = s?.date || today(); $('stype').value = s?.type || 'easy'; $('stitle').value = s?.title || ''; $('sdistance').value = s?.distance ?? 5; $('sduration').value = s?.duration ?? 35; $('space').value = s?.pace || '6:50'; $('sstatus').value = s?.status || 'planned'; $('sdetails').value = s?.details || ''; $('snotes').value = s?.notes || ''; let a = s?.actual || {}; $('adistance').value = a.distance ?? s?.distance ?? ''; $('aduration').value = a.duration ?? s?.duration ?? ''; $('ahr').value = a.hr || ''; $('ahrmax').value = a.hrmax || ''; $('arpe').value = a.rpe || 4; $('afatigue').value = a.fatigue || 3; $('apain').value = a.pain || ''; $('acomment').value = a.comment || ''; $('apaceok').checked = !!a.paceOk; $('actualfields').classList.toggle('hidden', !done && s?.status !== 'done'); if (done) { $('actualfields').classList.remove('hidden'); $('sstatus').value = 'done' } $('modal').classList.add('open'); document.body.style.overflow = 'hidden' } function close() { $('modal').classList.remove('open'); document.body.style.overflow = '' } function saveSession(override) { let id = $('sid').value || 'user-' + Date.now(), old = state.sessions.find(s => s.id === id), dist = Number($('sdistance').value), dur = Number($('sduration').value), datev = $('sdate').value; if (!datev || !$('stitle').value.trim() || !Number.isFinite(dist) || dist < 0 || !Number.isFinite(dur) || dur < 0) { alert('Vérifie la date, le nom, la distance et la durée.'); return false } let status = override || $('sstatus').value, actual = old?.actual || null; if (status === 'done') { let ad = Number($('adistance').value), at = Number($('aduration').value); if (!(ad > 0 && at > 0)) { alert('Pour valider, saisis une distance et une durée réelles.'); $('actualfields').classList.remove('hidden'); return false } actual = { distance: ad, duration: at, hr: Number($('ahr').value) || null, hrmax: Number($('ahrmax').value) || null, rpe: Number($('arpe').value) || null, fatigue: Number($('afatigue').value) || null, pain: $('apain').value, comment: $('acomment').value, paceOk: $('apaceok').checked } } let obj = { ...(old || {}), id, date: datev, type: $('stype').value, title: $('stitle').value.trim(), distance: dist, duration: dur, pace: $('space').value, details: $('sdetails').value, notes: $('snotes').value, status, actual, phase: phase(datev), source: old?.source || 'user' }; state.sessions = old ? state.sessions.map(s => s.id === id ? obj : s) : [...state.sessions, obj]; save(); close(); renderAll(); return true }
