@@ -5,79 +5,107 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#10120f">
   <meta name="description" content="MoApp Run — ton coach pour le semi-marathon d'Hyères 2027.">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css">
+  <style>
+:root{color-scheme:dark;--bg:#10120f;--panel:#191c18;--panel2:#20241e;--line:#2d332a;--text:#f2f4ee;--muted:#a0a79a;--accent:#c5f36a;--accent-dark:#202b10;--danger:#ff827d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-synthesis:none}*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;background:var(--bg);color:var(--text);font-size:15px;line-height:1.45}.app-shell{max-width:760px;margin:auto;min-height:100dvh;padding-bottom:calc(88px + env(safe-area-inset-bottom))}.topbar{height:68px;padding:env(safe-area-inset-top) 20px 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(16,18,15,.92);backdrop-filter:blur(18px);z-index:5}.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-size:18px;text-decoration:none;letter-spacing:-.5px}.brand b{color:var(--accent)}.brand-mark{display:grid;place-items:center;background:var(--accent);color:#141710;font-weight:900;border-radius:12px;width:34px;height:34px}.avatar{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);color:var(--accent);font-weight:700}main{padding:18px 18px 30px}.page{display:none;animation:enter .2s ease}.page.active{display:block}@keyframes enter{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}.eyebrow{font-size:10px;font-weight:800;letter-spacing:1.8px;color:var(--accent);display:flex;align-items:center;gap:8px}.pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px #c5f36a77}h1{font-size:clamp(32px,8vw,46px);line-height:1.04;letter-spacing:-1.7px;margin:14px 0 10px;font-weight:750}h2{font-size:19px;letter-spacing:-.4px;margin:0;font-weight:700}h3{font-size:17px;margin:7px 0 5px}.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:10px;color:var(--muted);line-height:1.45}.hero-card{background:linear-gradient(145deg,#262e1d,#191d16 72%);border:1px solid #3a472a;border-radius:24px;padding:21px;margin:25px 0 27px;box-shadow:0 16px 40px #0002}.hero-top,.hero-bottom,.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.hero-top{font-size:10px;letter-spacing:1.5px;font-weight:800;color:#c5d0b9}.tag{font-size:9px;font-weight:800;letter-spacing:1px;padding:5px 8px;border-radius:6px;background:var(--accent);color:#19200f}.tag.neutral{background:#2c3128;color:#d7ddcf;display:inline-block;margin-top:8px}.hero-time{font-size:clamp(57px,15vw,78px);letter-spacing:-4px;line-height:1.25;font-weight:750;margin:10px 0 18px}.hero-time span{font-size:21px;letter-spacing:0;color:var(--accent);margin:0 8px 0 3px}.hero-bottom{justify-content:flex-start;gap:34px;border-top:1px solid #ffffff17;padding-top:16px}.hero-bottom div{display:grid;gap:5px}.hero-bottom small{font-size:11px;color:#b4bdab}.hero-bottom strong{font-size:16px}.hero-bottom strong small{font-size:11px}.hero-card .tiny{margin:15px 0 0}.section-heading{margin:25px 0 13px}.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.stat-card,.panel,.next-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:17px}.stat-card{display:flex;flex-direction:column;gap:6px;min-height:137px}.stat-icon{color:var(--accent);font-size:19px}.stat-card small{color:var(--muted);font-size:11px}.stat-card strong{font-size:29px;letter-spacing:-1px}.stat-card strong em{font-size:14px;color:var(--muted);font-style:normal}.next-card{display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--panel2)}.next-card p{font-size:13px;margin:4px 0 0}.next-arrow{font-size:25px;color:var(--accent);padding-left:12px}.text-button{border:0;background:none;color:var(--accent);font:inherit;font-size:12px;font-weight:700;padding:10px}.activity-list{display:grid;gap:9px}.activity-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:15px}.activity-icon{width:42px;height:42px;border-radius:13px;background:#293020;color:var(--accent);display:grid;place-items:center;font-size:20px;flex-shrink:0}.activity-info{flex:1;min-width:0}.activity-info strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-info p{margin:3px 0 0;color:var(--muted);font-size:11px}.activity-metric{text-align:right;font-weight:750;white-space:nowrap}.activity-metric small{display:block;color:var(--muted);font-size:10px;font-weight:400}.empty-state{border:1px dashed #3a4036;border-radius:16px;padding:22px;color:var(--muted);font-size:13px;text-align:center}.footnote{font-size:10px;color:#858c7f;line-height:1.5;margin-top:20px}.button-row{display:flex;gap:9px;margin:20px 0 10px}.button{min-height:46px;border-radius:13px;padding:12px 15px;font:inherit;font-size:13px;font-weight:750;border:1px solid transparent;cursor:pointer;touch-action:manipulation}.button.primary{background:var(--accent);color:#171b12}.button.secondary{background:var(--panel2);color:var(--text);border-color:var(--line)}.button.danger{background:#351e1d;color:var(--danger);border-color:#63312e}.button:disabled{opacity:.4;cursor:not-allowed}.full{width:100%;margin-top:10px}.status-note{font-size:12px;color:var(--muted);margin:8px 0 16px}.panel{margin:16px 0}.panel h2{margin-bottom:14px}.form-grid{display:grid;gap:13px}.form-grid h2{margin-bottom:0}.form-grid label,.panel label{display:grid;gap:6px;color:#d4d9cf;font-size:12px;font-weight:600}.form-grid input,.form-grid select,.form-grid textarea{width:100%;border:1px solid #394034;border-radius:11px;background:#11140f;color:var(--text);padding:12px;font:inherit;font-size:14px;min-height:45px}.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{outline:2px solid var(--accent);outline-offset:1px}.file-label{display:block;background:var(--panel2);padding:12px;border-radius:12px;margin:10px 0}.file-label input{display:block;width:100%;margin-top:10px;font-size:12px}.performance-summary{font-size:13px;color:var(--muted)}.large-number{font-size:42px;letter-spacing:-1.5px;font-weight:750;color:var(--accent)}.workout{display:flex;gap:13px;padding:16px 0;border-bottom:1px solid var(--line)}.workout:last-child{border-bottom:0}.day{display:grid;place-items:center;width:43px;height:37px;flex-shrink:0;border-radius:10px;background:#293020;color:var(--accent);font-size:10px;font-weight:800}.workout p,.notice p{margin:5px 0 0;font-size:12px;color:var(--muted)}.notice{border:1px solid #41482d;background:#1c2116;padding:17px;border-radius:16px;margin-top:17px}.notice strong{font-size:14px;color:var(--accent)}.bottom-nav{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:760px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(20,23,19,.96);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr)}.nav-item{border:0;background:none;color:#8f9788;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:52px;border-radius:12px}.nav-item span{font-size:21px;line-height:1}.nav-item small{font-size:10px}.nav-item.active{color:var(--accent)}.toast{position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));left:18px;right:18px;max-width:500px;margin:auto;background:#e9f8d3;color:#1b2412;border-radius:12px;padding:13px 16px;font-size:13px;font-weight:650;box-shadow:0 8px 30px #0006;z-index:20;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.status-ok{color:var(--accent)}@media(min-width:600px){main{padding:26px 28px 38px}.hero-card{padding:28px}.stats-grid{gap:15px}.form-grid{grid-template-columns:1fr 1fr}.form-grid h2,.form-grid .full{grid-column:1/-1}.form-grid label:last-of-type{grid-column:1/-1}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+
+/* Ajustements mobile et calendrier du plan */
+.topbar{justify-content:flex-start}
+.date-input{display:block;min-width:0;max-width:100%;width:100%;font-size:14px!important;padding:10px!important;appearance:none;-webkit-appearance:none}
+.form-grid label{min-width:0}
+.form-grid input,.form-grid select,.form-grid textarea{min-width:0;max-width:100%}
+.plan-calendar{display:grid;gap:12px;margin-top:16px}
+.plan-week{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px}
+.plan-week-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px}
+.plan-week-head h2{font-size:15px}
+.plan-week-head small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.plan-week .workout{gap:10px;padding:13px 0}
+.plan-week .workout:last-child{padding-bottom:0}
+.plan-week .workout strong{font-size:13px}
+.plan-week .workout p{font-size:12px;line-height:1.5}
+.pace-guide{margin-top:15px}
+.pace-guide h2{margin-bottom:10px}
+.pace-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
+.pace-row:last-of-type{border-bottom:0}
+.pace-row strong{font-weight:650}
+.pace-row span{color:var(--accent);white-space:nowrap;font-weight:700}
+@media(max-width:380px){main{padding-left:13px;padding-right:13px}.date-input{font-size:12px!important;padding:9px!important}.pace-row{font-size:11px;gap:7px}.plan-week{padding:12px}}
+
+  </style>
   <title>MoApp Run</title>
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="#accueil" aria-label="MoApp Run, accueil"><span class="brand-mark">M</span><span>MoApp <b>Run</b></span></a>
-      <span class="avatar" aria-label="MoApp Run">MR</span>
     </header>
 
     <main id="app-main">
       <section id="accueil" class="page active">
         <div class="eyebrow"><span class="pulse"></span> OBJECTIF · HYÈRES 2027</div>
-        <h1>Chaque sortie<br>te rapproche.</h1>
-        <p class="muted">Une préparation à ton rythme, fondée sur tes vraies activités.</p>
+        <h1>Semi-marathon<br>Hyères 2027</h1>
         <article class="hero-card">
           <div class="hero-top"><span>OBJECTIF SEMI-MARATHON</span><span class="tag">CIBLE</span></div>
           <div class="hero-time">1<span>h</span>55<span>min</span></div>
-          <div class="hero-bottom"><div><small>Allure théorique</small><strong>5:27 <small>/ km</small></strong></div><div><small>Date visée</small><strong>21 mars 2027*</strong></div></div>
-          <p class="tiny">*Date à confirmer avec l’organisateur. Objectif indicatif, sans garantie de résultat.</p>
+          <div class="hero-bottom"><div><small>Allure théorique</small><strong>5:27 <small>/ km</small></strong></div><div><small>Date visée</small><strong>21 mars 2027</strong></div></div>
+          
         </article>
         <div class="section-heading"><h2>Ta semaine</h2><span id="week-range" class="muted small"></span></div>
         <div class="stats-grid">
           <article class="stat-card"><span class="stat-icon">↗</span><small>Distance</small><strong id="week-distance">—</strong><span class="muted small">km cette semaine</span></article>
           <article class="stat-card"><span class="stat-icon">✓</span><small>Séances</small><strong id="week-sessions">0 <em>/ 3</em></strong><span class="muted small">lundi · mercredi · samedi</span></article>
         </div>
-        <article class="next-card"><div><div class="eyebrow">PROCHAINE ÉTAPE</div><h3 id="next-title">Construisons ton plan</h3><p id="next-description" class="muted">Ajoute une activité ou consulte les séances proposées.</p></div><span class="next-arrow">→</span></article>
+        <article class="next-card"><div><div class="eyebrow">PROCHAINE ÉTAPE</div><h3 id="next-title">Construisons ton plan</h3><p id="next-description" class="muted">Consulte les séances de la semaine dans Plan.</p></div><span class="next-arrow">→</span></article>
         <div class="section-heading"><h2>Activités récentes</h2><button class="text-button" data-go="activites">Tout voir</button></div>
-        <div id="recent-activities" class="activity-list"><div class="empty-state">Aucune activité pour le moment. Connecte Strava ou ajoute ta première sortie.</div></div>
+        <div id="recent-activities" class="activity-list"><div class="empty-state">Aucune activité enregistrée.</div></div>
         <p class="footnote">Les records de 5 km (24:23) et 10 km (57:52) sont des déclarations initiales, non vérifiées.</p>
       </section>
 
       <section id="activites" class="page">
         <div class="eyebrow">TON HISTORIQUE</div><h1>Activités</h1>
-        <p class="muted">Importe les activités exportées depuis Strava. Aucun compte ni serveur supplémentaire nécessaire.</p>
+        
         <form id="activity-form" class="panel form-grid">
           <h2>Ajouter une activité</h2>
-          <label>Date et heure<input name="start_date" type="datetime-local" required></label>
+          <label>Date et heure<input class="date-input" name="start_date" type="datetime-local" required></label>
           <label>Distance (km)<input name="distance_km" type="number" min="0.01" max="500" step="0.01" placeholder="ex. 8,42" required></label>
           <label>Durée (minutes)<input name="duration_min" type="number" min="0.1" max="2000" step="0.1" placeholder="ex. 48,5" required></label>
           <label>Fréquence cardiaque moyenne (bpm, facultatif)<input name="avg_hr" type="number" min="30" max="250" placeholder="—"></label>
           <label>Ressenti<select name="effort"><option value="">Non renseigné</option><option value="1">1 — Très facile</option><option value="2">2 — Facile</option><option value="3">3 — Modéré</option><option value="4">4 — Difficile</option><option value="5">5 — Très difficile</option></select></label>
           <label>Notes (facultatif)<textarea name="notes" rows="2" maxlength="1000" placeholder="Terrain, météo, sensations…"></textarea></label>
           <button class="button primary full" type="submit">Enregistrer l’activité</button>
-          <p class="tiny full">La saisie manuelle est enregistrée sur cet appareil tant que la connexion cloud n’est pas configurée. Exporte régulièrement tes données.</p>
+          <p class="tiny full">Les activités sont enregistrées sur cet appareil. Exporte régulièrement tes données pour les sauvegarder.</p>
         </form>
         <div class="section-heading"><h2>Toutes les activités</h2><span id="activity-count" class="muted small">0 sortie</span></div>
         <div id="all-activities" class="activity-list"></div>
-        <div class="panel"><h2>Importer / sauvegarder</h2><p class="muted small">Importe le CSV de ton export Strava ou restaure une sauvegarde JSON. Les doublons probables sont signalés. Pour le CSV Strava, l’import ne conserve que les activités avec date, distance et durée valides.</p><label class="file-label">Choisir un CSV ou JSON<input id="file-import" type="file" accept=".csv,.json,text/csv,application/json"></label><button id="export-json" class="button secondary full">Exporter mes données (JSON)</button><p id="import-status" class="status-note" role="status"></p></div>
+        <div class="panel"><h2>Importer / sauvegarder</h2><p class="muted small">Sélectionne un ou plusieurs fichiers GPX. La distance est calculée depuis les points GPS ; le GPX reste sur ton appareil.</p><label class="file-label">Choisir des fichiers GPX, CSV ou JSON<input id="file-import" type="file" accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json" multiple></label><button id="export-json" class="button secondary full">Exporter mes données (JSON)</button><p id="import-status" class="status-note" role="status"></p></div>
       </section>
 
       <section id="performances" class="page">
         <div class="eyebrow">FAITS & ESTIMATIONS</div><h1>Performances</h1>
-        <p class="muted">Les records déclarés restent séparés des performances calculées depuis tes activités.</p>
+        
         <div class="stats-grid"><article class="stat-card"><small>Record 5 km déclaré</small><strong>24:23</strong><span class="tag neutral">À confirmer</span></article><article class="stat-card"><small>Record 10 km déclaré</small><strong>57:52</strong><span class="tag neutral">À confirmer</span></article></div>
         <article class="panel"><h2>Activités analysées</h2><p class="muted small">Les meilleures performances GPS ne seront calculées qu'à partir de données suffisamment détaillées et continues. Une allure moyenne seule ne crée pas de record.</p><div id="performance-summary" class="performance-summary">Ajoute ou synchronise des activités pour commencer.</div></article>
         <article class="panel"><h2>Allure moyenne observée</h2><div id="pace-summary" class="large-number">—</div><p class="muted small">Calculée à partir des distances et durées des activités importées, non corrigée du dénivelé.</p></article>
       </section>
 
       <section id="plan" class="page">
-        <div class="eyebrow">LUNDI · MERCREDI · SAMEDI</div><h1>Ton plan</h1>
-        <p class="muted">Une base prudente à ajuster après analyse de ton historique réel. Les séances ci-dessous sont des propositions, pas des consignes médicales.</p>
-        <article class="panel"><div class="section-heading"><h2>Cette semaine</h2><span class="tag">3 séances</span></div><div class="workout"><span class="day">LUN</span><div><strong>Endurance facile</strong><p>30–40 min à une allure confortable, conversation possible.</p></div></div><div class="workout"><span class="day">MER</span><div><strong>Footing + mobilité</strong><p>25–35 min faciles, puis mobilité douce si tout va bien.</p></div></div><div class="workout"><span class="day">SAM</span><div><strong>Sortie longue facile</strong><p>Choisis une durée proche de tes sorties récentes, sans forcer ni augmenter brutalement le volume.</p></div></div></article>
-        <article class="notice"><strong>Avant d’individualiser le plan</strong><p>Importe ton archive Strava : le volume et la durée des sorties récentes permettront d’adapter la charge. En cas de douleur ou de fatigue persistante, privilégie le repos et demande conseil à un professionnel de santé.</p></article>
+        <div class="eyebrow">OBJECTIF · 21 MARS 2027</div>
+        <h1>Plan d’entraînement</h1>
+        <div class="pace-guide panel">
+          <h2>Allures à viser</h2>
+          <div class="pace-row"><strong>Endurance facile</strong><span>6:20–7:00 /km</span></div>
+          <div class="pace-row"><strong>Allure soutenue / seuil</strong><span>5:45–6:00 /km</span></div>
+          <div class="pace-row"><strong>Allure objectif semi</strong><span>5:27 /km</span></div>
+          <div class="pace-row"><strong>Intervalles courts</strong><span>5:05–5:25 /km</span></div>
+          <p class="tiny">Les allures sont des repères de départ basés sur les records déclarés. En endurance, privilégie une respiration maîtrisée et la possibilité de parler. Ralentis si nécessaire.</p>
+        </div>
+        <div id="plan-calendar" class="plan-calendar"></div>
       </section>
 
       <section id="reglages" class="page">
         <div class="eyebrow">CONFIGURATION</div><h1>Réglages</h1>
         <article class="panel"><h2>Mode simple</h2><p class="muted small">Pas de compte, pas de serveur : tes activités sont conservées dans le stockage local de Safari. Utilise régulièrement l’export JSON pour sauvegarder tes données dans Fichiers ou iCloud Drive.</p></article>
-        <article class="panel"><h2>Confidentialité</h2><p class="muted small">Les données locales restent dans le stockage du navigateur sur cet appareil. La synchronisation cloud est activée uniquement après configuration et authentification. Les données Strava restent soumises aux autorisations et conditions de Strava.</p><button id="clear-local" class="button danger full">Effacer les données locales</button></article>
-        <article class="panel"><h2>À propos</h2><p class="muted small">MoApp Run · Version initiale. Objectif sportif : semi-marathon d’Hyères, date visée 21/03/2027 à confirmer, cible 1 h 55.</p></article>
+        <article class="panel"><h2>Confidentialité</h2><p class="muted small">Les données locales restent dans le stockage du navigateur sur cet appareil. Aucune synchronisation cloud n’est configurée.</p><button id="clear-local" class="button danger full">Effacer les données locales</button></article>
+        <article class="panel"><h2>À propos</h2><p class="muted small">MoApp Run · Version initiale. Objectif : semi-marathon d’Hyères, 21/03/2027, cible 1 h 55.</p></article>
       </section>
     </main>
     <nav class="bottom-nav" aria-label="Navigation principale">
@@ -89,6 +117,177 @@
     </nav>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
-  <script src="./app.js"></script>
+  <script>
+/* MoApp Run — version simple, sans backend ni secrets. */
+(() => {
+"use strict";
+const $=s=>document.querySelector(s), KEY="moapp-run-activities-v1";
+const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch{return[]}};
+let activities=read();
+const dateFmt=v=>{const d=new Date(v);return Number.isNaN(+d)?"Date inconnue":new Intl.DateTimeFormat("fr-FR",{day:"2-digit",month:"short",year:"numeric"}).format(d)};
+const pace=(km,min)=>{if(!(km>0&&min>0))return"—";const s=Math.round(min*60/km);return`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg){const el=$("#toast");el.textContent=msg;el.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),2800)}
+function save(){localStorage.setItem(KEY,JSON.stringify(activities));render()}
+function navigate(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.go===id));history.replaceState(null,"","#"+id);window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
+window.addEventListener("hashchange",()=>{const id=location.hash.slice(1);if($("#"+id)?.classList.contains("page"))navigate(id)});
+const now=new Date();const monday=new Date(now);monday.setDate(now.getDate()-(now.getDay()+6)%7);monday.setHours(0,0,0,0);const next=new Date(monday);next.setDate(next.getDate()+7);
+$("#week-range").textContent=`${monday.toLocaleDateString("fr-FR",{day:"numeric",month:"short"})} – ${new Date(+next-86400000).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}`;
+const item=a=>`<article class="activity-item"><span class="activity-icon">↗</span><div class="activity-info"><strong>${esc(a.name||"Course à pied")}</strong><p>${dateFmt(a.start_date)} · ${esc(a.source_label||"Import manuel")}${a.avg_hr?` · ${esc(a.avg_hr)} bpm`:""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR",{maximumFractionDigits:2})} km<small>${pace(Number(a.distance_km),Number(a.duration_min))}/km</small></div></article>`;
+function render(){
+ const sorted=[...activities].sort((a,b)=>new Date(b.start_date)-new Date(a.start_date));
+ const week=activities.filter(a=>new Date(a.start_date)>=monday&&new Date(a.start_date)<next);
+ $("#week-distance").textContent=week.reduce((s,a)=>s+Number(a.distance_km||0),0).toLocaleString("fr-FR",{maximumFractionDigits:1});
+ $("#week-sessions").innerHTML=`${week.length} <em>/ 3</em>`;
+ $("#activity-count").textContent=`${activities.length} sortie${activities.length>1?"s":""}`;
+ $("#recent-activities").innerHTML=sorted.slice(0,3).map(item).join("")||'<div class="empty-state">Aucune activité. Importe ton premier fichier CSV ou ajoute une sortie manuellement.</div>';
+ $("#all-activities").innerHTML=sorted.map(item).join("")||'<div class="empty-state">Aucune activité enregistrée.</div>';
+ $("#performance-summary").textContent=activities.length?`${activities.length} activité(s) importée(s). Ces résultats sont issus des données fournies et ne constituent pas des records officiels certifiés.`:"Importe tes activités pour commencer.";
+ const km=activities.reduce((s,a)=>s+Number(a.distance_km||0),0),min=activities.reduce((s,a)=>s+Number(a.duration_min||0),0);
+ $("#pace-summary").textContent=km?pace(km,min)+" /km":"—";
+}
+$("#activity-form").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget);
+ const a={id:crypto.randomUUID?.()||String(Date.now()),source_label:"Saisie manuelle",name:"Course à pied",start_date:f.get("start_date"),distance_km:Number(f.get("distance_km")),duration_min:Number(f.get("duration_min")),avg_hr:f.get("avg_hr")?Number(f.get("avg_hr")):null,effort:f.get("effort")?Number(f.get("effort")):null,notes:String(f.get("notes")||"").trim()};
+ if(!a.start_date||!(a.distance_km>0)||!(a.duration_min>0)){toast("Vérifie la date, la distance et la durée.");return}
+ const dup=activities.some(x=>Math.abs(new Date(x.start_date)-new Date(a.start_date))<120000&&Math.abs(Number(x.distance_km)-a.distance_km)<.03);
+ if(dup&&!confirm("Une activité similaire existe déjà. Ajouter quand même ?"))return;
+ activities.push(a);save();e.currentTarget.reset();toast("Activité enregistrée sur cet appareil.");navigate("activites");
+});
+function parseCSV(text){
+ const lines=text.replace(/^\uFEFF/,"").split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)return[];
+ const line=s=>{const out=[];let v="",q=false;for(let i=0;i<s.length;i++){const c=s[i];if(c==='"'&&s[i+1]==='"'&&q){v+='"';i++}else if(c==='"')q=!q;else if((c===","||c===";")&&!q){out.push(v);v=""}else v+=c}out.push(v);return out};
+ const headers=line(lines.shift()).map(x=>x.trim().toLowerCase());
+ return lines.map(s=>Object.fromEntries(line(s).map((v,i)=>[headers[i],v.trim()])));
+}
+function normalizeDate(r){return r.start_date_local||r.start_date||r.date||r["date de l'activité"]||""}
+function normalizeActivity(r,i){
+ const distRaw=r.distance_km??r.distance??r.distance_m;
+ let km=Number(String(distRaw??"").replace(",","."));
+ if(r.distance_m!==undefined&&r.distance_km===undefined)km/=1000;
+ // Strava export typically stores distance in metres.
+ if(r.distance!==undefined&&r.distance_km===undefined&&r.distance_m===undefined&&km>100)km/=1000;
+ let duration=Number(String(r.duration_min??r.moving_time??r.elapsed_time??r.moving_time_seconds??"").replace(",","."));
+ if(r.moving_time!==undefined||r.elapsed_time!==undefined||r.moving_time_seconds!==undefined)duration/=60;
+ const hr=r.average_heartrate??r.avg_hr??r.average_heart_rate;
+ return {id:r.id||r.activity_id||`import-${Date.now()}-${i}`,source_id:r.id||r.activity_id||null,source_label:"Import CSV",name:r.name||r.activity_name||"Course à pied",start_date:normalizeDate(r),distance_km:km,duration_min:duration,avg_hr:hr?Number(hr):null,notes:""};
+}
+function parseGPX(text, fileName, index){
+ const doc=new DOMParser().parseFromString(text,"application/xml");
+ if(doc.querySelector("parsererror")) throw Error(`Le fichier ${fileName} n’est pas un GPX valide.`);
+ const points=[...doc.getElementsByTagNameNS("*","trkpt")];
+ if(!points.length) throw Error(`Aucun point GPS trouvé dans ${fileName}.`);
+ const getChild=(node,name)=>[...node.children].find(el=>el.localName===name);
+ const parsed=points.map(p=>{
+   const lat=Number(p.getAttribute("lat")),lon=Number(p.getAttribute("lon"));
+   const t=getChild(p,"time")?.textContent?.trim();
+   const hrNode=[...p.getElementsByTagNameNS("*","hr")][0];
+   const time=t?new Date(t):null;
+   return {lat,lon,time:time&&!Number.isNaN(+time)?time:null,hr:hrNode?Number(hrNode.textContent):null};
+ }).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+ if(parsed.length<2) throw Error(`Pas assez de points GPS dans ${fileName}.`);
+ const rad=x=>x*Math.PI/180;
+ let meters=0;
+ for(let i=1;i<parsed.length;i++){
+   const a=parsed[i-1],b=parsed[i],dLat=rad(b.lat-a.lat),dLon=rad(b.lon-a.lon);
+   const h=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
+   meters+=6371000*2*Math.atan2(Math.sqrt(h),Math.sqrt(Math.max(0,1-h)));
+ }
+ const times=parsed.map(p=>p.time).filter(Boolean).sort((a,b)=>a-b);
+ if(meters<50) throw Error(`Distance trop faible ou invalide dans ${fileName}.`);
+ if(times.length<2) throw Error(`Aucun horodatage GPS exploitable dans ${fileName}.`);
+ const duration=(times[times.length-1]-times[0])/60000;
+ if(!(duration>0)) throw Error(`Durée invalide dans ${fileName}.`);
+ const trk=[...doc.getElementsByTagNameNS("*","trk")][0];
+ const trkName=trk&&getChild(trk,"name")?.textContent?.trim();
+ const start=times[0];
+ const avgHRs=parsed.map(p=>p.hr).filter(v=>Number.isFinite(v)&&v>0);
+ return {
+   id:`gpx-${Date.now()}-${index}-${Math.random().toString(36).slice(2,7)}`,
+   source_label:"Import GPX",
+   name:trkName||fileName.replace(/\.gpx$/i,"")||"Course à pied",
+   start_date:new Date(start.getTime()-start.getTimezoneOffset()*60000).toISOString().slice(0,16),
+   distance_km:Math.round(meters/10)/100,
+   duration_min:Math.round(duration*100)/100,
+   avg_hr:avgHRs.length?Math.round(avgHRs.reduce((a,b)=>a+b,0)/avgHRs.length):null,
+   notes:"Distance recalculée à partir des points GPS du GPX."
+ };
+}
+$("#file-import").addEventListener("change",async e=>{
+ const files=[...(e.target.files||[])];if(!files.length)return;
+ let incoming=[];
+ try{
+  for(const file of files){
+   if(file.size>25*1024*1024)throw Error(`${file.name} dépasse 25 Mo.`);
+   const text=await file.text();
+   const name=file.name.toLowerCase();
+   if(name.endsWith(".gpx")) incoming.push(parseGPX(text,file.name,incoming.length));
+   else if(name.endsWith(".json")){
+    const obj=JSON.parse(text),list=Array.isArray(obj)?obj:obj.activities;
+    if(!Array.isArray(list))throw Error("Le JSON ne contient pas de liste d'activités.");
+    incoming.push(...list);
+   } else if(name.endsWith(".csv")) incoming.push(...parseCSV(text).map(normalizeActivity));
+   else throw Error(`Format non pris en charge : ${file.name}.`);
+  }
+  const valid=incoming.filter(a=>a.start_date&&Number(a.distance_km)>0&&Number(a.duration_min)>0);
+  if(!valid.length)throw Error("Aucune activité valide trouvée.");
+  const fresh=valid.filter(a=>!activities.some(x=>(a.source_id&&x.source_id&&String(x.source_id)===String(a.source_id))||(Math.abs(new Date(x.start_date)-new Date(a.start_date))<120000&&Math.abs(Number(x.distance_km)-Number(a.distance_km))<.03)));
+  if(!confirm(`${valid.length} activité(s) valide(s), ${fresh.length} nouvelle(s), ${valid.length-fresh.length} doublon(s) probable(s). Ajouter les nouvelles activités ?`))return;
+  activities.push(...fresh);save();$("#import-status").textContent=`Import terminé : ${fresh.length} ajoutée(s), ${valid.length-fresh.length} doublon(s) ignoré(s).`;toast("Import terminé.");
+ }catch(err){$("#import-status").textContent=`Import impossible : ${err.message}`}
+ finally{e.target.value=""}
+});
+function download(blob,name){const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1200)}
+$("#export-json").addEventListener("click",()=>{download(new Blob([JSON.stringify({app:"MoApp Run",version:1,exported_at:new Date().toISOString(),activities},null,2)],{type:"application/json"}),`moapp-run-${new Date().toISOString().slice(0,10)}.json`);$("#import-status").textContent="Sauvegarde JSON prête à enregistrer dans Fichiers."});
+$("#clear-local").addEventListener("click",()=>{if(confirm("Effacer toutes les activités enregistrées sur cet appareil ?")){activities=[];save();toast("Activités locales effacées.")}});
+
+const planWeeks = [
+  ["Reprise", ["30 min facile · 4–5 km", "30 min facile + 4 × 20 s accélérations souples", "8 km faciles"]],
+  ["Base", ["35 min faciles", "10 min faciles + 6 × 1 min soutenue (récup. 1 min) + 10 min faciles", "9 km faciles"]],
+  ["Base", ["35 min faciles", "35 min dont 2 × 6 min à 5:50–6:00/km (récup. 3 min)", "10 km faciles"]],
+  ["Assimilation", ["30 min faciles", "30 min faciles + 4 × 20 s accélérations souples", "8 km faciles"]],
+  ["Endurance", ["40 min faciles", "10 min faciles + 8 × 1 min à 5:15–5:25/km (récup. 90 s) + retour au calme", "10 km faciles"]],
+  ["Endurance", ["40 min faciles", "40 min dont 2 × 8 min à 5:50–6:00/km (récup. 3 min)", "11 km faciles"]],
+  ["Endurance", ["40 min faciles + 4 accélérations", "10 min faciles + 5 × 3 min à 5:35–5:50/km (récup. 2 min) + retour au calme", "12 km faciles"]],
+  ["Assimilation", ["35 min faciles", "30–35 min faciles", "9 km faciles"]],
+  ["Développement", ["45 min faciles", "10 min faciles + 3 × 8 min à 5:45–5:55/km (récup. 3 min) + retour au calme", "12 km faciles"]],
+  ["Développement", ["45 min faciles + 4 accélérations", "10 min faciles + 6 × 3 min à 5:20–5:35/km (récup. 2 min) + retour au calme", "13 km faciles"]],
+  ["Développement", ["45 min faciles", "45 min dont 20 min à 5:45–5:55/km", "14 km faciles"]],
+  ["Assimilation", ["35 min faciles", "35 min faciles + 5 × 20 s accélérations souples", "11 km faciles"]],
+  ["Spécifique semi", ["45 min faciles", "10 min faciles + 3 × 2 km à 5:35–5:45/km (récup. 3 min) + retour au calme", "14 km faciles"]],
+  ["Spécifique semi", ["45 min faciles + 4 accélérations", "10 min faciles + 2 × 15 min à 5:35–5:45/km (récup. 4 min) + retour au calme", "15 km faciles"]],
+  ["Spécifique semi", ["45 min faciles", "10 min faciles + 5 × 1 km à 5:20–5:30/km (récup. 2 min) + retour au calme", "16 km faciles"]],
+  ["Assimilation", ["40 min faciles", "40 min dont 15 min à 5:45–5:55/km", "12 km faciles"]],
+  ["Spécifique semi", ["45 min faciles", "3 × 3 km à 5:30–5:40/km (récup. 3 min)", "17 km faciles"]],
+  ["Spécifique semi", ["45 min faciles + 4 accélérations", "2 × 20 min à 5:30–5:40/km (récup. 5 min)", "18 km faciles"]],
+  ["Pic", ["45 min faciles", "6 × 1 km à 5:15–5:25/km (récup. 2 min)", "19 km faciles, sans accélérer en fin de sortie"]],
+  ["Début allègement", ["40 min faciles", "3 × 2 km à 5:27–5:35/km (récup. 3 min)", "15 km faciles"]],
+  ["Affûtage", ["35 min faciles", "30 min dont 3 × 5 min à 5:27/km (récup. 3 min)", "10 km faciles"]],
+  ["Semaine de course", ["30 min faciles + 4 × 20 s souples", "20 min faciles avec 3 min à allure objectif", "DIMANCHE 21 MARS : SEMI-MARATHON · départ contrôlé"]]
+];
+const calendar = $("#plan-calendar");
+if (calendar) {
+ const start = new Date(2026, 9, 19, 12);
+ const fmt = d => d.toLocaleDateString("fr-FR", {day:"numeric", month:"short"});
+ const days = ["LUN", "MER", "SAM"];
+ calendar.innerHTML = planWeeks.map((w, i) => {
+   const monday = new Date(start); monday.setDate(start.getDate() + i * 7);
+   const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+   const workouts = w[1].map((desc, j) => {
+     const d = new Date(monday); d.setDate(monday.getDate() + (i === 21 && j === 2 ? 6 : [0,2,5][j]));
+     const date = fmt(d);
+     const isRace = i === 21 && j === 2;
+     const paceHint = isRace ? "Objectif : 1 h 55" : (desc.toLowerCase().includes("facile") ? "6:20–7:00/km" : desc.includes("5:") ? "Respecte l’allure indiquée" : "Facile, contrôlé");
+     return `<div class="workout"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div><strong>${esc(isRace ? "Course" : ["Séance facile", "Séance qualité", "Sortie longue"][j])}</strong><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span></p></div></div>`;
+   }).join("");
+   return `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i+1} · ${esc(w[0])}</h2><small>${fmt(monday)} – ${fmt(sunday)}</small></div><span class="tag ${i===21?"":"neutral"}">${i===21?"COURSE":`${i+1}/22`}</span></div>${workouts}</article>`;
+ }).join("");
+}
+
+const params=new URLSearchParams(location.search);if(params.get("strava")){history.replaceState(null,"",location.pathname+location.hash)}
+render();
+})();
+  </script>
 </body>
 </html>
