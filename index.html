@@ -53,20 +53,23 @@
     }
 
     .brand {
+      display: flex;
+      align-items: center;
       font-weight: 900;
-      font-size: 20px;
+      font-size: 23px;
       padding: 0 10px
     }
 
-    .brand b {
-      display: inline-grid;
-      place-items: center;
-      background: var(--orange);
-      color: #111;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      margin-right: 8px
+    .brand img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      flex: 0 0 auto;
+      margin-right: 9px
+    }
+
+    .brandname {
+      min-width: 0
     }
 
     .brand small {
@@ -74,7 +77,7 @@
       font-size: 10px;
       color: var(--muted);
       letter-spacing: 2px;
-      margin-left: 43px
+      font-weight: 700
     }
 
     .nav {
@@ -100,6 +103,17 @@
 
     .nav button.active {
       box-shadow: inset 3px 0 var(--orange)
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      vertical-align: -4px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round
     }
 
     .sidefoot {
@@ -462,6 +476,42 @@
       fill: var(--orange)
     }
 
+    .bpmchart {
+      width: 100%;
+      height: auto;
+      display: block
+    }
+
+    .bpmchart .gridline {
+      stroke: var(--line)
+    }
+
+    .bpmchart text {
+      fill: var(--muted);
+      font-size: 11px
+    }
+
+    .bpm-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .bpm-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .bpm-legend i {
+      width: 15px;
+      height: 3px;
+      border-radius: 3px
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -704,7 +754,7 @@
       }
 
       main {
-        padding: calc(14px + env(safe-area-inset-top)) 12px calc(104px + env(safe-area-inset-bottom));
+        padding: calc(24px + env(safe-area-inset-top)) 12px calc(104px + env(safe-area-inset-bottom));
       }
 
       .top {
@@ -887,6 +937,12 @@
         line-height: 1.15
       }
 
+      .mobile .nav-icon {
+        width: 19px;
+        height: 19px;
+        vertical-align: initial
+      }
+
       .mobile button.active {
         font-weight: 800
       }
@@ -1036,11 +1092,11 @@
 <body>
   <div class="app">
     <aside class="side">
-      <div class="brand"><b>R</b>MoApp Run<small>SEMI PREP / 2027</small></div>
-      <nav class="nav"><button class="active" data-page="dashboard">▦　Vue d'ensemble</button><button
+      <div class="brand"><img src="moapp_icon.svg" alt=""><span class="brandname">MoApp Run<small>SEMI PREP / 2027</small></span></div>
+      <nav class="nav"><button class="active" data-page="dashboard"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>　Vue d'ensemble</button><button
           data-page="planning">▤　Planning</button><button data-page="objectif">◎　Mon objectif</button><button
           data-page="profil">◉　Profil & stats</button><button data-page="recuperation">♡　Récupération</button><button
-          data-page="reglages">⚙　Réglages & données</button></nav>
+          data-page="reglages"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4L17 17.4a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1a1.7 1.7 0 0 0-1.2-2.9H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2A1.7 1.7 0 0 0 17 3.4l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg>　Réglages & données</button></nav>
       <div class="sidefoot">OBJECTIF EN VUE<div class="bar" style="margin:9px 0"><span id="sideBar"></span></div><span
           id="sideCount">Semi de Hyères · mars 2027</span></div>
     </aside>
@@ -1277,6 +1333,14 @@
         </div>
         <div class="card" style="margin-top:15px">
           <div class="head">
+            <h2>Fréquence cardiaque par sortie</h2>
+            <span class="pill">BPM RÉELS</span>
+          </div>
+          <p class="footer">Évolution des fréquences moyennes et maximales par type de sortie. Seules les séances validées avec des données de fréquence cardiaque sont affichées.</p>
+          <div id="bpmchart"></div>
+        </div>
+        <div class="card" style="margin-top:15px">
+          <div class="head">
             <h2>Historique des séances</h2><span class="pill" id="historycount">0</span>
           </div>
           <div class="tablewrap" id="history"></div>
@@ -1349,10 +1413,10 @@
       </section>
     </main>
   </div>
-  <nav class="mobile"><button class="active" data-page="dashboard"><b>▦</b>Accueil</button><button
+  <nav class="mobile"><button class="active" data-page="dashboard"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>Accueil</button><button
       data-page="planning"><b>▤</b>Planning</button><button data-page="objectif"><b>◎</b>Objectif</button><button
       data-page="profil"><b>◉</b>Profil</button><button data-page="recuperation"><b>♡</b>Récup.</button><button
-      data-page="reglages"><b>⚙</b>Réglages</button></nav>
+      data-page="reglages"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1a1.7 1.7 0 0 1-2.4 2.4L17 17.4a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 0 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 0 1-2.4-2.4l.1-.1a1.7 1.7 0 0 0-1.2-2.9H4a1.7 1.7 0 0 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 0 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 0 1 3.4 0v.2A1.7 1.7 0 0 0 17 3.4l.1-.1a1.7 1.7 0 0 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 0 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9Z"/></svg>Réglages</button></nav>
   <div class="modalbg" id="modal">
     <div class="modal">
       <div class="modalhead">
@@ -1433,7 +1497,7 @@
       function renderObjective() { let m = Number(state.settings.goalMinutes); $('goalbig').textContent = duration(m); $('goal2').textContent = duration(m); if (!$('calctime').dataset.user) $('calctime').value = duration(m); calc(); $('checkpoints').innerHTML = state.checkpoints.length ? state.checkpoints.map(c => `<div class="session"><div class="datebox">${fmt(c.date)}</div><div><div class="stitle">${esc(c.title)}</div><div class="smeta">${esc(c.note)}</div></div><button class="btn small" data-delcp="${esc(c.id)}">×</button></div>`).join('') : '<div class="empty">Ajoute un test 5 km, 10 km ou une sortie longue de référence.</div>'; document.querySelectorAll('[data-delcp]').forEach(b => b.onclick = () => { state.checkpoints = state.checkpoints.filter(c => c.id !== b.dataset.delcp); save(); renderObjective() }) }
       function renderRecovery() { let r = [...state.recovery].sort((a, b) => b.date.localeCompare(a.date)); $('rechistory').innerHTML = r.length ? r.slice(0, 10).map(x => `<div class="session"><div class="datebox">${fmt(x.date)}</div><div><div class="stitle">Fatigue ${x.fatigue}/10 · Courbatures ${x.soreness}/10</div><div class="smeta">Sommeil ${x.sleep}/10 · Motivation ${x.motivation}/10 · ${esc(x.pain || 'Pas de douleur signalée')}</div></div><button class="btn small" data-delrec="${esc(x.id)}">×</button></div>`).join('') : '<div class="empty">L’historique apparaîtra ici.</div>'; document.querySelectorAll('[data-delrec]').forEach(b => b.onclick = () => { state.recovery = state.recovery.filter(x => x.id !== b.dataset.delrec); save(); renderAll() }) }
       function renderSettings() { $('racedate').value = state.settings.raceDate; $('goalminutes').value = state.settings.goalMinutes; $('runsperweek').value = state.settings.weeklyRuns; $('rundays').value = state.settings.runDays }
-      function renderAll() { renderDash(); renderPlanning(); renderProfile(); renderObjective(); renderRecovery(); renderSettings() }
+      function renderAll() { renderDash(); renderPlanning(); renderProfile(); $('bpmchart').innerHTML = bpmChart(state.sessions); renderObjective(); renderRecovery(); renderSettings() }
       function goto(p) { document.querySelectorAll('.page').forEach(x => x.classList.toggle('active', x.id === 'page-' + p)); document.querySelectorAll('[data-page]').forEach(x => x.classList.toggle('active', x.dataset.page === p)); let m = { dashboard: ['MoApp Run', 'Préparation semi-marathon', 'Semi de Hyères · objectif 1 h 55'], planning: ['PLANNING', 'Plan d’entraînement', '3 sorties par semaine'], objectif: ['OBJECTIF', 'Objectif semi-marathon', '21,0975 km'], profil: ['STATISTIQUES', 'Profil & statistiques', 'Séances réellement validées'], recuperation: ['RÉCUPÉRATION', 'Suivi de récupération', 'Fatigue, sommeil et courbatures'], reglages: ['RÉGLAGES', 'Course & données', 'Préférences du plan'] }[p]; $('eyebrow').textContent = m[0]; $('title').textContent = m[1]; $('subtitle').textContent = m[2]; renderAll(); window.scrollTo(0, 0) } document.querySelectorAll('[data-page]').forEach(b => b.onclick = () => goto(b.dataset.page)); document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => goto(b.dataset.goto));
       function setActualDuration(totalMinutes) {
         const totalSeconds = Math.round(Number(totalMinutes || 0) * 60);
@@ -1452,6 +1516,80 @@
         }
         return fields.reduce((seconds, field, index) => seconds + (Number(field.value) || 0) * [3600, 60, 1][index], 0);
       }
+
+      function bpmChart(sessions) {
+        const types = [
+          { id: 'easy', label: 'Endurance facile', color: '#8bdc83' },
+          { id: 'quality', label: 'Qualité contrôlée', color: '#ff9b68' },
+          { id: 'long', label: 'Sortie longue', color: '#80b9ff' }
+        ];
+        const values = sessions
+          .filter(session => session.status === 'done' && session.actual)
+          .map(session => ({
+            ...session,
+            hr: Number(session.actual.hr),
+            hrmax: Number(session.actual.hrmax)
+          }))
+          .filter(session => types.some(type => type.id === session.type) &&
+            [session.hr, session.hrmax].some(value => Number.isFinite(value) && value > 0))
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        if (!values.length) {
+          return '<div class="empty">Renseigne la FC moyenne ou maximale lors de tes sorties pour voir leur évolution ici.</div>';
+        }
+
+        const allRates = values.flatMap(session =>
+          [session.hr, session.hrmax].filter(value => Number.isFinite(value) && value > 0));
+        const minRate = Math.max(40, Math.floor((Math.min(...allRates) - 10) / 10) * 10);
+        const maxRate = Math.min(240, Math.ceil((Math.max(...allRates) + 10) / 10) * 10);
+        const yMin = maxRate > minRate ? minRate : Math.max(40, minRate - 10);
+        const yMax = maxRate > yMin ? maxRate : Math.min(240, yMin + 20);
+        const width = 720, height = 280, left = 44, right = 16, top = 16, bottom = 42;
+        const plotWidth = width - left - right, plotHeight = height - top - bottom;
+        const typeData = types.map(type => ({
+          ...type,
+          sessions: values.filter(session => session.type === type.id)
+        }));
+        const maxRuns = Math.max(1, ...typeData.map(type => type.sessions.length));
+        const x = index => left + (maxRuns === 1 ? plotWidth / 2 : index / (maxRuns - 1) * plotWidth);
+        const y = rate => top + (yMax - rate) / (yMax - yMin) * plotHeight;
+        const yTicks = 4;
+        const grid = Array.from({ length: yTicks + 1 }, (_, index) => {
+          const rate = yMin + (yMax - yMin) * index / yTicks;
+          const position = y(rate);
+          return `<line class="gridline" x1="${left}" y1="${position}" x2="${width - right}" y2="${position}"/><text x="${left - 8}" y="${position + 4}" text-anchor="end">${Math.round(rate)}</text>`;
+        }).join('');
+        const xLabels = Array.from({ length: maxRuns }, (_, index) => {
+          const step = Math.max(1, Math.ceil(maxRuns / 8));
+          return index % step === 0 || index === maxRuns - 1
+            ? `<text x="${x(index)}" y="${height - 12}" text-anchor="middle">${index + 1}</text>`
+            : '';
+        }).join('');
+        const series = typeData.map(type => {
+          const metrics = [
+            { key: 'hr', label: 'Moyenne', dash: '' },
+            { key: 'hrmax', label: 'Maximale', dash: ' stroke-dasharray="5 4"' }
+          ];
+          return metrics.map(metric => {
+            const points = type.sessions
+              .map((session, index) => ({ session, index, rate: session[metric.key] }))
+              .filter(point => Number.isFinite(point.rate) && point.rate > 0);
+            if (!points.length) return '';
+            const path = points.map((point, index) =>
+              `${index ? 'L' : 'M'} ${x(point.index)} ${y(point.rate)}`).join(' ');
+            const circles = points.map(point =>
+              `<circle cx="${x(point.index)}" cy="${y(point.rate)}" r="4" fill="${metric.key === 'hr' ? type.color : 'var(--panel)'}" stroke="${type.color}" stroke-width="2"><title>${esc(type.label)} · FC ${metric.label.toLowerCase()} : ${point.rate} bpm · ${fmt(point.session.date, { day: 'numeric', month: 'short', year: 'numeric' })}</title></circle>`
+            ).join('');
+            return `<path d="${path}" fill="none" stroke="${type.color}" stroke-width="2"${metric.dash}/>${circles}`;
+          }).join('');
+        }).join('');
+        const legend = typeData
+          .filter(type => type.sessions.length)
+          .map(type => `<span><i style="background:${type.color}"></i>${type.label}</span>`)
+          .join('');
+        return `<svg class="bpmchart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Évolution des fréquences cardiaques moyennes et maximales par type de sortie">${grid}${series}${xLabels}<text x="12" y="${top + plotHeight / 2}" text-anchor="middle" transform="rotate(-90 12 ${top + plotHeight / 2})">BPM</text></svg><div class="bpm-legend">${legend}<span>Trait plein : moyenne</span><span>Pointillés : maximale</span></div><p class="footer">Axe horizontal : numéro de la sortie dans son type, en ordre chronologique.</p>`;
+      }
+
       function openSession(id, done = false) { let s = state.sessions.find(x => x.id === id); $('sessionform').reset(); $('sid').value = s?.id || ''; $('modaltitle').textContent = s ? 'Modifier la séance' : 'Nouvelle séance'; $('sdate').value = s?.date || today(); $('stype').value = s?.type || 'easy'; $('stitle').value = s?.title || ''; $('sdistance').value = s?.distance ?? 5; $('sduration').value = s?.duration ?? 35; $('space').value = s?.pace || '6:50'; $('sstatus').value = s?.status || 'planned'; $('sdetails').value = s?.details || ''; $('snotes').value = s?.notes || ''; let a = s?.actual || {}; $('adistance').value = a.distance ?? s?.distance ?? ''; setActualDuration(a.duration ?? s?.duration ?? 0); $('ahr').value = a.hr || ''; $('ahrmax').value = a.hrmax || ''; $('arpe').value = a.rpe || 4; $('afatigue').value = a.fatigue || 3; $('apain').value = a.pain || ''; $('acomment').value = a.comment || ''; $('apaceok').checked = !!a.paceOk; $('actualfields').classList.toggle('hidden', !done && s?.status !== 'done'); if (done) { $('actualfields').classList.remove('hidden'); $('sstatus').value = 'done' } $('modal').classList.add('open'); document.body.style.overflow = 'hidden' } function close() { $('modal').classList.remove('open'); document.body.style.overflow = '' } function saveSession(override) { let id = $('sid').value || 'user-' + Date.now(), old = state.sessions.find(s => s.id === id), dist = Number($('sdistance').value), dur = Number($('sduration').value), datev = $('sdate').value; if (!datev || !$('stitle').value.trim() || !Number.isFinite(dist) || dist < 0 || !Number.isFinite(dur) || dur < 0) { alert('Vérifie la date, le nom, la distance et la durée.'); return false } let status = override || $('sstatus').value, actual = old?.actual || null; if (status === 'done') { let ad = Number($('adistance').value), actualSeconds = getActualDuration(); if (actualSeconds === null) { alert('Saisis des heures entières, de 0 à 99, ainsi que des minutes et secondes entières, chacune de 0 à 59.'); $('actualfields').classList.remove('hidden'); return false } let at = actualSeconds / 60; if (!(ad > 0 && actualSeconds > 0)) { alert('Pour valider, saisis une distance et une durée réelles supérieures à zéro.'); $('actualfields').classList.remove('hidden'); return false } actual = { distance: ad, duration: at, hr: Number($('ahr').value) || null, hrmax: Number($('ahrmax').value) || null, rpe: Number($('arpe').value) || null, fatigue: Number($('afatigue').value) || null, pain: $('apain').value, comment: $('acomment').value, paceOk: $('apaceok').checked } } let obj = { ...(old || {}), id, date: datev, type: $('stype').value, title: $('stitle').value.trim(), distance: dist, duration: dur, pace: $('space').value, details: $('sdetails').value, notes: $('snotes').value, status, actual, phase: phase(datev), source: old?.source || 'user' }; state.sessions = old ? state.sessions.map(s => s.id === id ? obj : s) : [...state.sessions, obj]; save(); close(); renderAll(); return true }
       $('sessionform').onsubmit = e => { e.preventDefault(); if (saveSession()) goto('planning') }; $('markdone').onclick = () => { if (!$('sid').value) { $('sstatus').value = 'done'; $('actualfields').classList.remove('hidden'); $('adistance').value = $('sdistance').value; setActualDuration($('sduration').value); $('adistance').focus(); return } saveSession('done') }; $('add').onclick = () => openSession(); $('add2').onclick = () => openSession(); $('close').onclick = $('cancel').onclick = close; $('modal').onclick = e => { if (e.target === $('modal')) close() }; document.addEventListener('keydown', e => { if (e.key === 'Escape') close() }); $('prev').onclick = () => { weekOffset--; renderPlanning() }; $('nextweek').onclick = () => { weekOffset++; renderPlanning() };['statusfilter', 'typefilter', 'search'].forEach(id => $(id).addEventListener('input', renderPlanning)); $('calculate').onclick = calc; $('calcdist').oninput = calc; $('calctime').oninput = () => { $('calctime').dataset.user = '1'; calc() }; $('saveprofile').onclick = () => { state.profile = { age: Number($('age').value) || 22, height: Number($('height').value) || 180, weight: Number($('weight').value) || 60, days: Number($('days').value) || 3, start: $('start').value || today() }; save(); renderAll(); alert('Profil enregistré.') }; $('settingsform').onsubmit = e => { e.preventDefault(); let g = Number($('goalminutes').value); if (!$('racedate').value || g < 60 || g > 400) { alert('Vérifie la date et l’objectif.'); return } const previous = { ...state.settings }; state.settings = { raceDate: $('racedate').value, goalMinutes: g, weeklyRuns: Number($('runsperweek').value), runDays: $('rundays').value }; const kept = state.sessions.filter(s => s.source !== 'plan' || s.status === 'done' || s.status === 'cancelled' || s.status === 'moved'); state.sessions = kept; seedPlan(true); save(); renderAll(); alert('Réglages enregistrés et plan recalculé. Les séances terminées, annulées, reportées et ajoutées manuellement sont conservées.') }; $('recform').onsubmit = e => { e.preventDefault(); state.recovery.push({ id: 'rec-' + Date.now(), date: $('rdate').value || today(), fatigue: Number($('fatigue').value), soreness: Number($('soreness').value), sleep: Number($('sleep').value), motivation: Number($('motivation').value), pain: $('pain').value, note: $('rnote').value }); save(); renderAll(); $('rnote').value = ''; $('pain').value = ''; alert('État de récupération enregistré.') }; $('addcp').onclick = () => { let title = prompt('Nom du point de contrôle'); if (!title) return; let d = prompt('Date (AAAA-MM-JJ)', today()); if (!d || !/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(d)) { alert('Date invalide'); return } let note = prompt('Résultat ou commentaire', '') || ''; state.checkpoints.push({ id: 'cp-' + Date.now(), title, date: d, note }); save(); renderObjective() }; function download(name, content, type) { let u = URL.createObjectURL(new Blob([content], { type })), a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000) } $('jsonout').onclick = () => { download('MoApp Run-sauvegarde.json', JSON.stringify(state, null, 2), 'application/json'); $('message').textContent = 'JSON exporté.' }; $('csvout').onclick = () => { let rows = [['date', 'titre', 'type', 'statut', 'distance_prevue', 'distance_reelle', 'duree_reelle_min', 'allure_reelle', 'fc_moyenne', 'difficulte', 'commentaire'], ...state.sessions.map(s => [s.date, s.title, s.type, s.status, s.distance, s.actual?.distance ?? '', s.actual?.duration ?? '', s.actual ? pace(s.actual.duration, s.actual.distance) : '', s.actual?.hr ?? '', s.actual?.rpe ?? '', s.actual?.comment ?? ''])]; download('MoApp Run-seances.csv', '\ufeff' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')).join('\r\n'), 'text/csv;charset=utf-8'); $('message').textContent = 'CSV exporté.' }; $('jsonin').onchange = async e => { try { let obj = JSON.parse(await e.target.files[0].text()); if (!Array.isArray(obj.sessions) || !obj.settings) throw 0; if (!confirm('Importer remplacera les données actuelles. Continuer ?')) return; state = { ...defaults(), ...obj }; save(); renderAll(); $('message').textContent = 'Sauvegarde importée.' } catch (err) { alert('Fichier JSON invalide ou non compatible.') } finally { e.target.value = '' } }; $('reset').onclick = () => { if (confirm('Supprimer toutes les données locales ? Cette action est irréversible sans sauvegarde.')) { state = defaults(); seedPlan(); save(); renderAll(); $('message').textContent = 'Données réinitialisées.' } }; state.theme = 'dark'; document.body.classList.remove('light'); $('rdate').value = today(); seedPlan(); renderAll();
     })();
