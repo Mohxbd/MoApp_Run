@@ -855,6 +855,31 @@
       transition: width .25s ease
     }
 
+    .import-panel {
+      display: grid;
+      gap: 12px;
+      margin: 14px 0 20px;
+      min-width: 0
+    }
+
+    .import-panel .file-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 48px;
+      padding: 12px 14px;
+      background: var(--accent);
+      color: #17200d;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer
+    }
+
+    .import-panel .file-label input {
+      display: none
+    }
+
     .volume-chart {
       display: flex;
       align-items: flex-end;
@@ -983,6 +1008,33 @@
       border-radius: 8px
     }
 
+    .plan-date-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+      width: 100%;
+      margin-top: 7px;
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .plan-date-picker[hidden] {
+      display: none
+    }
+
+    .plan-date-picker input {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding: 10px;
+      border-radius: 9px;
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font: inherit
+    }
+
     .plan-workout.completed {
       opacity: .78
     }
@@ -1085,7 +1137,7 @@
             séance prévue.</p>
         </article>
         <div class="section-heading">
-          <h2>Volume hebdomadaire</h2><span class="muted small">12 dernières semaines</span>
+          <h2>Volume hebdomadaire</h2><span class="muted small">Cette semaine + 11 suivantes</span>
         </div>
         <article class="panel">
           <div id="weekly-volume-chart" class="volume-chart" aria-label="Kilomètres par semaine"></div>
@@ -1104,29 +1156,26 @@
         <div class="eyebrow">TON HISTORIQUE</div>
         <h1>Activités</h1>
 
+        <!-- Saisie manuelle désactivée : les activités sont ajoutées par import de fichier.
         <form id="activity-form" class="panel form-grid">
           <h2>Ajouter une activité</h2>
           <label>Date et heure<input class="date-input" name="start_date" type="datetime-local" required></label>
-          <label>Distance (km)<input name="distance_km" type="number" min="0.01" max="500" step="0.01"
-              placeholder="ex. 8,42" required></label>
-          <label>Durée (minutes)<input name="duration_min" type="number" min="0.1" max="2000" step="0.1"
-              placeholder="ex. 48,5" required></label>
-          <label>Fréquence cardiaque moyenne (bpm, facultatif)<input name="avg_hr" type="number" min="30" max="250"
-              placeholder="—"></label>
-          <label>Ressenti<select name="effort">
-              <option value="">Non renseigné</option>
-              <option value="1">1 — Très facile</option>
-              <option value="2">2 — Facile</option>
-              <option value="3">3 — Modéré</option>
-              <option value="4">4 — Difficile</option>
-              <option value="5">5 — Très difficile</option>
-            </select></label>
-          <label>Notes (facultatif)<textarea name="notes" rows="2" maxlength="1000"
-              placeholder="Terrain, météo, sensations…"></textarea></label>
+          <label>Distance (km)<input name="distance_km" type="number" min="0.01" max="500" step="0.01" placeholder="ex. 8,42" required></label>
+          <label>Durée (minutes)<input name="duration_min" type="number" min="0.1" max="2000" step="0.1" placeholder="ex. 48,5" required></label>
+          <label>Fréquence cardiaque moyenne (bpm, facultatif)<input name="avg_hr" type="number" min="30" max="250" placeholder="—"></label>
+          <label>Ressenti<select name="effort"><option value="">Non renseigné</option><option value="1">1 — Très facile</option><option value="2">2 — Facile</option><option value="3">3 — Modéré</option><option value="4">4 — Difficile</option><option value="5">5 — Très difficile</option></select></label>
+          <label>Notes (facultatif)<textarea name="notes" rows="2" maxlength="1000" placeholder="Terrain, météo, sensations…"></textarea></label>
           <button class="button primary full" type="submit">Enregistrer l’activité</button>
-          <p class="tiny full">Les activités sont enregistrées sur cet appareil. Exporte régulièrement tes données pour
-            les sauvegarder.</p>
+          <p class="tiny full">Les activités sont enregistrées sur cet appareil. Exporte régulièrement tes données pour les sauvegarder.</p>
         </form>
+        -->
+        <section class="panel import-panel">
+          <h2>Ajouter une activité</h2>
+          <label class="file-label">Choisir les fichiers<input id="file-import" type="file"
+              accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json" multiple></label>
+          <button id="export-json" class="button secondary full" type="button">Exporter mes données</button>
+          <p id="import-status" class="status-note" role="status"></p>
+        </section>
         <div class="section-heading">
           <h2>Toutes les activités</h2><span id="activity-count" class="muted small">0 sortie</span>
         </div>
@@ -1153,19 +1202,6 @@
           </div>
           <p id="detail-no-gpx" class="tiny"></p>
         </section>
-        <div class="panel">
-          <h2>Importer / sauvegarder</h2>
-          <p class="muted small">Importe des GPX, CSV ou une sauvegarde JSON. Sur iPhone, tu peux sélectionner Google
-            Drive depuis l’app Fichiers si Drive y est activé, ou télécharger le fichier depuis Drive avant de
-            l’importer.</p><a class="button secondary full" href="https://drive.google.com/drive/my-drive"
-            target="_blank" rel="noopener noreferrer"
-            style="display:flex;align-items:center;justify-content:center;text-decoration:none">Ouvrir Google Drive
-            ↗</a><label class="file-label">Choisir des fichiers depuis Fichiers / Google Drive<input id="file-import"
-              type="file" accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json"
-              multiple></label><button id="export-json" class="button secondary full">Exporter mes données
-            (JSON)</button>
-          <p id="import-status" class="status-note" role="status"></p>
-        </div>
       </section>
 
       <section id="performances" class="page">
@@ -1208,17 +1244,18 @@
         <h1>Plan d’entraînement</h1>
         <div class="pace-guide panel">
           <h2>Allures à viser</h2>
-          <div class="pace-row"><strong>Endurance facile</strong><span>6:20–7:00 /km</span></div>
-          <div class="pace-row"><strong>Allure soutenue / seuil</strong><span>5:45–6:00 /km</span></div>
-          <div class="pace-row"><strong>Allure objectif semi</strong><span>5:27 /km</span></div>
-          <div class="pace-row"><strong>Intervalles courts</strong><span>5:05–5:25 /km</span></div>
-          <p class="tiny">Les allures sont des repères, pas des obligations. En endurance, tu dois pouvoir parler en
-            phrases complètes. Si la fatigue persiste, remplace la séance rapide par une sortie facile. Le plan
-            privilégie trois séances, une seule séance de qualité et une sortie longue progressive, avec des semaines
-            allégées.</p>
+          <div class="pace-row"><strong>Endurance facile / sortie longue</strong><span>6:35–7:15 /km</span></div>
+          <div class="pace-row"><strong>Endurance active</strong><span>6:05–6:25 /km</span></div>
+          <div class="pace-row"><strong>Seuil contrôlé</strong><span>5:55–6:05 /km</span></div>
+          <div class="pace-row"><strong>Intervalles de 2–4 min</strong><span>5:25–5:40 /km</span></div>
+          <div class="pace-row"><strong>Allure semi visée (à confirmer)</strong><span>5:27 /km</span></div>
+          <p class="tiny">Les allures de base sont calées prudemment sur ton 10 km déclaré en 57:52 et sur ta sortie
+            récente. L’objectif 1 h 55 (5:27/km) est plus rapide que ton allure moyenne sur 10 km : il reste ambitieux
+            et doit être réévalué après un test contrôlé en janvier/février. En endurance, tu dois pouvoir parler en
+            phrases complètes ; si la respiration ou la fatigue ne correspond pas à l’effort visé, ralentis.</p>
         </div>
-        <p class="muted small">Les séances peuvent être décalées d’un jour. Une activité importée le même jour valide
-          automatiquement la séance correspondante.</p>
+        <p class="muted small">Choisis librement une date pour chaque séance. Une activité importée à la même date
+          valide automatiquement la séance correspondante.</p>
         <div id="plan-calendar" class="plan-calendar"></div>
       </section>
 
@@ -1259,8 +1296,8 @@
       const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1";
       const savedPR = (() => { try { return JSON.parse(localStorage.getItem(PR_KEY) || "{}") } catch { return {} } })();
       let personalRecords = { "5k": "24:23", "10k": "57:52", ...savedPR };
-      const readShifts = () => { try { return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") } catch { return {} } };
-      let planShifts = readShifts();
+      const readPlanDates = () => { try { return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") } catch { return {} } };
+      let planDates = readPlanDates();
       const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]") } catch { return [] } };
       let activities = read();
       const dateFmt = v => { const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(d) };
@@ -1318,16 +1355,21 @@
       function chartSVG(values, label, suffix, color) {
         const usable = values.filter(v => Number.isFinite(v.value));
         if (!usable.length) return '<div class="chart-empty">Pas assez de données GPS pour ce graphique. Importe un GPX contenant des points horodatés' + (label.includes("cardiaque") ? ' et des mesures de fréquence cardiaque.' : '.') + '</div>';
-        const W = 340, H = 170, L = 30, R = 8, T = 16, B = 28, innerW = W - L - R, innerH = H - T - B;
+        const W = 340, H = 190, L = 34, R = 8, T = 14, B = 30, innerW = W - L - R, innerH = H - T - B;
         const minV = Math.min(...usable.map(v => v.value)), maxV = Math.max(...usable.map(v => v.value));
-        const pad = (maxV - minV) * .18 || 1, lo = minV - pad, hi = maxV + pad;
-        const pts = usable.map((v, i) => ({ x: L + (usable.length === 1 ? innerW / 2 : i * innerW / (usable.length - 1)), y: T + (hi - v.value) / (hi - lo) * innerH, v: v.value, k: v.km }));
-        const line = pts.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+        const lo = label.includes("cardiaque") ? Math.max(0, Math.floor((minV - 8) / 10) * 10) : Math.max(0, Math.floor((minV - 25) / 30) * 30);
+        const hi = label.includes("cardiaque") ? Math.ceil((maxV + 8) / 10) * 10 : Math.ceil((maxV + 25) / 30) * 30;
+        const span = Math.max(1, hi - lo), n = usable.length, slot = innerW / n, bw = Math.max(3, slot * .64);
         const axisLabel = val => label.includes("cardiaque") ? `${Math.round(val)}` : `${Math.floor(Math.round(val) / 60)}:${String(Math.round(val) % 60).padStart(2, "0")}`;
-        const grid = [0, 1, 2, 3].map(i => { const y = T + i * innerH / 3; const val = hi - i * (hi - lo) / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#394034" stroke-width="1"/><text x="${L - 5}" y="${y + 3}" fill="#a0a79a" font-size="9" text-anchor="end">${axisLabel(val)}</text>` }).join("");
-        const dots = pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.2" fill="${color}"><title>${p.k} km : ${label.includes("cardiaque") ? Math.round(p.v) + " bpm" : `${Math.floor(Math.round(p.v) / 60)}:${String(Math.round(p.v) % 60).padStart(2, "0")} /km`}</title></circle>`).join("");
-        const labels = pts.map(p => `<text x="${p.x}" y="${H - 8}" fill="#a0a79a" font-size="9" text-anchor="middle">${p.k}</text>`).join("");
-        return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">${grid}<path d="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}</svg><p class="tiny">Axe horizontal : kilomètre · axe vertical : ${esc(label.includes("cardiaque") ? "battements/minute" : "allure (min/km)")}. Sur le graphique d’allure, plus la valeur est basse, plus l’allure est rapide.</p>`;
+        const grid = [0, 1, 2, 3].map(i => { const y = T + i * innerH / 3; const val = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#394034" stroke-width="1"/><text x="${L - 5}" y="${y + 3}" fill="#a0a79a" font-size="9" text-anchor="end">${axisLabel(val)}</text>` }).join("");
+        const bars = usable.map((v, i) => {
+          const x = L + i * slot + (slot - bw) / 2;
+          const h = Math.max(1, (v.value - lo) / span * innerH);
+          const y = T + innerH - h;
+          const value = label.includes("cardiaque") ? `${Math.round(v.value)} bpm` : `${Math.floor(Math.round(v.value) / 60)}:${String(Math.round(v.value) % 60).padStart(2, "0")} /km`;
+          return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${color}"><title>${v.km} km : ${value}</title></rect><text x="${(x + bw / 2).toFixed(1)}" y="${H - 9}" fill="#a0a79a" font-size="${n > 10 ? 7 : 9}" text-anchor="middle">${v.km}</text>`;
+        }).join("");
+        return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">${grid}${bars}</svg><p class="tiny">Chaque barre représente un kilomètre · axe horizontal : km · axe vertical : ${esc(label.includes("cardiaque") ? "battements/minute" : "allure (min/km)")}. Pour l’allure, une barre plus basse signifie un km plus rapide.</p>`;
       }
       function openActivityDetail(id) {
         const a = activities.find(x => String(x.id) === String(id)); if (!a) return;
@@ -1344,14 +1386,6 @@
         $("#activity-detail").scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
-      $("#activity-form").addEventListener("submit", e => {
-        e.preventDefault(); const f = new FormData(e.currentTarget);
-        const a = { id: crypto.randomUUID?.() || String(Date.now()), source_label: "Saisie manuelle", name: "Course à pied", start_date: f.get("start_date"), distance_km: Number(f.get("distance_km")), duration_min: Number(f.get("duration_min")), avg_hr: f.get("avg_hr") ? Number(f.get("avg_hr")) : null, effort: f.get("effort") ? Number(f.get("effort")) : null, notes: String(f.get("notes") || "").trim() };
-        if (!a.start_date || !(a.distance_km > 0) || !(a.duration_min > 0)) { toast("Vérifie la date, la distance et la durée."); return }
-        const dup = activities.some(x => Math.abs(new Date(x.start_date) - new Date(a.start_date)) < 120000 && Math.abs(Number(x.distance_km) - a.distance_km) < .03);
-        if (dup && !confirm("Une activité similaire existe déjà. Ajouter quand même ?")) return;
-        activities.push(a); save(); e.currentTarget.reset(); toast("Activité enregistrée sur cet appareil."); navigate("activites");
-      });
       function parseCSV(text) {
         const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(x => x.trim()); if (lines.length < 2) return [];
         const line = s => { const out = []; let v = "", q = false; for (let i = 0; i < s.length; i++) { const c = s[i]; if (c === '"' && s[i + 1] === '"' && q) { v += '"'; i++ } else if (c === '"') q = !q; else if ((c === "," || c === ";") && !q) { out.push(v); v = "" } else v += c } out.push(v); return out };
@@ -1475,26 +1509,26 @@
 
       const planWeeks = [
         ["Reprise", ["30 min en endurance facile, sans chercher la vitesse", "30 min faciles + 4 × 20 s d’accélérations relâchées, récupération en marchant", "8 km faciles, marche autorisée si besoin"]],
-        ["Base", ["35 min faciles", "10 min faciles + 6 × 1 min à effort 5 km contrôlé, récup. 1 min lente + 10 min faciles", "9 km faciles"]],
-        ["Base", ["35 min faciles", "10 min faciles + 2 × 6 min au seuil contrôlé (5:50–6:00/km), récup. 3 min + 10 min faciles", "10 km faciles"]],
+        ["Base", ["35 min faciles", "10 min faciles + 6 × 1 min à 5:20–5:35/km, récup. 1 min lente + 10 min faciles", "9 km faciles"]],
+        ["Base", ["35 min faciles", "10 min faciles + 2 × 6 min à 5:55–6:05/km, récup. 3 min en trottinant + 10 min faciles", "10 km faciles"]],
         ["Assimilation", ["30 min faciles", "30 min faciles + 4 × 20 s d’accélérations relâchées", "8 km faciles"]],
-        ["Endurance", ["40 min faciles", "12 min d’échauffement + 8 × 1 min vive (5:15–5:25/km), récup. 90 s lente + 10 min retour au calme", "10 km faciles"]],
-        ["Endurance", ["40 min faciles", "10 min faciles + 2 × 8 min au seuil contrôlé (5:50–6:00/km), récup. 3 min + 10 min faciles", "11 km faciles"]],
-        ["Endurance", ["40 min faciles + 4 × 20 s relâchées", "12 min d’échauffement + 5 × 3 min à effort 10 km contrôlé, récup. 2 min lente + 10 min retour au calme", "12 km faciles"]],
+        ["Endurance", ["40 min faciles", "12 min d’échauffement + 8 × 1 min vive (5:25–5:40/km), récup. 90 s lente + 10 min retour au calme", "10 km faciles"]],
+        ["Endurance", ["40 min faciles", "10 min faciles + 2 × 8 min à 5:55–6:05/km, récup. 3 min en trottinant + 10 min faciles", "11 km faciles"]],
+        ["Endurance", ["40 min faciles + 4 × 20 s relâchées", "12 min d’échauffement + 5 × 3 min à 5:35–5:45/km, récup. 2 min lente + 10 min retour au calme", "12 km faciles"]],
         ["Assimilation", ["35 min faciles", "30–35 min faciles, sans fractionné", "9 km faciles"]],
-        ["Développement", ["45 min faciles", "12 min faciles + 3 × 8 min au seuil (5:45–5:55/km), récup. 3 min + 10 min faciles", "12 km faciles"]],
-        ["Développement", ["45 min faciles + 4 accélérations relâchées", "12 min d’échauffement + 6 × 3 min à effort 10 km, récup. 2 min lente + 10 min retour au calme", "13 km faciles"]],
-        ["Développement", ["45 min faciles", "10 min faciles + 20 min soutenues mais régulières (5:45–5:55/km) + 10 min faciles", "14 km faciles"]],
+        ["Développement", ["45 min faciles", "12 min faciles + 3 × 8 min au seuil (5:55–6:05/km), récup. 3 min + 10 min faciles", "12 km faciles"]],
+        ["Développement", ["45 min faciles + 4 accélérations relâchées", "12 min d’échauffement + 6 × 3 min à 5:30–5:40/km, récup. 2 min lente + 10 min retour au calme", "13 km faciles"]],
+        ["Développement", ["45 min faciles", "10 min faciles + 20 min soutenues mais régulières (5:55–6:05/km) + 10 min faciles", "14 km faciles"]],
         ["Assimilation", ["35 min faciles", "35 min faciles + 4 × 20 s relâchées", "11 km faciles"]],
-        ["Spécifique semi", ["45 min faciles", "15 min d’échauffement + 3 × 2 km à 5:35–5:45/km, récup. 3 min en trottinant + 10 min faciles", "14 km faciles"]],
-        ["Spécifique semi", ["45 min faciles + 4 accélérations relâchées", "12 min faciles + 2 × 15 min à 5:35–5:45/km, récup. 4 min lente + 10 min retour au calme", "15 km faciles"]],
-        ["Spécifique semi", ["45 min faciles", "15 min d’échauffement + 5 × 1 km à 5:20–5:30/km, récup. 2 min lente + 10 min retour au calme", "16 km faciles, hydratation à tester"]],
+        ["Spécifique semi", ["45 min faciles", "15 min d’échauffement + 3 × 2 km à 5:40–5:50/km, récup. 3 min en trottinant + 10 min faciles", "14 km faciles"]],
+        ["Spécifique semi", ["45 min faciles + 4 accélérations relâchées", "12 min faciles + 2 × 15 min à 5:40–5:50/km, récup. 4 min lente + 10 min retour au calme", "15 km faciles"]],
+        ["Spécifique semi", ["45 min faciles", "15 min d’échauffement + 5 × 1 km à 5:25–5:35/km, récup. 2 min lente + 10 min retour au calme", "16 km faciles, hydratation à tester"]],
         ["Assimilation", ["40 min faciles", "40 min dont 15 min soutenues à 5:45–5:55/km, sans forcer", "12 km faciles"]],
-        ["Spécifique semi", ["45 min faciles", "15 min faciles + 3 × 3 km à 5:30–5:40/km, récup. 3 min en trottinant + retour au calme", "17 km faciles, effort régulier"]],
-        ["Spécifique semi", ["45 min faciles + 4 accélérations relâchées", "15 min faciles + 2 × 20 min à 5:30–5:40/km, récup. 5 min lente + retour au calme", "18 km faciles, tester ravitaillement et tenue"]],
-        ["Pic", ["40–45 min faciles", "15 min d’échauffement + 5 × 1 km à 5:15–5:25/km, récup. 2 min lente + 10 min retour au calme", "16 km faciles, pas de finish rapide"]],
-        ["Début d’affûtage", ["40 min faciles", "12 min faciles + 3 × 2 km à 5:27–5:35/km, récup. 3 min lente + 10 min faciles", "14 km faciles"]],
-        ["Affûtage", ["35 min faciles", "30 min au total dont 3 × 5 min à allure objectif (5:27/km), récupération 3 min facile", "10 km faciles"]],
+        ["Spécifique semi", ["45 min faciles", "15 min faciles + 3 × 3 km à 5:35–5:45/km, récup. 3 min en trottinant + retour au calme", "17 km faciles, effort régulier"]],
+        ["Spécifique semi", ["45 min faciles + 4 accélérations relâchées", "15 min faciles + 2 × 20 min à 5:35–5:45/km, récup. 5 min lente + retour au calme", "18 km faciles, tester ravitaillement et tenue"]],
+        ["Pic", ["40–45 min faciles", "15 min d’échauffement + 5 × 1 km à 5:20–5:30/km, récup. 2 min lente + 10 min retour au calme", "16 km faciles, pas de finish rapide"]],
+        ["Début d’affûtage", ["40 min faciles", "12 min faciles + 3 × 2 km à 5:30–5:40/km (si l’effort reste contrôlé), récup. 3 min lente + 10 min faciles", "14 km faciles"]],
+        ["Affûtage", ["35 min faciles", "30 min au total dont 3 × 5 min à 5:27–5:35/km, seulement si le test de février confirme l’objectif, récupération 3 min facile", "10 km faciles"]],
         ["Semaine de course", ["30 min faciles + 4 × 20 s relâchées", "20 min faciles dont 3 min à allure objectif, arrêter frais", "DIMANCHE 21 MARS : SEMI-MARATHON · départ prudent, viser 5:27/km progressivement"]]
       ];
 
@@ -1503,8 +1537,10 @@
       const fmtPlan = d => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
       function isoDay(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` }
       function sessionDate(weekIndex, dayIndex) {
+        const key = `${weekIndex}-${dayIndex}`;
+        if (typeof planDates[key] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(planDates[key])) { const [y, m, d] = planDates[key].split("-").map(Number); return new Date(y, m - 1, d, 12) }
         const d = new Date(calendarStart); d.setDate(calendarStart.getDate() + weekIndex * 7 + (weekIndex === 21 && dayIndex === 2 ? 6 : [0, 2, 5][dayIndex]));
-        d.setDate(d.getDate() + Number(planShifts[`${weekIndex}-${dayIndex}`] || 0)); return d;
+        return d;
       }
       function sessionActivityDate(a) { const d = new Date(a.start_date); return Number.isNaN(+d) ? "" : isoDay(d) }
       function isSessionDone(w, j) {
@@ -1519,17 +1555,22 @@
           const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
           const workouts = w[1].map((desc, j) => {
             const d = sessionDate(i, j), date = fmtPlan(d), isRace = i === 21 && j === 2, done = isSessionDone(i, j), key = `${i}-${j}`;
-            const paceHint = isRace ? "Objectif : 1 h 55" : desc.toLowerCase().includes("facile") ? "6:20–7:00/km" : desc.includes("5:") ? "Respecte l’allure indiquée" : "Effort régulier, contrôlé";
-            return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}${done ? '<span class="completed-badge">✓ VALIDÉE</span>' : ""}</strong><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span></p><div class="plan-actions"><button class="button secondary" data-shift="${key}" data-delta="-1" type="button">− 1 jour</button><button class="button secondary" data-shift="${key}" data-delta="1" type="button">+ 1 jour</button>${done ? '<span class="completed-badge">Activité détectée</span>' : ""}</div></div></div>`;
+            const paceHint = isRace ? "Objectif indicatif : 5:27/km si confirmé" : desc.toLowerCase().includes("facile") ? "6:35–7:15/km" : desc.includes("5:") ? "Respecte la plage d’allure écrite dans la séance" : "Effort régulier, contrôlé";
+            return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}${done ? '<span class="completed-badge">✓ VALIDÉE</span>' : ""}</strong><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span></p><div class="plan-actions"><button class="button secondary" data-pick-date="${key}" type="button">Choisir une date</button><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label>${done ? '<span class="completed-badge">Activité détectée</span>' : ""}</div></div></div>`;
           }).join("");
           return `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${workouts}</article>`;
         }).join("");
-        calendar.querySelectorAll("[data-shift]").forEach(btn => btn.addEventListener("click", () => {
-          const key = btn.dataset.shift, delta = Number(btn.dataset.delta);
-          planShifts[key] = Number(planShifts[key] || 0) + delta;
-          localStorage.setItem(PLAN_KEY, JSON.stringify(planShifts));
+        calendar.querySelectorAll("[data-pick-date]").forEach(btn => btn.addEventListener("click", () => {
+          const picker = calendar.querySelector(`[data-plan-date="${btn.dataset.pickDate}"]`);
+          if (picker) { picker.parentElement.hidden = false; picker.focus(); picker.showPicker?.() }
+        }));
+        calendar.querySelectorAll("[data-plan-date]").forEach(input => input.addEventListener("change", () => {
+          const key = input.dataset.planDate;
+          if (!input.value) return;
+          planDates[key] = input.value;
+          localStorage.setItem(PLAN_KEY, JSON.stringify(planDates));
           renderPlan(); renderProgress();
-          toast("Date de séance décalée.");
+          toast("Date de séance mise à jour.");
         }));
       }
       function renderProgress() {
@@ -1546,8 +1587,8 @@
         const current = new Date(); current.setHours(0, 0, 0, 0);
         const thisMonday = new Date(current); thisMonday.setDate(current.getDate() - (current.getDay() + 6) % 7);
         const weeks = [];
-        for (let i = 11; i >= 0; i--) {
-          const start = new Date(thisMonday); start.setDate(thisMonday.getDate() - i * 7); const end = new Date(start); end.setDate(start.getDate() + 7);
+        for (let i = 0; i < 12; i++) {
+          const start = new Date(thisMonday); start.setDate(thisMonday.getDate() + i * 7); const end = new Date(start); end.setDate(start.getDate() + 7);
           const km = activities.filter(a => { const d = new Date(a.start_date); return d >= start && d < end }).reduce((s, a) => s + Number(a.distance_km || 0), 0);
           weeks.push({ start, km });
         }
