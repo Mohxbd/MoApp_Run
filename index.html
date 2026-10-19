@@ -9,14 +9,12 @@
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <title>MoApp Run</title>
-  <script src="./config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="#accueil" aria-label="MoApp Run, accueil"><span class="brand-mark">M</span><span>MoApp <b>Run</b></span></a>
-      <button id="profile-button" class="avatar" aria-label="Compte">MR</button>
+      <span class="avatar" aria-label="MoApp Run">MR</span>
     </header>
 
     <main id="app-main">
@@ -43,9 +41,7 @@
 
       <section id="activites" class="page">
         <div class="eyebrow">TON HISTORIQUE</div><h1>Activités</h1>
-        <p class="muted">Tes sorties importées et saisies, sans données inventées.</p>
-        <div class="button-row"><button id="connect-strava" class="button primary">↗ Connecter Strava</button><button id="sync-strava" class="button secondary" disabled>Synchroniser</button></div>
-        <p id="strava-status" class="status-note" role="status">Strava non connecté.</p>
+        <p class="muted">Importe les activités exportées depuis Strava. Aucun compte ni serveur supplémentaire nécessaire.</p>
         <form id="activity-form" class="panel form-grid">
           <h2>Ajouter une activité</h2>
           <label>Date et heure<input name="start_date" type="datetime-local" required></label>
@@ -59,7 +55,7 @@
         </form>
         <div class="section-heading"><h2>Toutes les activités</h2><span id="activity-count" class="muted small">0 sortie</span></div>
         <div id="all-activities" class="activity-list"></div>
-        <div class="panel"><h2>Importer / sauvegarder</h2><p class="muted small">Importe un CSV simple (date,distance_km,duration_min,avg_hr) ou restaure une sauvegarde JSON. Les doublons probables sont signalés.</p><label class="file-label">Choisir un CSV ou JSON<input id="file-import" type="file" accept=".csv,.json,text/csv,application/json"></label><button id="export-json" class="button secondary full">Exporter mes données (JSON)</button><p id="import-status" class="status-note" role="status"></p></div>
+        <div class="panel"><h2>Importer / sauvegarder</h2><p class="muted small">Importe le CSV de ton export Strava ou restaure une sauvegarde JSON. Les doublons probables sont signalés. Pour le CSV Strava, l’import ne conserve que les activités avec date, distance et durée valides.</p><label class="file-label">Choisir un CSV ou JSON<input id="file-import" type="file" accept=".csv,.json,text/csv,application/json"></label><button id="export-json" class="button secondary full">Exporter mes données (JSON)</button><p id="import-status" class="status-note" role="status"></p></div>
       </section>
 
       <section id="performances" class="page">
@@ -79,7 +75,7 @@
 
       <section id="reglages" class="page">
         <div class="eyebrow">CONFIGURATION</div><h1>Réglages</h1>
-        <article class="panel"><h2>Compte & synchronisation</h2><p class="muted small">La connexion Strava sécurisée nécessite une configuration Supabase et une application Strava. Aucun secret ne doit être ajouté au code public.</p><div id="account-status" class="status-note">Mode local — données sur cet appareil.</div><button id="sign-in" class="button secondary full">Se connecter au cloud (si configuré)</button><button id="sign-out" class="button secondary full" hidden>Se déconnecter du cloud</button></article>
+        <article class="panel"><h2>Mode simple</h2><p class="muted small">Pas de compte, pas de serveur : tes activités sont conservées dans le stockage local de Safari. Utilise régulièrement l’export JSON pour sauvegarder tes données dans Fichiers ou iCloud Drive.</p></article>
         <article class="panel"><h2>Confidentialité</h2><p class="muted small">Les données locales restent dans le stockage du navigateur sur cet appareil. La synchronisation cloud est activée uniquement après configuration et authentification. Les données Strava restent soumises aux autorisations et conditions de Strava.</p><button id="clear-local" class="button danger full">Effacer les données locales</button></article>
         <article class="panel"><h2>À propos</h2><p class="muted small">MoApp Run · Version initiale. Objectif sportif : semi-marathon d’Hyères, date visée 21/03/2027 à confirmer, cible 1 h 55.</p></article>
       </section>
