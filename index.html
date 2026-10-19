@@ -221,6 +221,46 @@
       margin: 5px 0 9px
     }
 
+    .hero-time-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0
+    }
+
+    .hero-time-row .hero-time {
+      min-width: 0;
+      font-size: clamp(40px, 10vw, 56px);
+      white-space: nowrap;
+      margin: 5px 0 9px
+    }
+
+    .hero-countdown {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      text-align: right;
+      flex-shrink: 0;
+      gap: 3px;
+      padding-left: 6px
+    }
+
+    .hero-countdown small {
+      color: #b4bdab;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .7px
+    }
+
+    .hero-countdown strong {
+      color: var(--accent);
+      font-size: clamp(22px, 6vw, 30px);
+      line-height: 1.1;
+      letter-spacing: -.5px
+    }
+
     .hero-time span {
       font-size: 21px;
       letter-spacing: 0;
@@ -947,9 +987,27 @@
 
     .import-panel {
       display: grid;
-      gap: 12px;
-      margin: 14px 0 20px;
+      gap: 7px;
+      margin: 10px 0 16px;
+      padding: 12px;
       min-width: 0
+    }
+
+    .import-panel h2 {
+      font-size: 16px;
+      margin-bottom: 2px
+    }
+
+    .import-panel .button {
+      min-height: 38px;
+      padding: 8px 12px;
+      font-size: 12px;
+      margin-top: 2px
+    }
+
+    .import-panel .status-note {
+      margin: 2px 0 0;
+      font-size: 11px
     }
 
     .import-panel .file-label {
@@ -957,8 +1015,9 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      min-height: 48px;
-      padding: 12px 14px;
+      min-height: 38px;
+      padding: 8px 10px;
+      font-size: 12px;
       background: var(--accent);
       color: #17200d;
       border-radius: 12px;
@@ -1190,10 +1249,12 @@
     <main id="app-main">
       <section id="accueil" class="page active">
         <div class="eyebrow"><span class="pulse"></span> OBJECTIF · HYÈRES 2027</div>
-        <h1>Semi-marathon<br>Hyères 2027</h1>
         <article class="hero-card">
           <div class="hero-top"><span>OBJECTIF SEMI-MARATHON</span><span class="tag">CIBLE</span></div>
-          <div class="hero-time">1<span>h</span>55<span>min</span></div>
+          <div class="hero-time-row">
+            <div class="hero-time">1<span>h</span>55<span>min</span></div>
+            <div class="hero-countdown"><small>JUSQU’AU SEMI</small><strong id="countdown">J-152</strong></div>
+          </div>
           <div class="hero-bottom">
             <div><small>Allure théorique</small><strong>5:27 <small>/ km</small></strong></div>
             <div><small>Date visée</small><strong>21 mars 2027</strong></div>
@@ -1218,11 +1279,6 @@
           <article class="stat-card"><span class="stat-icon">✓</span><small>Séances</small><strong id="week-sessions">0
               <em>/ 3</em></strong><span class="muted small">lundi · mercredi · samedi</span></article>
         </div>
-        <article class="panel countdown-panel">
-          <div class="eyebrow">JUSQU’AU SEMI</div>
-          <div id="countdown" class="large-number">J-152</div>
-          <p class="muted small">Départ prévu le 21 mars 2027</p>
-        </article>
         <div class="section-heading">
           <h2>Préparation</h2><span id="plan-progress-label" class="muted small">0 %</span>
         </div>
@@ -1308,26 +1364,15 @@
         <h1>Performances</h1>
 
         <div class="stats-grid">
-          <article class="stat-card"><small>Record 5 km</small><strong id="pr-5k-display">24:23</strong><span
-              class="tag neutral">Personnel</span></article>
-          <article class="stat-card"><small>Record 10 km</small><strong id="pr-10k-display">57:52</strong><span
-              class="tag neutral">Personnel</span></article>
+          <article class="stat-card"><small>Meilleur 5 km détecté</small><strong id="pr-5k-display">—</strong><span
+              class="tag neutral">Données GPS</span></article>
+          <article class="stat-card"><small>Meilleur 10 km détecté</small><strong id="pr-10k-display">—</strong><span
+              class="tag neutral">Données GPS</span></article>
         </div>
-        <form id="records-form" class="panel form-grid">
-          <h2>Mes records personnels</h2>
-          <label>Record 5 km (mm:ss)<input name="pr5k" id="pr-5k-input" type="text" inputmode="numeric"
-              pattern="[0-9]{1,2}:[0-5][0-9]" placeholder="24:23" required></label>
-          <label>Record 10 km (mm:ss)<input name="pr10k" id="pr-10k-input" type="text" inputmode="numeric"
-              pattern="[0-9]{1,2}:[0-5][0-9]" placeholder="57:52" required></label>
-          <button class="button primary full" type="submit">Enregistrer mes records</button>
-          <p class="tiny full">Saisis tes chronos personnels ici. Ils seront inclus dans ta sauvegarde JSON pour pouvoir
-            les restaurer sur un autre appareil.</p>
-        </form>
         <article class="panel">
           <h2>Activités analysées</h2>
-          <p class="muted small">Les meilleures performances GPS ne seront calculées qu'à partir de données suffisamment
-            détaillées et continues. Une allure moyenne seule ne crée pas de record.</p>
-          <div id="performance-summary" class="performance-summary">Ajoute ou synchronise des activités pour commencer.
+          <p class="muted small">Les meilleurs temps sont calculés automatiquement à partir des kilomètres complets consécutifs présents dans les fichiers GPS importés. Les activités sans splits GPS exploitables ne permettent pas de détecter un record.</p>
+          <div id="performance-summary" class="performance-summary">Importe des activités GPS pour détecter tes meilleurs temps.
           </div>
         </article>
         <article class="panel">
@@ -1393,8 +1438,6 @@
     (() => {
       "use strict";
       const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1";
-      const savedPR = (() => { try { return JSON.parse(localStorage.getItem(PR_KEY) || "{}") } catch { return {} } })();
-      let personalRecords = { "5k": "24:23", "10k": "57:52", ...savedPR };
       const readPlanDates = () => { try { return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") } catch { return {} } };
       let planDates = readPlanDates();
       const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]") } catch { return [] } };
@@ -1410,6 +1453,21 @@
       const now = new Date(); const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() + 6) % 7); monday.setHours(0, 0, 0, 0); const next = new Date(monday); next.setDate(next.getDate() + 7);
       $("#week-range").textContent = `${monday.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} – ${new Date(+next - 86400000).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`;
       const item = a => `<article class="activity-item" role="button" tabindex="0" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(a.name || "Course à pied")}"><span class="activity-icon">↗</span><div class="activity-info"><strong>${esc(a.name || "Course à pied")}</strong><p>${dateFmt(a.start_date)} · ${esc(a.source_label || "Import manuel")}${a.avg_hr ? ` · ${esc(a.avg_hr)} bpm` : ""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} km<small>${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></article>`;
+      function bestDistanceTime(targetKm) {
+        let best = null;
+        for (const activity of activities) {
+          const splits = (activity.km_splits || []).filter(split => !split.partial && Number(split.km) > 0 && Number(split.seconds) > 0);
+          if (splits.length < targetKm) continue;
+          for (let i = 0; i <= splits.length - targetKm; i++) {
+            const window = splits.slice(i, i + targetKm);
+            // N'accepte que des kilomètres consécutifs complets.
+            if (window.some((split, j) => j > 0 && Number(split.km) !== Number(window[j - 1].km) + 1)) continue;
+            const seconds = window.reduce((sum, split) => sum + Number(split.seconds), 0);
+            if (seconds > 0 && (best == null || seconds < best)) best = seconds;
+          }
+        }
+        return best;
+      }
       function render() {
         const sorted = [...activities].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         const week = activities.filter(a => new Date(a.start_date) >= monday && new Date(a.start_date) < next);
@@ -1419,10 +1477,12 @@
         $("#recent-activities").innerHTML = sorted.slice(0, 3).map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         $("#all-activities").innerHTML = sorted.map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         $("#performance-summary").textContent = activities.length ? `${activities.length} activité(s) importée(s). Les estimations détaillées nécessitent des points GPS horodatés.` : "Importe tes activités pour commencer.";
-        $("#pr-5k-display").textContent = personalRecords["5k"] || "—";
-        $("#pr-10k-display").textContent = personalRecords["10k"] || "—";
-        $("#pr-5k-input").value = personalRecords["5k"] || "24:23";
-        $("#pr-10k-input").value = personalRecords["10k"] || "57:52";
+        const best5 = bestDistanceTime(5), best10 = bestDistanceTime(10);
+        $("#pr-5k-display").textContent = best5 == null ? "—" : formatRaceTime(best5);
+        $("#pr-10k-display").textContent = best10 == null ? "—" : formatRaceTime(best10);
+        $("#performance-summary").textContent = activities.length
+          ? `${activities.length} activité(s) analysée(s). ${best5 == null ? "Aucun temps 5 km détectable pour le moment." : `Meilleur bloc de 5 km : ${formatRaceTime(best5)}.`} ${best10 == null ? "Aucun temps 10 km détectable pour le moment." : `Meilleur bloc de 10 km : ${formatRaceTime(best10)}.`}`
+          : "Importe des activités GPS pour détecter tes meilleurs temps.";
         const km = activities.reduce((s, a) => s + Number(a.distance_km || 0), 0), min = activities.reduce((s, a) => s + Number(a.duration_min || 0), 0);
         $("#pace-summary").textContent = km ? pace(km, min) + " /km" : "—";
         const raceDate = new Date(2027, 2, 21); raceDate.setHours(0, 0, 0, 0);
@@ -1434,16 +1494,6 @@
         renderProgress();
         renderNextWorkout();
       }
-      $("#records-form").addEventListener("submit", e => {
-        e.preventDefault();
-        const f = new FormData(e.currentTarget), pr5 = String(f.get("pr5k") || "").trim(), pr10 = String(f.get("pr10k") || "").trim();
-        const valid = /^\d{1,2}:[0-5]\d$/;
-        if (!valid.test(pr5) || !valid.test(pr10)) { toast("Format attendu : mm:ss, par exemple 24:23."); return }
-        personalRecords = { "5k": pr5, "10k": pr10 };
-        localStorage.setItem(PR_KEY, JSON.stringify(personalRecords));
-        render(); toast("Records personnels enregistrés.");
-      });
-
       $("#close-detail").addEventListener("click", () => { $("#activity-detail").hidden = true });
       document.addEventListener("click", e => {
         const card = e.target.closest("[data-activity-id]"); if (card) openActivityDetail(card.dataset.activityId);
@@ -1452,6 +1502,7 @@
         if ((e.key === "Enter" || e.key === " ") && e.target.matches("[data-activity-id]")) { e.preventDefault(); openActivityDetail(e.target.dataset.activityId) }
       });
       function formatDuration(min) { if (!(min > 0)) return "—"; const sec = Math.round(min * 60); return `${Math.floor(sec / 3600)}:${String(Math.floor(sec % 3600 / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}` }
+      function formatRaceTime(totalSeconds) { const sec = Math.round(totalSeconds); const hours = Math.floor(sec / 3600); const minutes = Math.floor((sec % 3600) / 60); const seconds = sec % 60; return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}` : `${minutes}:${String(seconds).padStart(2, "0")}` }
       function chartSVG(values, label, suffix, color) {
         const usable = values.filter(v => Number.isFinite(v.value));
         if (!usable.length) return '<div class="chart-empty">Pas assez de données GPS pour ce graphique. Importe un GPX contenant des points horodatés' + (label.includes("cardiaque") ? ' et des mesures de fréquence cardiaque.' : '.') + '</div>';
@@ -1596,13 +1647,6 @@
               const obj = JSON.parse(text), list = Array.isArray(obj) ? obj : obj.activities;
               if (!Array.isArray(list)) throw Error("Le JSON ne contient pas de liste d'activités.");
               incoming.push(...list);
-              if (!Array.isArray(obj) && obj.personalRecords) {
-                const pr = obj.personalRecords;
-                if ((!pr["5k"] || /^\d{1,2}:[0-5]\d$/.test(pr["5k"])) && (!pr["10k"] || /^\d{1,2}:[0-5]\d$/.test(pr["10k"]))) {
-                  personalRecords = { "5k": pr["5k"] || personalRecords["5k"], "10k": pr["10k"] || personalRecords["10k"] };
-                  localStorage.setItem(PR_KEY, JSON.stringify(personalRecords));
-                }
-              }
             } else if (name.endsWith(".csv")) incoming.push(...parseCSV(text).map(normalizeActivity));
             else throw Error(`Format non pris en charge : ${file.name}.`);
           }
@@ -1615,7 +1659,7 @@
         finally { e.target.value = "" }
       });
       function download(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1200) }
-      $("#export-json").addEventListener("click", () => { download(new Blob([JSON.stringify({ app: "MoApp Run", version: 1, exported_at: new Date().toISOString(), activities, personalRecords }, null, 2)], { type: "application/json" }), `moapp-run-${new Date().toISOString().slice(0, 10)}.json`); $("#import-status").textContent = "Sauvegarde JSON prête à enregistrer dans Fichiers." });
+      $("#export-json").addEventListener("click", () => { download(new Blob([JSON.stringify({ app: "MoApp Run", version: 1, exported_at: new Date().toISOString(), activities }, null, 2)], { type: "application/json" }), `moapp-run-${new Date().toISOString().slice(0, 10)}.json`); $("#import-status").textContent = "Sauvegarde JSON prête à enregistrer dans Fichiers." });
       $("#clear-local").addEventListener("click", () => { if (confirm("Effacer toutes les activités enregistrées sur cet appareil ?")) { activities = []; save(); toast("Activités locales effacées.") } });
 
       const planWeeks = [
