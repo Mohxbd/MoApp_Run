@@ -1699,6 +1699,31 @@
         padding-right: 26px;
       }
     }
+
+    /* Forcer la disposition des statistiques du détail sur mobile également. */
+    @media (max-width: 959px) {
+      #activity-detail .detail-main-stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px;
+      }
+
+      #activity-detail .detail-main-stats .distance-stat {
+        grid-column: 1 / -1 !important;
+        width: 100%;
+      }
+
+      #activity-detail .detail-main-stats .stat-card:not(.distance-stat) {
+        grid-column: span 1;
+        min-width: 0;
+      }
+
+      #activity-detail .detail-hr-stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px;
+      }
+    }
   </style>
   <title>MoApp Run</title>
 </head>
