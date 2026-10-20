@@ -1778,6 +1778,30 @@
       min-width: 0;
     }
 
+    .zone-panel {
+      margin-top: 24px;
+    }
+
+    #detail-pace-zones .zone-fill {
+      background: #7fc8ff;
+    }
+
+    @media (max-width: 959px) {
+      #activity-detail {
+        display: block;
+      }
+
+      #activity-detail>.chart-panel {
+        margin-top: 24px;
+      }
+    }
+
+    @media (min-width: 960px) {
+      #activity-detail:not([hidden]) {
+        row-gap: 26px;
+      }
+    }
+
     .zone-value {
       color: var(--text);
       text-align: right;
@@ -1844,7 +1868,6 @@
           <article id="next-workout-card" class="next-workout-card" aria-live="polite"></article>
           <button class="carousel-arrow" id="workout-next" type="button" aria-label="Séance suivante">›</button>
         </section>
-        <p class="tiny">Fais glisser la carte vers la gauche ou la droite pour parcourir les séances.</p>
         <div class="section-heading">
           <h2>Volume hebdomadaire</h2>
         </div>
@@ -1857,8 +1880,6 @@
         <div id="recent-activities" class="activity-list">
           <div class="empty-state">Aucune activité enregistrée.</div>
         </div>
-        <p class="footnote">Les records de 5 km (24:23) et 10 km (57:52) sont des déclarations initiales, non vérifiées.
-        </p>
       </section>
 
       <section id="activites" class="page">
@@ -2281,12 +2302,29 @@
           return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span></div>`;
         }).join("");
       }
+      function detectedMaxHeartRate() {
+        // Référence par défaut : 198 bpm. Elle augmente uniquement si une activité importée
+        // contient un maximum supérieur, provenant des échantillons GPS ou du résumé de l’activité.
+        let detected = 198;
+        for (const a of activities) {
+          const summaryMax = Number(a.max_hr);
+          if (Number.isFinite(summaryMax) && summaryMax > detected && summaryMax <= 250) detected = summaryMax;
+          for (const sample of (a.track_samples || [])) {
+            const hr = Number(sample.hr);
+            if (Number.isFinite(hr) && hr > detected && hr <= 250) detected = hr;
+          }
+        }
+        return Math.round(detected);
+      }
       function renderActivityZones(activity) {
         const samples = activity.track_samples || [];
-        const heartRates = samples.map(sample => Number(sample.hr)).filter(value => Number.isFinite(value) && value > 0);
-        const maxHr = Number(activity.max_hr) || (heartRates.length ? Math.max(...heartRates) : 0);
-        if (maxHr > 0) {
-          const limits = [0, .6, .7, .8, .9, 1.01].map(ratio => maxHr * ratio);
+        const heartRates = samples.map(sample => Number(sample.hr)).filter(value => Number.isFinite(value) && value > 0 && value <= 250);
+        // Référence à 198 bpm par défaut ; si une activité dépasse cette valeur, on utilise
+        // automatiquement le maximum observé sur l’ensemble des activités importées.
+        // Seuils : 65 %, 81 %, 89 % et 97 % de la FC max de référence.
+        const maxHr = detectedMaxHeartRate();
+        if (heartRates.length) {
+          const limits = [0, .65, .81, .89, .97, Infinity].map(ratio => ratio === Infinity ? Infinity : maxHr * ratio);
           renderZoneChart($("#detail-hr-zones"), heartRates, limits, "Données FC indisponibles");
         } else { renderZoneChart($("#detail-hr-zones"), [], [], "Données FC indisponibles"); }
         const paces = samples.map(sample => Number(sample.pace_sec_km)).filter(value => Number.isFinite(value) && value > 0 && value < 1800);
