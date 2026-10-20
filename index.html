@@ -134,7 +134,7 @@
       height: 7px;
       border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 0 12px #c5f36a77
+      box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 47%, transparent)
     }
 
     h1 {
@@ -310,7 +310,7 @@
     }
 
     .section-heading {
-      margin: 25px 0 13px
+      margin: 18px 0 9px
     }
 
     .stats-grid {
@@ -534,7 +534,7 @@
     }
 
     .chart-value-bg {
-      fill: #c5f36a
+      fill: var(--accent)
     }
 
     .text-button {
@@ -1316,7 +1316,7 @@
       width: 100%;
       max-width: 30px;
       min-height: 2px;
-      background: #c5f36a;
+      background: var(--accent);
       border-radius: 5px 5px 1px 1px
     }
 
@@ -1684,7 +1684,8 @@
       }
 
       .section-heading {
-        margin-top: 30px;
+        margin-top: 22px;
+        margin-bottom: 9px;
       }
     }
 
@@ -1753,7 +1754,7 @@
 
     .zone-row {
       display: grid;
-      grid-template-columns: 24px minmax(0, 1fr) 42px;
+      grid-template-columns: 24px minmax(50px, 1fr) 42px minmax(76px, auto);
       align-items: center;
       gap: 9px;
     }
@@ -1765,15 +1766,15 @@
     }
 
     .zone-track {
-      height: 10px;
+      height: 16px;
       background: var(--panel2);
-      border-radius: 99px;
+      border-radius: 5px;
       overflow: hidden;
     }
 
     .zone-fill {
       height: 100%;
-      border-radius: 99px;
+      border-radius: 5px;
       background: var(--accent);
       min-width: 0;
     }
@@ -1782,8 +1783,30 @@
       margin-top: 24px;
     }
 
-    #detail-pace-zones .zone-fill {
-      background: #7fc8ff;
+    .zone-range {
+      color: var(--muted);
+      text-align: right;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .zone-value {
+      color: var(--text);
+      text-align: right;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    @media(max-width:380px) {
+      .zone-row {
+        grid-template-columns: 20px minmax(35px, 1fr) 36px minmax(68px, auto);
+        gap: 5px;
+      }
+
+      .zone-range {
+        font-size: 9px;
+      }
     }
 
     @media (max-width: 959px) {
@@ -1929,14 +1952,14 @@
           <div class="chart-panel">
             <div class="chart-title-row">
               <h3>Fréquence cardiaque</h3><button class="text-button chart-mode-toggle" data-chart="hr"
-                type="button">Vue précise GPS</button>
+                type="button">Détails</button>
             </div>
             <div id="detail-hr-chart" class="detail-chart"></div>
           </div>
           <div class="chart-panel">
             <div class="chart-title-row">
-              <h3>Allure</h3><button class="text-button chart-mode-toggle" data-chart="pace" type="button">Vue précise
-                GPS</button>
+              <h3>Allure</h3><button class="text-button chart-mode-toggle" data-chart="pace"
+                type="button">Détails</button>
             </div>
             <div id="detail-pace-chart" class="detail-chart"></div>
           </div>
@@ -1981,13 +2004,9 @@
           <div class="pace-row"><strong>Seuil contrôlé</strong><span>5:55–6:05 /km</span></div>
           <div class="pace-row"><strong>Intervalles de 2–4 min</strong><span>5:25–5:40 /km</span></div>
           <div class="pace-row"><strong>Allure semi visée (à confirmer)</strong><span>5:27 /km</span></div>
-          <p class="tiny">Les allures de base sont calées prudemment sur ton 10 km déclaré en 57:52 et sur ta sortie
-            récente. L’objectif 1 h 55 (5:27/km) est plus rapide que ton allure moyenne sur 10 km : il reste ambitieux
-            et doit être réévalué après un test contrôlé en janvier/février. En endurance, tu dois pouvoir parler en
-            phrases complètes ; si la respiration ou la fatigue ne correspond pas à l’effort visé, ralentis.</p>
+
         </div>
-        <p class="muted small">Choisis librement une date pour chaque séance. Une activité importée à la même date
-          valide automatiquement la séance correspondante.</p>
+
         <div id="plan-calendar" class="plan-calendar"></div>
       </section>
 
@@ -2003,8 +2022,8 @@
               aria-label="Vert citron" aria-pressed="true"></button>
             <button class="theme-swatch" type="button" data-accent="#67e8c0" style="background:#67e8c0"
               aria-label="Turquoise" aria-pressed="false"></button>
-            <button class="theme-swatch" type="button" data-accent="#7fc8ff" style="background:#7fc8ff"
-              aria-label="Bleu" aria-pressed="false"></button>
+            <button class="theme-swatch" type="button" data-accent="#ff5b5b" style="background:#ff5b5b"
+              aria-label="Rouge" aria-pressed="false"></button>
             <button class="theme-swatch" type="button" data-accent="#c4a1ff" style="background:#c4a1ff"
               aria-label="Violet" aria-pressed="false"></button>
             <button class="theme-swatch" type="button" data-accent="#ff9fbd" style="background:#ff9fbd"
@@ -2071,7 +2090,7 @@
       const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
       const ACCENT_KEY = "moapp-run-accent-v1";
       function applyAccent(color) {
-        const allowed = ["#c5f36a", "#67e8c0", "#7fc8ff", "#c4a1ff", "#ff9fbd", "#ffbd66"];
+        const allowed = ["#c5f36a", "#67e8c0", "#ff5b5b", "#c4a1ff", "#ff9fbd", "#ffbd66"];
         const chosen = allowed.includes(color) ? color : allowed[0];
         document.documentElement.style.setProperty("--accent", chosen);
         localStorage.setItem(ACCENT_KEY, chosen);
@@ -2106,8 +2125,8 @@
       }
       const HR_CHART_START = "2026-10-19";
       const HR_CATEGORY_COLORS = {
-        "Endurance facile": "#c5f36a",
-        "Séance qualité": "#7fc8ff",
+        "Endurance facile": "var(--accent)",
+        "Séance qualité": "var(--accent)",
         "Sortie longue": "#c4a1ff",
         "Non planifiée": "#ffbd66"
       };
@@ -2266,8 +2285,8 @@
         const grid = [0, 1, 2, 3].map(i => { const y = T + i * ih / 3, v = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#394034"/><text x="${L - 7}" y="${y + 3}" fill="#a0a79a" font-size="10" text-anchor="end">${label(v)}</text>` }).join("");
         const kmMarks = []; for (let km = Math.ceil(vals[0].x); km <= vals[vals.length - 1].x; km++) { const idx = vals.findIndex(v => v.x >= km); if (idx >= 0) { const x = xAt(idx); kmMarks.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${H - B}" stroke="#394034" stroke-dasharray="3 4"/><text x="${x}" y="${H - 10}" fill="#a0a79a" font-size="10" text-anchor="middle">${km} km</text>`) } }
         const pts = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
-        const dots = vals.map((v, i) => { const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${metric === "hr" ? "#c5f36a" : "#7fc8ff"}" stroke="#10120f" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>` }).join("");
-        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise">${grid}${kmMarks.join("")}<polyline points="${pts}" fill="none" stroke="${metric === "hr" ? "#c5f36a" : "#7fc8ff"}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
+        const dots = vals.map((v, i) => { const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${"var(--accent)"}" stroke="#10120f" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>` }).join("");
+        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise">${grid}${kmMarks.join("")}<polyline points="${pts}" fill="none" stroke="${"var(--accent)"}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
       }
       document.querySelectorAll(".chart-mode-toggle").forEach(button => button.addEventListener("click", () => {
         const a = activities.find(x => String(x.id) === String(document.querySelector("[data-activity-id][aria-current='true']")?.dataset.activityId));
@@ -2277,17 +2296,17 @@
         const metric = button.dataset.chart, target = $(metric === "hr" ? "#detail-hr-chart" : "#detail-pace-chart");
         if (target.dataset.mode === "precise") {
           target.dataset.mode = "km";
-          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "#c5f36a") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");
-          attachChartInteractions(target); button.textContent = "Vue précise GPS";
+          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "var(--accent)");
+          attachChartInteractions(target); button.textContent = "Détails";
         } else {
           target.dataset.mode = "precise";
           target.innerHTML = preciseLineSVG(activity.track_samples || [], metric);
           attachChartInteractions(target);
-          button.textContent = "Vue par kilomètre";
+          button.textContent = "Par kilomètre";
         }
       }));
 
-      function renderZoneChart(target, values, zones, emptyMessage) {
+      function renderZoneChart(target, values, zones, emptyMessage, ranges = []) {
         if (!target) return;
         const valid = values.filter(v => Number.isFinite(v) && v > 0);
         if (!valid.length) { target.innerHTML = `<div class="zone-empty">${emptyMessage}</div>`; return; }
@@ -2299,7 +2318,7 @@
         });
         target.innerHTML = counts.map((count, i) => {
           const pct = count / valid.length * 100;
-          return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span></div>`;
+          return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${ranges[i] || ""}</span></div>`;
         }).join("");
       }
       function detectedMaxHeartRate() {
@@ -2325,7 +2344,7 @@
         const maxHr = detectedMaxHeartRate();
         if (heartRates.length) {
           const limits = [0, .65, .81, .89, .97, Infinity].map(ratio => ratio === Infinity ? Infinity : maxHr * ratio);
-          renderZoneChart($("#detail-hr-zones"), heartRates, limits, "Données FC indisponibles");
+          renderZoneChart($("#detail-hr-zones"), heartRates, limits, "Données FC indisponibles", [`0–${Math.round(maxHr * .65) - 1} bpm`, `${Math.round(maxHr * .65)}–${Math.round(maxHr * .81) - 1} bpm`, `${Math.round(maxHr * .81)}–${Math.round(maxHr * .89) - 1} bpm`, `${Math.round(maxHr * .89)}–${Math.round(maxHr * .97) - 1} bpm`, `≥${Math.round(maxHr * .97)} bpm`]);
         } else { renderZoneChart($("#detail-hr-zones"), [], [], "Données FC indisponibles"); }
         const paces = samples.map(sample => Number(sample.pace_sec_km)).filter(value => Number.isFinite(value) && value > 0 && value < 1800);
         // Zones d’allure relatives à l’allure cible semi (5:27/km), de la plus lente à la plus rapide.
@@ -2338,7 +2357,7 @@
         });
         const paceTarget = $("#detail-pace-zones");
         if (!paces.length) paceTarget.innerHTML = '<div class="zone-empty">Données d’allure indisponibles</div>';
-        else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span></div>`; }).join("");
+        else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${ranges[i] || ""}</span></div>`; }).join("");
       }
 
       function openActivityDetail(id) {
@@ -2354,9 +2373,9 @@
         $("#detail-avg-hr").textContent = a.avg_hr ? `${Math.round(a.avg_hr)} bpm` : "—";
         $("#detail-hr-chart").dataset.mode = "km";
         $("#detail-pace-chart").dataset.mode = "km";
-        $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "#c5f36a");
-        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
-        document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Vue précise GPS");
+        $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)");
+        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "var(--accent)");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
+        document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Détails");
         renderActivityZones(a);
         $("#detail-no-gpx").textContent = "";
         $("#activity-detail").scrollIntoView({ behavior: "smooth", block: "start" });
