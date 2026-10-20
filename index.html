@@ -1779,6 +1779,10 @@
       min-width: 0;
     }
 
+    #detail-pace-zones .zone-fill {
+      background: #3b82f6;
+    }
+
     .zone-panel {
       margin-top: 24px;
     }
@@ -2296,7 +2300,7 @@
         const metric = button.dataset.chart, target = $(metric === "hr" ? "#detail-hr-chart" : "#detail-pace-chart");
         if (target.dataset.mode === "precise") {
           target.dataset.mode = "km";
-          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "var(--accent)");
+          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#3b82f6");
           attachChartInteractions(target); button.textContent = "Détails";
         } else {
           target.dataset.mode = "precise";
@@ -2335,6 +2339,7 @@
         }
         return Math.round(detected);
       }
+      function formatPaceSeconds(seconds) { const value = Math.round(seconds); return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, "0")}/km`; }
       function renderActivityZones(activity) {
         const samples = activity.track_samples || [];
         const heartRates = samples.map(sample => Number(sample.hr)).filter(value => Number.isFinite(value) && value > 0 && value <= 250);
@@ -2356,8 +2361,9 @@
           paceCounts[zone]++;
         });
         const paceTarget = $("#detail-pace-zones");
+        const paceRanges = [`> ${formatPaceSeconds(targetPace * 1.2)}`, `${formatPaceSeconds(targetPace * 1.1)}–${formatPaceSeconds(targetPace * 1.2)}`, `${formatPaceSeconds(targetPace)}–${formatPaceSeconds(targetPace * 1.1)}`, `${formatPaceSeconds(targetPace * .9)}–${formatPaceSeconds(targetPace)}`, `< ${formatPaceSeconds(targetPace * .9)}`];
         if (!paces.length) paceTarget.innerHTML = '<div class="zone-empty">Données d’allure indisponibles</div>';
-        else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${ranges[i] || ""}</span></div>`; }).join("");
+        else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%;background:#3b82f6"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${paceRanges[i]}</span></div>`; }).join("");
       }
 
       function openActivityDetail(id) {
@@ -2374,7 +2380,7 @@
         $("#detail-hr-chart").dataset.mode = "km";
         $("#detail-pace-chart").dataset.mode = "km";
         $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)");
-        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "var(--accent)");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
+        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#3b82f6");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
         document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Détails");
         renderActivityZones(a);
         $("#detail-no-gpx").textContent = "";
