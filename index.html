@@ -385,6 +385,23 @@
       gap: 5px 7px
     }
 
+    #week-session-days {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      text-transform: lowercase;
+    }
+
+    .home-plan-day {
+      display: inline-block;
+    }
+
+    .home-plan-day.is-disabled {
+      text-decoration: line-through;
+      opacity: .55;
+    }
+
     .week-summary-item:first-child {
       padding-left: 0;
       border-right: 1px solid var(--line)
@@ -1177,6 +1194,24 @@
       font-weight: 500;
     }
 
+    .plan-distance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .plan-distance-row .planned-stat {
+      margin-top: 5px;
+      min-width: 0;
+    }
+
+    .plan-distance-row .feeling-badge {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
     .plan-week-switch {
       display: grid;
       grid-template-columns: 40px minmax(0, 1fr) 40px;
@@ -1484,6 +1519,101 @@
       border-radius: 10px
     }
 
+    .plan-day-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      align-self: stretch;
+      gap: 6px;
+      flex: 0 0 54px;
+    }
+
+    .plan-day-column .plan-session-switch {
+      margin-top: auto;
+      margin-left: 0;
+      align-self: center;
+    }
+
+    .plan-session-switch {
+      position: relative;
+      display: block;
+      width: 43px !important;
+      min-width: 43px;
+      max-width: 43px;
+      height: 24px !important;
+      min-height: 24px;
+      flex: 0 0 24px;
+      padding: 0 !important;
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      line-height: 0;
+    }
+
+    .plan-session-switch input {
+      position: absolute !important;
+      appearance: none;
+      -webkit-appearance: none;
+      opacity: 0;
+      width: 1px !important;
+      height: 1px !important;
+      min-width: 1px !important;
+      min-height: 1px !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    .plan-session-switch .switch-track {
+      position: absolute;
+      display: block;
+      box-sizing: border-box;
+      width: 43px;
+      height: 24px;
+      inset: 0 auto auto 0;
+      border-radius: 999px;
+      background: #737373;
+      transition: background .18s ease;
+    }
+
+    .plan-session-switch .switch-track::after {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform .18s ease;
+      box-shadow: 0 1px 2px #0003;
+    }
+
+    .plan-session-switch input:checked+.switch-track {
+      background: var(--accent);
+    }
+
+    .plan-session-switch input:checked+.switch-track::after {
+      transform: translateX(19px);
+    }
+
+    .plan-session-switch input:focus-visible+.switch-track {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .plan-workout.disabled-session {
+      opacity: .48;
+    }
+
+    .plan-workout.disabled-session .plan-workout-body {
+      filter: saturate(.5);
+    }
+
+    .plan-workout.disabled-session .plan-workout-title-row>strong {
+      text-decoration: line-through;
+    }
+
     .plan-workout-body {
       flex: 1;
       min-width: 0
@@ -1491,6 +1621,53 @@
 
     .plan-workout-body p {
       overflow-wrap: anywhere
+    }
+
+
+    .feeling-panel {
+      margin-top: 24px;
+    }
+
+    .feeling-panel .chart-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .feeling-panel .chart-title-row strong {
+      color: var(--accent);
+      font-size: 18px;
+      white-space: nowrap;
+    }
+
+    .feeling-panel .chart-title-row strong small {
+      font-size: 11px;
+      margin-left: 3px;
+      color: var(--muted);
+    }
+
+    .feeling-slider {
+      display: block;
+      width: 100%;
+      margin: 16px 0 8px;
+      accent-color: var(--feeling-color, var(--accent));
+      touch-action: pan-y;
+    }
+
+    .feeling-scale {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .feeling-badge {
+      color: var(--accent);
+      font-size: 10px;
+      line-height: 1.35;
+      font-weight: 500;
+      white-space: nowrap;
     }
 
     .plan-workout-title-row {
@@ -2070,8 +2247,8 @@
           </div>
           <div class="week-summary-item">
             <div class="week-summary-label"><span class="stat-icon">✓</span><small>Séances</small></div>
-            <div class="week-summary-value"><strong id="week-sessions">0 <em>/ 3</em></strong><small>lundi · mercredi ·
-                samedi</small></div>
+            <div class="week-summary-value"><strong id="week-sessions">0 <em>/ 3</em></strong><small
+                id="week-session-days">—</small></div>
           </div>
         </article>
         <div class="section-heading">
@@ -2160,6 +2337,15 @@
             <h3>Zones d’allure</h3>
             <div id="detail-pace-zones" class="zone-chart" aria-label="Répartition de l’allure par zones"></div>
           </div>
+          <section class="chart-panel feeling-panel" aria-labelledby="feeling-title">
+            <div class="chart-title-row">
+              <h3 id="feeling-title">Ressenti de la séance</h3><strong><span
+                  id="feeling-value">—</span><small>/10</small></strong>
+            </div>
+            <input id="activity-feeling" class="feeling-slider" type="range" min="1" max="10" step="1" value="5"
+              aria-label="Ressenti de la séance sur 10">
+            <div class="feeling-scale"><span>Très facile</span><span>Très difficile</span></div>
+          </section>
           <p id="detail-no-gpx" class="tiny"></p>
         </section>
       </section>
@@ -2290,11 +2476,17 @@
     /* MoApp Run — version simple, sans backend ni secrets. */
     (() => {
       "use strict";
-      const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1";
+      const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1";
       const readPlanDates = () => { try { return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") } catch { return {} } };
       let planDates = readPlanDates();
+      const DELETED_SESSIONS_KEY = "moapp-run-deleted-sessions-v1";
+      const readDeletedSessions = () => { try { return JSON.parse(localStorage.getItem(DELETED_SESSIONS_KEY) || "[]") } catch { return [] } };
+      let deletedSessions = new Set(readDeletedSessions());
+      const isSessionDeleted = (w, j) => deletedSessions.has(`${w}-${j}`);
       const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]") } catch { return [] } };
       let activities = read();
+      const readFeelings = () => { try { return JSON.parse(localStorage.getItem(FEELING_KEY) || "{}") } catch { return {} } };
+      let feelings = readFeelings();
       const dateFmt = v => { const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(d) };
       const pace = (km, min) => { if (!(km > 0 && min > 0)) return "—"; const s = Math.round(min * 60 / km); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` };
       const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -2446,8 +2638,19 @@
       function render() {
         const sorted = [...activities].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         const week = activities.filter(a => new Date(a.start_date) >= monday && new Date(a.start_date) < next);
+        const plannedDays = [];
+        planWeeks.forEach((w, wi) => w[1].forEach((_, di) => {
+          const d = sessionDate(wi, di);
+          if (d >= monday && d < next) plannedDays.push({ date: d, disabled: isSessionDeleted(wi, di) });
+        }));
+        const plannedThisWeek = plannedDays.filter(item => !item.disabled).length;
         $("#week-distance").textContent = week.reduce((s, a) => s + Number(a.distance_km || 0), 0).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
-        $("#week-sessions").innerHTML = `${week.length} <em>/ 3</em>`;
+        $("#week-sessions").innerHTML = `${week.length} <em>/ ${plannedThisWeek}</em>`;
+        const daysEl = $("#week-session-days");
+        if (daysEl) daysEl.innerHTML = plannedDays.length ? plannedDays.map(item => {
+          const label = item.date.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "");
+          return `<span class="home-plan-day${item.disabled ? " is-disabled" : ""}"${item.disabled ? ' aria-label="Séance désactivée"' : ""}>${esc(label)}</span>`;
+        }).join(' <span aria-hidden="true">·</span> ') : "Aucune séance prévue";
         $("#activity-count").textContent = `${activities.length} sortie${activities.length > 1 ? "s" : ""}`;
         const detailPanel = $("#activity-detail");
         if (detailPanel) { detailPanel.hidden = true; $("#activites").append(detailPanel); }
@@ -2473,6 +2676,29 @@
       const closeActivityDetail = () => { $("#activity-detail").hidden = true; window.currentDetailActivityId = null; };
       detailTitle.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); closeActivityDetail(); });
       detailTitle.addEventListener("touchend", e => { e.preventDefault(); closeActivityDetail(); }, { passive: false });
+      const feelingSlider = $("#activity-feeling");
+      function feelingColor(value) {
+        if (value == null || value <= 3) return "#22c55e";
+        if (value <= 6) return "#eab308";
+        return "#ef4444";
+      }
+      function updateFeelingDisplay(value) {
+        const color = feelingColor(value);
+        const valueEl = $("#feeling-value");
+        valueEl.textContent = value == null ? "—" : String(value);
+        valueEl.style.color = value == null ? "var(--muted)" : color;
+        feelingSlider.style.setProperty("--feeling-color", color);
+        feelingSlider.style.accentColor = color;
+      }
+      feelingSlider.addEventListener("input", () => updateFeelingDisplay(Number(feelingSlider.value)));
+      feelingSlider.addEventListener("change", () => {
+        const id = window.currentDetailActivityId;
+        if (id == null) return;
+        feelings[String(id)] = Number(feelingSlider.value);
+        localStorage.setItem(FEELING_KEY, JSON.stringify(feelings));
+        renderPlan();
+        toast("Ressenti enregistré");
+      });
       document.addEventListener("click", e => {
         const card = e.target.closest("[data-activity-id]"); if (card) openActivityDetail(card.dataset.activityId);
       });
@@ -2605,6 +2831,9 @@
       function openActivityDetail(id) {
         const a = activities.find(x => String(x.id) === String(id)); if (!a) return;
         window.currentDetailActivityId = a.id;
+        const savedFeeling = feelings[String(a.id)];
+        $("#activity-feeling").value = savedFeeling == null ? 5 : savedFeeling;
+        updateFeelingDisplay(savedFeeling == null ? null : savedFeeling);
         const detailPanel = $("#activity-detail");
         const activityCard = [...document.querySelectorAll("#all-activities [data-activity-id]")].find(el => String(el.dataset.activityId) === String(a.id));
         if (activityCard) activityCard.after(detailPanel);
@@ -2815,7 +3044,7 @@
       let workoutCarouselIndex = -1;
       function getWorkoutCards() {
         const cards = [];
-        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => cards.push({ week: i, day: j, date: sessionDate(i, j), desc, isRace: i === 21 && j === 2, done: isSessionDone(i, j) })));
+        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => { if (!isSessionDeleted(i, j)) cards.push({ week: i, day: j, date: sessionDate(i, j), desc, isRace: i === 21 && j === 2, done: isSessionDone(i, j) }); }));
         return cards.sort((a, b) => a.date - b.date);
       }
       function renderNextWorkout() {
@@ -2884,7 +3113,7 @@
         const day = sessionActivityDate(activity);
         for (let wi = 0; wi < planWeeks.length; wi++) {
           for (let di = 0; di < planWeeks[wi][1].length; di++) {
-            if (isoDay(sessionDate(wi, di)) !== day) continue;
+            if (isSessionDeleted(wi, di) || isoDay(sessionDate(wi, di)) !== day) continue;
             const desc = planWeeks[wi][1][di];
             const durationMatches = [...desc.matchAll(/(\d+)\s*min/gi)].map(m => m[1] + " min");
             const paceMatches = [...desc.matchAll(/(\d:\d{2})\s*[–-]\s*(\d:\d{2})\s*\/km/g)].map(m => `${m[1]}–${m[2]}/km`);
@@ -2897,19 +3126,29 @@
       let currentPlanWeek = (() => { const now = new Date(); now.setHours(12, 0, 0, 0); return Math.max(0, Math.min(21, Math.floor((now - calendarStart) / (7 * 86400000)))) })();
       function renderPlan() {
         const calendar = $("#plan-calendar"); if (!calendar) return;
-        const days = ["LUN", "MER", "SAM"];
         const i = currentPlanWeek, w = planWeeks[i];
         const monday = new Date(calendarStart); monday.setDate(calendarStart.getDate() + i * 7);
         const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
         const workouts = w[1].map((desc, j) => {
           const d = sessionDate(i, j), date = fmtPlan(d), isRace = i === 21 && j === 2, done = isSessionDone(i, j), key = `${i}-${j}`;
+          const disabled = isSessionDeleted(i, j);
+          const dayLabel = d.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "").toLocaleUpperCase("fr-FR");
           const paceHint = isRace ? "Objectif indicatif : 5:27/km si confirmé" : desc.toLowerCase().includes("facile") ? "6:35–7:15/km" : desc.includes("5:") ? "Respecte la plage d’allure écrite dans la séance" : "Effort régulier, contrôlé";
-          return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span><br><span class="planned-stat">Distance prévue : ${esc(plannedDistanceForSession(desc, i, j))}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
+          const completedActivity = activities.find(a => sessionActivityDate(a) === isoDay(d));
+          const feeling = completedActivity ? feelings[String(completedActivity.id)] : null;
+          return `<div class="workout plan-workout ${done ? "completed" : ""} ${disabled ? "disabled-session" : ""}"><div class="plan-day-column"><span class="day">${dayLabel}<br><small>${date}</small></span><label class="plan-session-switch" title="${disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-session="${key}" ${disabled ? "" : "checked"} aria-label="${disabled ? "Activer" : "Désactiver"} la séance du ${esc(dayLabel)}"><span class="switch-track"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span><br><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(plannedDistanceForSession(desc, i, j))}</span>${feeling != null ? `<span class="feeling-badge" style="color:${feelingColor(feeling)}" aria-label="Ressenti : ${feeling} sur 10">Ressenti : ${feeling}/10</span>` : ""}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
         }).join("");
         calendar.innerHTML = `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${workouts}</article>`;
         $("#plan-week-counter").textContent = `Semaine ${i + 1} / ${planWeeks.length}`;
         $("#plan-week-dates").textContent = `${fmtPlan(monday)} – ${fmtPlan(sunday)}`;
         $("#plan-week-prev").disabled = i === 0; $("#plan-week-next").disabled = i === planWeeks.length - 1;
+        calendar.querySelectorAll("[data-toggle-session]").forEach(input => input.addEventListener("change", () => {
+          const key = input.dataset.toggleSession;
+          if (input.checked) deletedSessions.delete(key); else deletedSessions.add(key);
+          localStorage.setItem(DELETED_SESSIONS_KEY, JSON.stringify([...deletedSessions]));
+          render(); renderProgress(); renderNextWorkout();
+          toast(input.checked ? "Séance activée dans le plan." : "Séance désactivée du plan.");
+        }));
         calendar.querySelectorAll("[data-pick-date]").forEach(btn => btn.addEventListener("click", () => {
           const picker = calendar.querySelector(`[data-plan-date="${btn.dataset.pickDate}"]`);
           if (picker) { picker.parentElement.hidden = false; picker.focus(); picker.showPicker?.() }
@@ -2929,7 +3168,7 @@
       }
       function renderProgress() {
         let total = 0, done = 0;
-        planWeeks.forEach((w, i) => w[1].forEach((_, j) => { const d = sessionDate(i, j); if (d <= raceDay) { total++; if (isSessionDone(i, j)) done++ } }));
+        planWeeks.forEach((w, i) => w[1].forEach((_, j) => { if (isSessionDeleted(i, j)) return; const d = sessionDate(i, j); if (d <= raceDay) { total++; if (isSessionDone(i, j)) done++ } }));
         const pct = total ? Math.round(done / total * 100) : 0;
         $("#plan-progress-count").textContent = `${done} / ${total} séances`;
         $("#plan-progress-percent").textContent = `${pct} %`;
