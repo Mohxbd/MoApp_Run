@@ -1514,31 +1514,78 @@
       flex: 0 0 54px;
     }
 
-    .plan-day-column .plan-delete-button {
+    .plan-day-column .plan-session-switch {
       margin-top: auto;
     }
 
-    .plan-delete-button {
-      display: flex;
+    .plan-session-switch {
+      position: relative;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      border: 0;
-      background: transparent;
-      color: #ef4444;
-      padding: 4px;
-      cursor: pointer;
-      border-radius: 6px;
+      width: 34px;
+      height: 20px;
+      flex: 0 0 34px;
     }
 
-    .plan-delete-button svg {
-      width: 17px;
-      height: 17px;
+    .plan-session-switch input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+    }
+
+    .plan-session-switch .switch-track {
+      width: 34px;
+      height: 20px;
+      border-radius: 999px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      transition: background .18s ease;
+    }
+
+    .plan-session-switch .switch-track::after {
+      content: "";
       display: block;
+      width: 14px;
+      height: 14px;
+      margin: 2px;
+      border-radius: 50%;
+      background: var(--text);
+      transition: transform .18s ease;
     }
 
-    .plan-delete-button:active {
-      color: #b91c1c;
-      background: rgba(239, 68, 68, .10);
+    .plan-session-switch input:checked+.switch-track {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .plan-session-switch input:checked+.switch-track::after {
+      background: #172016;
+      transform: translateX(14px);
+    }
+
+    .plan-session-switch input:focus-visible+.switch-track {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .plan-workout.disabled-session {
+      opacity: .48;
+    }
+
+    .plan-workout.disabled-session .plan-workout-body>p {
+      text-decoration: line-through;
+    }
+
+    .home-planned-days {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0 4px;
+    }
+
+    .home-planned-days .disabled-day {
+      text-decoration: line-through;
+      opacity: .55;
     }
 
     .plan-workout-body {
@@ -2262,8 +2309,8 @@
           </div>
           <div class="week-summary-item">
             <div class="week-summary-label"><span class="stat-icon">✓</span><small>Séances</small></div>
-            <div class="week-summary-value"><strong id="week-sessions">0 <em>/ 3</em></strong><small>lundi · mercredi ·
-                samedi</small></div>
+            <div class="week-summary-value"><strong id="week-sessions">0 <em>/ 3</em></strong><small
+                id="week-planned-days" class="home-planned-days">lundi · mercredi · samedi</small></div>
           </div>
         </article>
         <div class="section-heading">
@@ -2503,10 +2550,11 @@
       const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1";
       const readPlanDates = () => { try { return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") } catch { return {} } };
       let planDates = readPlanDates();
-      const DELETED_SESSIONS_KEY = "moapp-run-deleted-sessions-v1";
-      const readDeletedSessions = () => { try { return JSON.parse(localStorage.getItem(DELETED_SESSIONS_KEY) || "[]") } catch { return [] } };
-      let deletedSessions = new Set(readDeletedSessions());
-      const isSessionDeleted = (w, j) => deletedSessions.has(`${w}-${j}`);
+      const DISABLED_SESSIONS_KEY = "moapp-run-disabled-sessions-v1";
+      const readDisabledSessions = () => { try { return JSON.parse(localStorage.getItem(DISABLED_SESSIONS_KEY) || localStorage.getItem("moapp-run-deleted-sessions-v1") || "[]") } catch { return [] } };
+      let disabledSessions = new Set(readDisabledSessions());
+      const isSessionDisabled = (w, j) => disabledSessions.has(`${w}-${j}`);
+      const isSessionDeleted = isSessionDisabled; // compatibilité avec les calculs existants
       const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]") } catch { return [] } };
       let activities = read();
       const readFeelings = () => { try { return JSON.parse(localStorage.getItem(FEELING_KEY) || "{}") } catch { return {} } };
@@ -2665,6 +2713,16 @@
         const plannedThisWeek = planWeeks.reduce((count, w, wi) => count + w[1].filter((_, di) => { const d = sessionDate(wi, di); return !isSessionDeleted(wi, di) && d >= monday && d < next; }).length, 0);
         $("#week-distance").textContent = week.reduce((s, a) => s + Number(a.distance_km || 0), 0).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
         $("#week-sessions").innerHTML = `${week.length} <em>/ ${plannedThisWeek}</em>`;
+        const plannedDaysEl = $("#week-planned-days");
+        if (plannedDaysEl) {
+          const dayEntries = [];
+          planWeeks.forEach((w, wi) => w[1].forEach((_, di) => {
+            const d = sessionDate(wi, di);
+            if (d >= monday && d < next) dayEntries.push({ wi, di, d, label: d.toLocaleDateString("fr-FR", { weekday: "long" }) });
+          }));
+          dayEntries.sort((a, b) => a.d - b.d);
+          plannedDaysEl.innerHTML = dayEntries.length ? dayEntries.map(x => `<span class="${isSessionDisabled(x.wi, x.di) ? "disabled-day" : ""}">${esc(x.label)}</span>`).join('<span aria-hidden="true">·</span>') : "Aucune séance prévue";
+        }
         $("#activity-count").textContent = `${activities.length} sortie${activities.length > 1 ? "s" : ""}`;
         const detailPanel = $("#activity-detail");
         if (detailPanel) { detailPanel.hidden = true; $("#activites").append(detailPanel); }
@@ -3121,7 +3179,7 @@
       let workoutCarouselIndex = -1;
       function getWorkoutCards() {
         const cards = [];
-        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => { if (!isSessionDeleted(i, j)) cards.push({ week: i, day: j, date: sessionDate(i, j), desc, isRace: i === 21 && j === 2, done: isSessionDone(i, j) }); }));
+        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => { if (!isSessionDisabled(i, j)) cards.push({ week: i, day: j, date: sessionDate(i, j), desc, isRace: i === 21 && j === 2, done: isSessionDone(i, j) }); }));
         return cards.sort((a, b) => a.date - b.date);
       }
       function renderNextWorkout() {
@@ -3208,22 +3266,23 @@
         const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
         const workouts = w[1].map((desc, j) => {
           const d = sessionDate(i, j), date = fmtPlan(d), isRace = i === 21 && j === 2, done = isSessionDone(i, j), key = `${i}-${j}`;
-          if (isSessionDeleted(i, j)) return "";
+          const disabled = isSessionDisabled(i, j);
           const dayLabel = d.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "").toLocaleUpperCase("fr-FR");
           const paceHint = isRace ? "Objectif indicatif : 5:27/km si confirmé" : desc.toLowerCase().includes("facile") ? "6:35–7:15/km" : desc.includes("5:") ? "Respecte la plage d’allure écrite dans la séance" : "Effort régulier, contrôlé";
           const completedActivity = activities.find(a => sessionActivityDate(a) === isoDay(d));
           const feeling = completedActivity ? feelings[String(completedActivity.id)] : null;
-          return `<div class="workout plan-workout ${done ? "completed" : ""}"><div class="plan-day-column"><span class="day">${dayLabel}<br><small>${date}</small></span><button class="plan-delete-button" data-delete-session="${key}" type="button" aria-label="Supprimer cette séance" title="Supprimer cette séance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg></button></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span><br><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(plannedDistanceForSession(desc, i, j))}</span>${feeling != null ? `<span class="feeling-badge" style="color:${feelingColor(feeling)}" aria-label="Ressenti : ${feeling} sur 10">Ressenti : ${feeling}/10</span>` : ""}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
+          return `<div class="workout plan-workout ${done ? "completed" : ""} ${disabled ? "disabled-session" : ""}"><div class="plan-day-column"><span class="day">${dayLabel}<br><small>${date}</small></span><label class="plan-session-switch" title="${disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-session="${key}" ${disabled ? "" : "checked"} aria-label="${disabled ? "Activer" : "Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span><br><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(plannedDistanceForSession(desc, i, j))}</span>${feeling != null ? `<span class="feeling-badge" style="color:${feelingColor(feeling)}" aria-label="Ressenti : ${feeling} sur 10">Ressenti : ${feeling}/10</span>` : ""}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
         }).join("");
         calendar.innerHTML = `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${workouts}</article>`;
         $("#plan-week-counter").textContent = `Semaine ${i + 1} / ${planWeeks.length}`;
         $("#plan-week-dates").textContent = `${fmtPlan(monday)} – ${fmtPlan(sunday)}`;
         $("#plan-week-prev").disabled = i === 0; $("#plan-week-next").disabled = i === planWeeks.length - 1;
-        calendar.querySelectorAll("[data-delete-session]").forEach(btn => btn.addEventListener("click", () => {
-          const key = btn.dataset.deleteSession;
-          if (!confirm("Supprimer cette séance du plan ? Cette action ne supprime aucune activité importée.")) return;
-          deletedSessions.add(key); localStorage.setItem(DELETED_SESSIONS_KEY, JSON.stringify([...deletedSessions]));
-          render(); renderProgress(); renderNextWorkout(); toast("Séance supprimée du plan.");
+        calendar.querySelectorAll("[data-toggle-session]").forEach(input => input.addEventListener("change", () => {
+          const key = input.dataset.toggleSession;
+          if (input.checked) disabledSessions.delete(key); else disabledSessions.add(key);
+          localStorage.setItem(DISABLED_SESSIONS_KEY, JSON.stringify([...disabledSessions]));
+          render();
+          toast(input.checked ? "Séance activée." : "Séance désactivée.");
         }));
         calendar.querySelectorAll("[data-pick-date]").forEach(btn => btn.addEventListener("click", () => {
           const picker = calendar.querySelector(`[data-plan-date="${btn.dataset.pickDate}"]`);
@@ -3232,7 +3291,10 @@
         calendar.querySelectorAll("[data-plan-date]").forEach(input => input.addEventListener("change", () => {
           const key = input.dataset.planDate; if (!input.value) return;
           planDates[key] = input.value; localStorage.setItem(PLAN_KEY, JSON.stringify(planDates));
-          renderPlan(); renderProgress(); toast("Date de séance mise à jour.");
+          const cards = getWorkoutCards();
+          workoutCarouselIndex = -1;
+          render();
+          toast("Date de séance mise à jour.");
         }));
       }
       function setupPlanWeekSwipe() {
