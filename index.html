@@ -1724,6 +1724,72 @@
         gap: 10px;
       }
     }
+
+
+    .objective-progress {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #ffffff17;
+    }
+
+    .objective-progress .progress-copy {
+      margin-bottom: 7px;
+      font-size: 11px;
+    }
+
+    .objective-progress .progress-copy strong {
+      font-size: 11px;
+    }
+
+    .objective-progress .progress-track {
+      height: 7px;
+      background: #30362c;
+    }
+
+    .zone-chart {
+      display: grid;
+      gap: 9px;
+    }
+
+    .zone-row {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) 42px;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .zone-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .zone-track {
+      height: 10px;
+      background: var(--panel2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .zone-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+      min-width: 0;
+    }
+
+    .zone-value {
+      color: var(--text);
+      text-align: right;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .zone-empty {
+      color: var(--muted);
+      font-size: 12px;
+      padding: 8px 0;
+    }
   </style>
   <title>MoApp Run</title>
 </head>
@@ -1748,17 +1814,14 @@
             <div><small>Allure théorique</small><strong>5:27 <small>/ km</small></strong></div>
             <div><small>Date visée</small><strong>21 mars 2027</strong></div>
           </div>
-
+          <div class="objective-progress">
+            <div class="progress-copy"><strong id="plan-progress-count">0 / 66 séances</strong><span
+                id="plan-progress-percent">0 %</span></div>
+            <div class="progress-track">
+              <div id="plan-progress-bar" class="progress-fill" style="width:0%"></div>
+            </div>
+          </div>
         </article>
-        <div class="section-heading">
-          <h2>Prochaine séance</h2><span class="muted small" id="next-workout-counter"></span>
-        </div>
-        <section id="next-workout-carousel" class="next-workout-carousel" aria-label="Séances précédentes et à venir">
-          <button class="carousel-arrow" id="workout-prev" type="button" aria-label="Séance précédente">‹</button>
-          <article id="next-workout-card" class="next-workout-card" aria-live="polite"></article>
-          <button class="carousel-arrow" id="workout-next" type="button" aria-label="Séance suivante">›</button>
-        </section>
-        <p class="tiny">Fais glisser la carte vers la gauche ou la droite pour parcourir les séances.</p>
         <div class="section-heading">
           <h2>Ta semaine</h2><span id="week-range" class="muted small"></span>
         </div>
@@ -1774,19 +1837,16 @@
           </div>
         </article>
         <div class="section-heading">
-          <h2>Préparation</h2><span id="plan-progress-label" class="muted small">0 %</span>
+          <h2>Prochaine séance</h2><span class="muted small" id="next-workout-counter"></span>
         </div>
-        <article class="panel">
-          <div class="progress-copy"><strong id="plan-progress-count">0 / 66 séances</strong><span
-              id="plan-progress-percent">0 %</span></div>
-          <div class="progress-track">
-            <div id="plan-progress-bar" class="progress-fill" style="width:0%"></div>
-          </div>
-          <p class="tiny">Séances validées automatiquement lorsqu’une activité est enregistrée à la même date que la
-            séance prévue.</p>
-        </article>
+        <section id="next-workout-carousel" class="next-workout-carousel" aria-label="Séances précédentes et à venir">
+          <button class="carousel-arrow" id="workout-prev" type="button" aria-label="Séance précédente">‹</button>
+          <article id="next-workout-card" class="next-workout-card" aria-live="polite"></article>
+          <button class="carousel-arrow" id="workout-next" type="button" aria-label="Séance suivante">›</button>
+        </section>
+        <p class="tiny">Fais glisser la carte vers la gauche ou la droite pour parcourir les séances.</p>
         <div class="section-heading">
-          <h2>Volume hebdomadaire</h2><span class="muted small">Cette semaine + 11 suivantes</span>
+          <h2>Volume hebdomadaire</h2>
         </div>
         <article class="panel">
           <div id="weekly-volume-chart" class="volume-chart" aria-label="Kilomètres par semaine"></div>
@@ -1858,6 +1918,15 @@
                 GPS</button>
             </div>
             <div id="detail-pace-chart" class="detail-chart"></div>
+          </div>
+          <div class="chart-panel zone-panel">
+            <h3>Zones de fréquence cardiaque</h3>
+            <div id="detail-hr-zones" class="zone-chart" aria-label="Répartition de la fréquence cardiaque par zones">
+            </div>
+          </div>
+          <div class="chart-panel zone-panel">
+            <h3>Zones d’allure</h3>
+            <div id="detail-pace-zones" class="zone-chart" aria-label="Répartition de l’allure par zones"></div>
           </div>
           <p id="detail-no-gpx" class="tiny"></p>
         </section>
@@ -2197,6 +2266,43 @@
         }
       }));
 
+      function renderZoneChart(target, values, zones, emptyMessage) {
+        if (!target) return;
+        const valid = values.filter(v => Number.isFinite(v) && v > 0);
+        if (!valid.length) { target.innerHTML = `<div class="zone-empty">${emptyMessage}</div>`; return; }
+        const counts = [0, 0, 0, 0, 0];
+        valid.forEach(value => {
+          let zone = zones.findIndex((limit, i) => i < zones.length - 1 && value >= limit && value < zones[i + 1]);
+          if (zone < 0) zone = value < zones[0] ? 0 : 4;
+          counts[Math.max(0, Math.min(4, zone))]++;
+        });
+        target.innerHTML = counts.map((count, i) => {
+          const pct = count / valid.length * 100;
+          return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span></div>`;
+        }).join("");
+      }
+      function renderActivityZones(activity) {
+        const samples = activity.track_samples || [];
+        const heartRates = samples.map(sample => Number(sample.hr)).filter(value => Number.isFinite(value) && value > 0);
+        const maxHr = Number(activity.max_hr) || (heartRates.length ? Math.max(...heartRates) : 0);
+        if (maxHr > 0) {
+          const limits = [0, .6, .7, .8, .9, 1.01].map(ratio => maxHr * ratio);
+          renderZoneChart($("#detail-hr-zones"), heartRates, limits, "Données FC indisponibles");
+        } else { renderZoneChart($("#detail-hr-zones"), [], [], "Données FC indisponibles"); }
+        const paces = samples.map(sample => Number(sample.pace_sec_km)).filter(value => Number.isFinite(value) && value > 0 && value < 1800);
+        // Zones d’allure relatives à l’allure cible semi (5:27/km), de la plus lente à la plus rapide.
+        const targetPace = 327;
+        // Z1 = allure la plus lente, Z5 = allure la plus rapide.
+        const paceCounts = [0, 0, 0, 0, 0];
+        paces.forEach(value => {
+          const zone = value > targetPace * 1.2 ? 0 : value > targetPace * 1.1 ? 1 : value > targetPace ? 2 : value > targetPace * .9 ? 3 : 4;
+          paceCounts[zone]++;
+        });
+        const paceTarget = $("#detail-pace-zones");
+        if (!paces.length) paceTarget.innerHTML = '<div class="zone-empty">Données d’allure indisponibles</div>';
+        else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="zone-value">${Math.round(pct)} %</span></div>`; }).join("");
+      }
+
       function openActivityDetail(id) {
         const a = activities.find(x => String(x.id) === String(id)); if (!a) return;
         window.currentDetailActivityId = a.id;
@@ -2213,6 +2319,7 @@
         $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "#c5f36a");
         $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "#7fc8ff");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
         document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Vue précise GPS");
+        renderActivityZones(a);
         $("#detail-no-gpx").textContent = "";
         $("#activity-detail").scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -2451,7 +2558,6 @@
         let total = 0, done = 0;
         planWeeks.forEach((w, i) => w[1].forEach((_, j) => { const d = sessionDate(i, j); if (d <= raceDay) { total++; if (isSessionDone(i, j)) done++ } }));
         const pct = total ? Math.round(done / total * 100) : 0;
-        $("#plan-progress-label").textContent = `${pct} %`;
         $("#plan-progress-count").textContent = `${done} / ${total} séances`;
         $("#plan-progress-percent").textContent = `${pct} %`;
         $("#plan-progress-bar").style.width = `${pct}%`;
