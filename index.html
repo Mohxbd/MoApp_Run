@@ -1956,6 +1956,8 @@
         $("#week-sessions").innerHTML = `${week.length} <em>/ 3</em>`;
         $("#activity-count").textContent = `${activities.length} sortie${activities.length > 1 ? "s" : ""}`;
         $("#recent-activities").innerHTML = sorted.slice(0, 3).map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
+        const detailPanel = $("#activity-detail");
+        if (detailPanel) { detailPanel.hidden = true; $("#activites").append(detailPanel); }
         $("#all-activities").innerHTML = sorted.map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         const best5 = bestDistanceTime(5), best10 = bestDistanceTime(10);
         renderRacePredictor(best5, best10);
@@ -1975,7 +1977,7 @@
         renderHrTypeChart();
       }
       const detailTitle = $("#detail-title");
-      const closeActivityDetail = () => { $("#activity-detail").hidden = true; };
+      const closeActivityDetail = () => { $("#activity-detail").hidden = true; window.currentDetailActivityId = null; };
       detailTitle.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); closeActivityDetail(); });
       detailTitle.addEventListener("touchend", e => { e.preventDefault(); closeActivityDetail(); }, { passive: false });
       document.addEventListener("click", e => {
@@ -2110,7 +2112,10 @@
       function openActivityDetail(id) {
         const a = activities.find(x => String(x.id) === String(id)); if (!a) return;
         window.currentDetailActivityId = a.id;
-        $("#activity-detail").hidden = false;
+        const detailPanel = $("#activity-detail");
+        const activityCard = [...document.querySelectorAll("#all-activities [data-activity-id]")].find(el => String(el.dataset.activityId) === String(a.id));
+        if (activityCard) activityCard.after(detailPanel);
+        detailPanel.hidden = false;
         $("#detail-title").textContent = a.name || "Course à pied";
         $("#detail-meta").textContent = `${dateFmt(a.start_date)} · ${a.source_label || "Import manuel"}`;
         $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " km";
@@ -2356,22 +2361,45 @@
         const date = isoDay(sessionDate(w, j));
         return activities.some(a => sessionActivityDate(a) === date);
       }
+      function plannedDistanceForSession(desc, wi, di) {
+        if (wi === 21 && di === 2) return "21,1 km";
+        // Les distances explicites de sortie longue priment sur les distances des blocs rapides.
+        const explicit = [...desc.matchAll(/(\d+(?:[.,]\d+)?)\s*km/gi)].map(m => Number(m[1].replace(",", ".")));
+        if (di === 2 && explicit.length) return `${explicit[0].toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+        // Pour les séances exprimées en durée, estimation du volume total à partir de l’allure facile.
+        const minutes = [...desc.matchAll(/(\d+)\s*min/gi)].map(m => Number(m[1]));
+        if (explicit.length && di !== 1) return `${explicit[0].toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+        if (di === 0) {
+          const totalMin = minutes.reduce((sum, n) => sum + n, 0);
+          if (totalMin) return `~${(totalMin / 6.9).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+          return "~5–7 km";
+        }
+        if (di === 1) {
+          // Une séance qualité inclut échauffement, répétitions, récupérations et retour au calme.
+          let estimatedMinutes = minutes.reduce((sum, n) => sum + n, 0);
+          const reps = [...desc.matchAll(/(\d+)\s*[×x]\s*(\d+)\s*min/gi)];
+          if (reps.length) estimatedMinutes += reps.reduce((sum, m) => sum + Number(m[1]) * Number(m[2]), 0);
+          const kmBlocks = [...desc.matchAll(/(\d+)\s*[×x]\s*(\d+(?:[.,]\d+)?)\s*km/gi)];
+          const fastKm = kmBlocks.reduce((sum, m) => sum + Number(m[1]) * Number(m[2].replace(",", ".")), 0);
+          if (fastKm) return `~${(fastKm + 3.5).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+          if (estimatedMinutes) return `~${(estimatedMinutes / 6.5).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+          return "~6–8 km";
+        }
+        return "—";
+      }
       function getPlannedMetricsForActivity(activity) {
         const day = sessionActivityDate(activity);
         for (let wi = 0; wi < planWeeks.length; wi++) {
           for (let di = 0; di < planWeeks[wi][1].length; di++) {
             if (isoDay(sessionDate(wi, di)) !== day) continue;
             const desc = planWeeks[wi][1][di];
-            const distanceMatches = [...desc.matchAll(/(\d+(?:[.,]\d+)?)\s*km/gi)].map(m => m[1].replace(',', '.') + ' km');
-            const durationMatches = [...desc.matchAll(/(\d+)\s*min/gi)].map(m => m[1] + ' min');
+            const durationMatches = [...desc.matchAll(/(\d+)\s*min/gi)].map(m => m[1] + " min");
             const paceMatches = [...desc.matchAll(/(\d:\d{2})\s*[–-]\s*(\d:\d{2})\s*\/km/g)].map(m => `${m[1]}–${m[2]}/km`);
-            const distance = distanceMatches.length ? (distanceMatches.length > 1 ? distanceMatches.join(' · ') : distanceMatches[0]) : (wi === 21 && di === 2 ? '21,1 km' : '—');
-            const duration = durationMatches.length ? (durationMatches.length > 1 ? durationMatches.join(' · ') : durationMatches[0]) : '—';
-            const paceText = paceMatches.length ? paceMatches.join(' · ') : (desc.includes('faciles') ? '6:35–7:15/km' : wi === 21 && di === 2 ? '5:27/km (objectif)' : 'Selon les blocs');
-            return { distance, duration, pace: paceText, description: desc };
+            const paceText = paceMatches.length ? paceMatches.join(" · ") : (desc.toLowerCase().includes("facile") || desc.toLowerCase().includes("faciles") ? "6:35–7:15/km" : wi === 21 && di === 2 ? "5:27/km (objectif)" : "Selon les blocs");
+            return { distance: plannedDistanceForSession(desc, wi, di), duration: durationMatches.length ? durationMatches.join(" · ") : "—", pace: paceText, description: desc };
           }
         }
-        return { distance: '—', duration: '—', pace: '—' };
+        return { distance: "—", duration: "—", pace: "—" };
       }
       let currentPlanWeek = (() => { const now = new Date(); now.setHours(12,0,0,0); return Math.max(0, Math.min(21, Math.floor((now - calendarStart) / (7 * 86400000)))) })();
       function renderPlan() {
@@ -2383,7 +2411,7 @@
         const workouts = w[1].map((desc, j) => {
           const d = sessionDate(i, j), date = fmtPlan(d), isRace = i === 21 && j === 2, done = isSessionDone(i, j), key = `${i}-${j}`;
           const paceHint = isRace ? "Objectif indicatif : 5:27/km si confirmé" : desc.toLowerCase().includes("facile") ? "6:35–7:15/km" : desc.includes("5:") ? "Respecte la plage d’allure écrite dans la séance" : "Effort régulier, contrôlé";
-          return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
+          return `<div class="workout plan-workout ${done ? "completed" : ""}"><span class="day">${isRace ? "DIM" : days[j]}<br><small>${date}</small></span><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span><br><span class="planned-stat">Distance prévue : ${esc(plannedDistanceForSession(desc, i, j))}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
         }).join("");
         calendar.innerHTML = `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${workouts}</article>`;
         $("#plan-week-counter").textContent = `Semaine ${i + 1} / ${planWeeks.length}`;
