@@ -806,7 +806,8 @@
 
     .bottom-nav {
       position: fixed;
-      z-index: 10;
+      /* Keep app navigation above Leaflet's map panes and controls while scrolling. */
+      z-index: 1000;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
@@ -1560,6 +1561,8 @@
     .pace-map-layout {
       position: relative;
       display: block;
+      isolation: isolate;
+      z-index: 0;
     }
 
     .pace-map {
@@ -1609,13 +1612,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 3px;
-      color: #374151;
+      color: var(--text);
       font-size: 7px;
       line-height: 1;
-      background: rgba(255, 255, 255, .88);
-      border: 1px solid rgba(0, 0, 0, .12);
+      background: var(--panel2);
+      border: 1px solid var(--line);
       border-radius: 7px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .16);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .28);
       pointer-events: none;
     }
 
