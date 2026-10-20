@@ -998,7 +998,11 @@
     }
 
     .detail-main-stats {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail-main-stats .distance-stat {
+      grid-column: 1 / -1;
     }
 
     .detail-hr-stats {
@@ -1807,7 +1811,8 @@
           </div>
           <p id="detail-meta" class="muted small"></p>
           <div class="stats-grid detail-stats detail-main-stats">
-            <article class="stat-card"><small>Distance</small><strong id="detail-distance">—</strong></article>
+            <article class="stat-card distance-stat"><small>Distance</small><strong id="detail-distance">—</strong>
+            </article>
             <article class="stat-card"><small>Durée</small><strong id="detail-duration">—</strong></article>
             <article class="stat-card"><small>Allure moyenne</small><strong id="detail-pace">—</strong></article>
           </div>
@@ -1926,16 +1931,14 @@
             <rect x="4" y="5" width="16" height="16" rx="2" />
             <path d="M8 3v4M16 3v4M4 10h16M8 14h2M14 14h2M8 17h2" />
           </svg></span><small>Plan</small></button>
-      <button class="nav-item" data-go="reglages"><span>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+      <button class="nav-item" data-go="reglages"><span><svg viewBox="0 0 24 24" aria-hidden="true">
             <line x1="4" y1="6" x2="20" y2="6" />
             <line x1="4" y1="12" x2="20" y2="12" />
             <line x1="4" y1="18" x2="20" y2="18" />
             <circle cx="9" cy="6" r="2" />
             <circle cx="15" cy="12" r="2" />
             <circle cx="10" cy="18" r="2" />
-          </svg>
-        </span><small>Réglages</small></button>
+          </svg></span><small>Réglages</small></button>
     </nav>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
