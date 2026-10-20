@@ -970,7 +970,7 @@
       color: var(--accent)
     }
 
-    @media(min-width:600px) {
+    @media(max-width:599px) {
       main {
         padding: 26px 28px 38px
       }
@@ -1580,7 +1580,7 @@
 
     /* Mise en page ordinateur : navigation latérale et espace de travail élargi.
        Les règles mobiles existantes restent inchangées pour l’iPhone. */
-    @media (min-width: 960px) {
+    @media (max-width: 0px) {
       .app-shell {
         display: grid;
         grid-template-columns: 220px minmax(0, 1fr);
@@ -1700,7 +1700,7 @@
       }
     }
 
-    @media (min-width: 960px) and (max-width: 1120px) {
+    @media (max-width: 0px) and (min-width: 1121px) {
       .topbar {
         padding-left: 26px;
         padding-right: 26px;
@@ -1713,7 +1713,7 @@
     }
 
     /* Forcer la disposition des statistiques du détail sur mobile également. */
-    @media (max-width: 959px) {
+      {
       #activity-detail .detail-main-stats {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -1824,7 +1824,7 @@
       }
     }
 
-    @media (max-width: 959px) {
+      {
       #activity-detail {
         display: block;
       }
@@ -1835,12 +1835,6 @@
 
       #activity-detail>.chart-panel {
         margin-top: 24px;
-      }
-    }
-
-    @media (min-width: 960px) {
-      #activity-detail:not([hidden]) {
-        row-gap: 26px;
       }
     }
 
