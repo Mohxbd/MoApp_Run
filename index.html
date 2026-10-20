@@ -1857,6 +1857,105 @@
       font-size: 12px;
       padding: 8px 0;
     }
+
+    .comparison-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .comparison-item {
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 12px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .comparison-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .comparison-head strong {
+      font-size: 13px;
+    }
+
+    .comparison-meta {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .comparison-result {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .comparison-result>div {
+      background: var(--panel2);
+      border-radius: 9px;
+      padding: 8px;
+      min-width: 0;
+    }
+
+    .comparison-result small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-bottom: 3px;
+    }
+
+    .comparison-result strong {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .status-pill {
+      font-size: 10px;
+      border-radius: 99px;
+      padding: 3px 7px;
+      background: var(--panel2);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .status-pill.done {
+      color: var(--accent);
+    }
+
+    .predictor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .predictor-cell {
+      background: var(--panel2);
+      border-radius: 12px;
+      padding: 11px 8px;
+      min-width: 0;
+    }
+
+    .predictor-cell small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .predictor-cell strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 17px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .predictor-note {
+      color: var(--muted);
+      font-size: 11px;
+      margin: 10px 0 0;
+    }
   </style>
   <title>MoApp Run</title>
 </head>
@@ -2007,6 +2106,25 @@
               id="pr-10k-meta" class="record-meta">Date et allure —</span></article>
         </div>
         <article class="panel">
+          <h2>Prédicteur de course</h2>
+          <p class="muted small">Estimation basée sur tes meilleurs kilomètres consécutifs complets détectés dans les
+            activités importées.</p>
+          <div class="predictor-grid">
+            <div class="predictor-cell"><small>5 km</small><strong id="predict-5k">—</strong></div>
+            <div class="predictor-cell"><small>10 km</small><strong id="predict-10k">—</strong></div>
+            <div class="predictor-cell"><small>Semi-marathon</small><strong id="predict-half">—</strong></div>
+          </div>
+          <p id="predictor-note" class="predictor-note">Importe une activité avec des tours kilométriques complets pour
+            obtenir une estimation.</p>
+          <div class="objective-progress">
+            <div class="progress-copy"><strong>Objectif semi : 1 h 55</strong><span id="predict-target-delta">—</span>
+            </div>
+            <div class="progress-track">
+              <div id="predict-target-bar" class="progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
           <h2>Évolution de la FC moyenne</h2>
           <div id="hr-type-chart" class="hr-type-chart">
             <div class="chart-empty">Importe des activités avec des données de FC à partir du 19/10/2026.</div>
@@ -2027,6 +2145,14 @@
 
         </div>
 
+        <article class="panel">
+          <h2>Prévu vs réalisé</h2>
+          <p class="muted small">Les activités importées sont associées aux séances ayant la même date. Vérifie le
+            résultat si plusieurs sorties ont été faites le même jour.</p>
+          <div id="planned-realized" class="comparison-list">
+            <div class="empty-state">Les comparaisons apparaîtront ici.</div>
+          </div>
+        </article>
         <div id="plan-calendar" class="plan-calendar"></div>
       </section>
 
@@ -2226,6 +2352,33 @@
           point.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showTip(point); } });
         });
       }
+      function renderRacePredictor(best5, best10) {
+        const targetKm = 21.0975, targetSeconds = 115 * 60;
+        const estimates = [];
+        if (best5) estimates.push({ distance: 5, seconds: best5.seconds, source: "5 km" });
+        if (best10) estimates.push({ distance: 10, seconds: best10.seconds, source: "10 km" });
+        const estimate = estimates.length ? estimates.map(x => x.seconds * Math.pow(targetKm / x.distance, 1.06)).sort((a, b) => a - b)[Math.floor((estimates.length - 1) / 2)] : null;
+        const predictFrom = (distance) => {
+          if (best5) return best5.seconds * Math.pow(distance / 5, 1.06);
+          if (best10) return best10.seconds * Math.pow(distance / 10, 1.06);
+          return null;
+        };
+        const showTime = value => value == null ? "—" : formatRaceTime(value);
+        $("#predict-5k").textContent = showTime(predictFrom(5));
+        $("#predict-10k").textContent = showTime(predictFrom(10));
+        $("#predict-half").textContent = showTime(estimate);
+        const note = $("#predictor-note"), delta = $("#predict-target-delta"), bar = $("#predict-target-bar");
+        if (estimate == null) {
+          note.textContent = "Pas encore assez de tours kilométriques complets pour estimer un chrono. Importe un GPX contenant des données de tours ou de distance.";
+          delta.textContent = "Données manquantes"; bar.style.width = "0%";
+        } else {
+          const diff = Math.round(estimate - targetSeconds), abs = Math.abs(diff), time = `${Math.floor(abs / 3600) ? Math.floor(abs / 3600) + " h " : ""}${Math.floor(abs % 3600 / 60)} min`;
+          note.textContent = `Estimation indicative calculée à partir de ${estimates.map(x => x.source).join(" et ")} avec une formule de projection. Le parcours, l’endurance et les conditions peuvent modifier le résultat.`;
+          delta.textContent = diff <= 0 ? `${time} d’avance estimée` : `${time} au-dessus de l’objectif`;
+          bar.style.width = `${Math.max(0, Math.min(100, targetSeconds / estimate * 100))}%`;
+        }
+      }
+
       function render() {
         const sorted = [...activities].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         const week = activities.filter(a => new Date(a.start_date) >= monday && new Date(a.start_date) < next);
@@ -2235,6 +2388,7 @@
         $("#recent-activities").innerHTML = sorted.slice(0, 3).map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         $("#all-activities").innerHTML = sorted.map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         const best5 = bestDistanceTime(5), best10 = bestDistanceTime(10);
+        renderRacePredictor(best5, best10);
         $("#pr-5k-display").textContent = best5 == null ? "—" : formatRaceTime(best5.seconds);
         $("#pr-10k-display").textContent = best10 == null ? "—" : formatRaceTime(best10.seconds);
         $("#pr-5k-meta").textContent = best5 ? `${dateFmt(best5.date)} · ${best5.pace}/km` : "Date et allure —";
@@ -2245,6 +2399,7 @@
         const daysLeft = Math.ceil((raceDate - today) / 86400000);
         $("#countdown").textContent = daysLeft >= 0 ? `J-${daysLeft}` : `J+${Math.abs(daysLeft)}`;
         renderPlan();
+        renderPlannedRealized();
         renderVolumeChart();
         renderProgress();
         renderNextWorkout();
@@ -2627,6 +2782,30 @@
       function isSessionDone(w, j) {
         const date = isoDay(sessionDate(w, j));
         return activities.some(a => sessionActivityDate(a) === date);
+      }
+      function renderPlannedRealized() {
+        const el = $("#planned-realized"); if (!el) return;
+        const today = new Date(); today.setHours(23, 59, 59, 999);
+        const cards = [];
+        planWeeks.forEach((week, wi) => week[1].forEach((desc, di) => {
+          const date = sessionDate(wi, di), dayKey = isoDay(date);
+          const matches = activities.filter(a => sessionActivityDate(a) === dayKey).sort((a, b) => Number(b.distance_km || 0) - Number(a.distance_km || 0));
+          cards.push({ week: wi, day: di, desc, date, matches, isRace: wi === 21 && di === 2 });
+        }));
+        cards.sort((a, b) => b.date - a.date);
+        const relevant = cards.filter(c => c.matches.length || c.date <= today).slice(0, 6).concat(cards.filter(c => c.date > today).sort((a, b) => a.date - b.date).slice(0, Math.max(0, 6 - cards.filter(c => c.matches.length || c.date <= today).slice(0, 6).length)));
+        if (!relevant.length) { el.innerHTML = '<div class="empty-state">Aucune séance à comparer pour le moment.</div>'; return; }
+        el.innerHTML = relevant.map(c => {
+          const plannedTitle = c.isRace ? "Semi-marathon" : ["Endurance facile", "Séance qualité", "Sortie longue"][c.day];
+          const dateLabel = c.date.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+          const a = c.matches[0];
+          let status, statusClass = "";
+          if (a) { status = c.matches.length > 1 ? `${c.matches.length} activités` : "Réalisée"; statusClass = "done"; }
+          else if (c.date > today) status = "À venir";
+          else status = "Non détectée";
+          const actual = a ? `${Number(a.distance_km || 0).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} km · ${pace(Number(a.distance_km || 0), Number(a.duration_min || 0))}/km` : (c.matches.length ? "Activité détectée" : "—");
+          return `<article class="comparison-item"><div class="comparison-head"><div><strong>${esc(plannedTitle)}</strong><div class="comparison-meta">${esc(dateLabel)} · S${c.week + 1}</div></div><span class="status-pill ${statusClass}">${esc(status)}</span></div><div class="comparison-result"><div><small>Prévu</small><strong>${esc(c.desc)}</strong></div><div><small>Réalisé</small><strong>${esc(actual)}</strong></div></div></article>`;
+        }).join("");
       }
       function renderPlan() {
         const calendar = $("#plan-calendar"); if (!calendar) return;
