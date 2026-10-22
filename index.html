@@ -2620,6 +2620,40 @@
       background: #20251d;
       transform: translateY(-1px);
     }
+    .plan-week-switch .carousel-arrow {
+      display: inline-grid;
+      place-items: center;
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      backdrop-filter: blur(14px) saturate(160%);
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.055));
+      border-color: rgba(255,255,255,.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 5px 14px rgba(0,0,0,.16);
+      line-height: 1;
+    }
+    .carousel-arrow svg {
+      display: block;
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .plan-week-switch .carousel-arrow:disabled {
+      opacity: .38;
+      cursor: default;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .plan-week-switch .carousel-arrow:hover:not(:disabled) {
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 36%, var(--line));
+      background: linear-gradient(145deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+    }
+    .carousel-arrow:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
 
     .volume-chart { gap: 9px; min-height: 160px; }
     .volume-week { height: 145px; gap: 8px; }
@@ -2716,7 +2750,18 @@
       color: #171b12;
     }
 
-    .plan-week { padding: clamp(17px, 3vw, 24px); }
+    .plan-week {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: clamp(17px, 3vw, 24px);
+      border: 1px solid rgba(197,243,106,.22);
+      border-radius: 28px;
+      background:
+        radial-gradient(ellipse at 88% 8%, rgba(197,243,106,.13), transparent 37%),
+        linear-gradient(135deg, #20271b 0%, #151a14 52%, #111410 100%);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.045);
+    }
     .plan-week-head h2 { font-size: 17px; }
     .plan-week .workout { gap: 14px; padding: 17px 0; }
     .day {
@@ -2994,11 +3039,25 @@
     html[data-theme="light"] .panel,
     html[data-theme="light"] .stat-card,
     html[data-theme="light"] .next-card,
-    html[data-theme="light"] .next-workout-card,
-    html[data-theme="light"] .plan-week {
+    html[data-theme="light"] .next-workout-card {
       background: linear-gradient(145deg, #fff, #f9faf7);
       border-color: #e1e5dc;
       box-shadow: 0 8px 28px rgba(28,39,20,.045);
+    }
+    html[data-theme="light"] .plan-week {
+      color: #f8faf4;
+      border-color: rgba(88,120,50,.23);
+      background:
+        radial-gradient(ellipse at 88% 8%, rgba(197,243,106,.16), transparent 37%),
+        linear-gradient(135deg, #34452a 0%, #26351f 52%, #1b2818 100%);
+      box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.045);
+    }
+    html[data-theme="light"] .plan-week .muted,
+    html[data-theme="light"] .plan-week-head small { color: #d1ddc7; }
+    html[data-theme="light"] .plan-week .day {
+      color: #4d7f20;
+      background: #edf4e5;
+      border-color: #dce8ce;
     }
     html[data-theme="light"] .week-summary-card { background: #fff; }
     html[data-theme="light"] .stat-card:hover,
@@ -3031,6 +3090,17 @@
     html[data-theme="light"] .carousel-arrow:hover:not(:disabled),
     html[data-theme="light"] .plan-calendar-button:hover {
       background: #eaf0e3;
+      border-color: #c7d8b7;
+    }
+    html[data-theme="light"] .plan-week-switch .carousel-arrow {
+      color: #20261d;
+      background: linear-gradient(145deg, rgba(255,255,255,.9), rgba(244,248,239,.64));
+      border-color: rgba(255,255,255,.82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 5px 15px rgba(28,39,20,.12);
+    }
+    html[data-theme="light"] .plan-week-switch .carousel-arrow:hover:not(:disabled) {
+      color: #4d7f20;
+      background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(237,244,229,.82));
       border-color: #c7d8b7;
     }
     html[data-theme="light"] .button.primary {
@@ -3136,14 +3206,14 @@
     #detail-title { display:grid;place-items:center;width:44px;height:44px;padding:0!important;border:1px solid #ffffff35!important;border-radius:50%!important;background:#ffffff18!important;box-shadow:0 6px 24px #0002,inset 0 1px #ffffff45;color:var(--text)!important;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);font-size:0!important; }
     #detail-title svg { width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round; }
     #activity-detail #detail-meta { margin:0 0 0; }
-    #activity-detail .pace-map-panel { order:-1; margin:0 -18px; padding:0; border:0; border-radius:0; overflow:hidden; }
+    #activity-detail .pace-map-panel { order:3; margin:0 -18px; padding:0; border:0; border-radius:0; overflow:hidden; }
     #activity-detail .pace-map-panel h3 { display:none!important; }
     #activity-detail .pace-map-layout { display:block; }
     #activity-detail .pace-map { height: min(86vh,720px); min-height:500px; border-radius:0; }
     #activity-detail .pace-map-legend { display:none; }
     #activity-detail .detail-main-stats { order:1; }
     #activity-detail .detail-hr-stats { order:2; }
-    #activity-detail .chart-panel { order:3; flex-shrink:0; }
+    #activity-detail .chart-panel { order:4; flex-shrink:0; }
     body.activity-detail-open { overflow:hidden!important; }
     @media(min-width:760px) { #activity-detail.activity-detail { padding-left:max(28px,calc((100vw - 900px)/2));padding-right:max(28px,calc((100vw - 900px)/2)); } #activity-detail .pace-map-panel { margin-left:calc(-1 * max(28px,calc((100vw - 900px)/2)));margin-right:calc(-1 * max(28px,calc((100vw - 900px)/2))); } #activity-detail .pace-map { height:min(86vh,720px);min-height:500px; } }
 </style>
@@ -3196,9 +3266,9 @@
           <h2>Prochaine séance</h2><span class="muted small" id="next-workout-counter"></span>
         </div>
         <section id="next-workout-carousel" class="next-workout-carousel" aria-label="Séances précédentes et à venir">
-          <button class="carousel-arrow" id="workout-prev" type="button" aria-label="Séance précédente">‹</button>
+          <button class="carousel-arrow" id="workout-prev" type="button" aria-label="Séance précédente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
           <article id="next-workout-card" class="next-workout-card" aria-live="polite"></article>
-          <button class="carousel-arrow" id="workout-next" type="button" aria-label="Séance suivante">›</button>
+          <button class="carousel-arrow" id="workout-next" type="button" aria-label="Séance suivante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
         </section>
         <div class="section-heading">
           <h2>Volume hebdomadaire</h2>
@@ -3237,7 +3307,7 @@
           <div class="section-heading">
             <h2><button id="detail-title" type="button" aria-label="Retour aux activités" title="Retour">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-              </button></h2>
+              </button><span id="detail-activity-name"></span></h2>
           </div>
           <p id="detail-meta" class="muted small"></p>
           <div class="stats-grid detail-stats detail-main-stats">
@@ -3339,9 +3409,9 @@
         <div class="eyebrow">OBJECTIF · 21 MARS 2027</div>
         <h1>Plan d’entraînement</h1>
         <div class="plan-week-switch">
-          <button id="plan-week-prev" class="carousel-arrow" type="button" aria-label="Semaine précédente">‹</button>
+          <button id="plan-week-prev" class="carousel-arrow" type="button" aria-label="Semaine précédente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
           <div><strong id="plan-week-counter">Semaine 1 / 22</strong><small id="plan-week-dates"></small></div>
-          <button id="plan-week-next" class="carousel-arrow" type="button" aria-label="Semaine suivante">›</button>
+          <button id="plan-week-next" class="carousel-arrow" type="button" aria-label="Semaine suivante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
         </div>
         <div id="plan-calendar" class="plan-calendar"></div>
         <form id="custom-session-form" class="custom-session-form" hidden>
@@ -4065,8 +4135,13 @@
         }
         L.circleMarker(latLngs[0], { radius: 5, color: '#16a34a', weight: 2, fillColor: '#fff', fillOpacity: 1 }).bindTooltip('Départ').addTo(paceLeafletMap);
         L.circleMarker(latLngs[latLngs.length - 1], { radius: 5, color: '#ef4444', weight: 2, fillColor: '#fff', fillOpacity: 1 }).bindTooltip('Arrivée').addTo(paceLeafletMap);
-        paceLeafletMap.fitBounds(L.latLngBounds(latLngs), { padding: [18, 18], maxZoom: 16 });
-        setTimeout(() => { if (paceLeafletMap) paceLeafletMap.invalidateSize(); }, 50);
+        const routeBounds = L.latLngBounds(latLngs);
+        paceLeafletMap.fitBounds(routeBounds, { padding: [32, 32], maxZoom: 15 });
+        setTimeout(() => {
+          if (!paceLeafletMap) return;
+          paceLeafletMap.invalidateSize();
+          paceLeafletMap.fitBounds(routeBounds, { padding: [32, 32], maxZoom: 15 });
+        }, 120);
       }
 
       function openActivityDetail(id) {
@@ -4079,7 +4154,9 @@
         const activityCard = [...document.querySelectorAll("#all-activities [data-activity-id]")].find(el => String(el.dataset.activityId) === String(a.id));
         document.body.append(detailPanel);
         detailPanel.hidden = false; document.body.classList.add("activity-detail-open");
-        $("#detail-title").dataset.activityName = a.name || "Course à pied";
+        const activityName = a.name || "Course à pied";
+        $("#detail-title").dataset.activityName = activityName;
+        $("#detail-activity-name").textContent = activityName;
         $("#detail-meta").textContent = `${dateFmt(a.start_date)} · ${a.source_label || "Import manuel"}`;
         $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " km";
         $("#detail-duration").textContent = formatDuration(Number(a.duration_min));
@@ -4394,9 +4471,19 @@
         }).join("");
         const customForWeek = customSessions.filter(session => { const [y,m,d] = session.date.split("-").map(Number); const date = new Date(y,m-1,d,12); return date >= monday && date <= sunday; }).sort((a,b)=>a.date.localeCompare(b.date)).map(session => {
           const [y,m,d] = session.date.split("-").map(Number), date = new Date(y,m-1,d,12), done = activities.some(a=>sessionActivityDate(a)===session.date);
-          return `<div class="workout plan-workout ${done?"completed":""}"><div class="plan-day-column"><span class="day">${esc(date.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".","").toLocaleUpperCase("fr-FR"))}<br><small>${fmtPlan(date)}</small></span><label class="plan-session-switch" title="${session.disabled?"Activer":"Désactiver"} cette séance"><input type="checkbox" data-toggle-custom="${esc(session.id)}" ${session.disabled?"":"checked"} aria-label="${session.disabled?"Activer":"Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(session.type)}</strong>${done?'<span class="plan-detected">✓ Activité détectée</span>':""}<button class="plan-calendar-button" data-edit-custom-date="${esc(session.id)}" type="button" aria-label="Changer la date" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button><button class="plan-delete-button" data-remove-custom="${esc(session.id)}" type="button" aria-label="Supprimer cette séance" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(session.distance)} km</span></span><br><span class="muted">Allure prévue : ${esc(session.pace)}/km</span></p></div></div>`;
+          return `<div class="workout plan-workout ${done?"completed":""}"><div class="plan-day-column"><span class="day">${esc(date.toLocaleDateString("fr-FR",{weekday:"short"}).replace(".","").toLocaleUpperCase("fr-FR"))}<br><small>${fmtPlan(date)}</small></span><label class="plan-session-switch" title="${session.disabled?"Activer":"Désactiver"} cette séance"><input type="checkbox" data-toggle-custom="${esc(session.id)}" ${session.disabled?"":"checked"} aria-label="${session.disabled?"Activer":"Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(session.type)}</strong>${done?'<span class="plan-detected">✓ Activité détectée</span>':""}<button class="plan-calendar-button" data-edit-custom-date="${esc(session.id)}" type="button" aria-label="Changer la date" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.7 6.3 3 3M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20z"/></svg></button><button class="plan-delete-button" data-remove-custom="${esc(session.id)}" type="button" aria-label="Supprimer cette séance" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(session.distance)} km</span></span><br><span class="muted">Allure prévue : ${esc(session.pace)}/km</span></p></div></div>`;
         }).join("");
         calendar.innerHTML = `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${[workouts,customForWeek].filter(Boolean).join("")}<button class="custom-session-add" id="open-custom-session"><span>＋</span> Ajouter une séance</button></article>`;
+        const weekCard = calendar.querySelector(".plan-week"), addSessionButton = weekCard.querySelector("#open-custom-session");
+        const getWorkoutDate = workout => {
+          const customId = workout.querySelector("[data-edit-custom-date]")?.dataset.editCustomDate;
+          if (customId) return customSessions.find(session => session.id === customId)?.date || "";
+          const [weekIndex, dayIndex] = workout.querySelector("[data-pick-date]").dataset.pickDate.split("-").map(Number);
+          return isoDay(sessionDate(weekIndex, dayIndex));
+        };
+        [...weekCard.querySelectorAll(".plan-workout")]
+          .sort((a, b) => getWorkoutDate(a).localeCompare(getWorkoutDate(b)))
+          .forEach(workout => weekCard.insertBefore(workout, addSessionButton));
         $("#plan-week-counter").textContent = `Semaine ${i + 1} / ${planWeeks.length}`;
         $("#plan-week-dates").textContent = `${fmtPlan(monday)} – ${fmtPlan(sunday)}`;
         $("#plan-week-prev").disabled = i === 0; $("#plan-week-next").disabled = i === planWeeks.length - 1;
@@ -4445,7 +4532,19 @@
       }
       function renderProgress() {
         let total = 0, done = 0;
-        planWeeks.forEach((w, i) => w[1].forEach((_, j) => { if (isSessionDeleted(i, j)) return; const d = sessionDate(i, j); if (d <= raceDay) { total++; if (isSessionDone(i, j)) done++ } }));
+        planWeeks.forEach((w, i) => w[1].forEach((_, j) => {
+          if (isSessionDeleted(i, j) || isSessionDisabled(i, j)) return;
+          const d = sessionDate(i, j);
+          if (d <= raceDay) { total++; if (isSessionDone(i, j)) done++ }
+        }));
+        customSessions.forEach(session => {
+          if (session.disabled) return;
+          const [year, month, day] = session.date.split("-").map(Number);
+          const date = new Date(year, month - 1, day, 12);
+          if (Number.isNaN(date.getTime()) || date > raceDay) return;
+          total++;
+          if (activities.some(activity => sessionActivityDate(activity) === session.date)) done++;
+        });
         const pct = total ? Math.round(done / total * 100) : 0;
         $("#plan-progress-count").textContent = `${done} / ${total} séances`;
         $("#plan-progress-percent").textContent = `${pct} %`;
@@ -4514,7 +4613,9 @@
     -webkit-backdrop-filter:none !important;
     pointer-events:none;
   }
-  #activity-detail .section-heading:first-child h2 { margin:0 !important; pointer-events:auto; }
+  #activity-detail .section-heading:first-child { right:18px !important; width:calc(100% - 36px) !important; }
+  #activity-detail .section-heading:first-child h2 { display:flex !important;align-items:center !important;gap:12px !important;width:100% !important;margin:0 !important;pointer-events:auto; }
+  #activity-detail #detail-activity-name { min-width:0;overflow:hidden;color:var(--text);font-size:17px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap; }
   #activity-detail #detail-title {
     width:44px !important;height:44px !important;border-radius:50% !important;
     display:grid !important;place-items:center !important;
@@ -4529,12 +4630,14 @@
 
 <style id="detail-compact-layout-v7">
   /* Carte agrandie et espace réduit avant les statistiques */
-  #activity-detail.activity-detail { gap:8px !important; padding-bottom:max(16px,env(safe-area-inset-bottom)) !important; }
-  #activity-detail .pace-map { height:min(86vh,720px) !important; min-height:500px !important; }
+  #activity-detail.activity-detail { gap:8px !important; padding-top:calc(env(safe-area-inset-top) + 68px) !important; padding-bottom:max(16px,env(safe-area-inset-bottom)) !important; }
+  #activity-detail .pace-map-panel { display:block !important;flex:0 0 auto !important; }
+  #activity-detail .pace-map { height:min(36vh,300px) !important; min-height:240px !important; }
   #activity-detail .pace-map-panel { margin-bottom:0 !important; padding-bottom:0 !important; }
   #activity-detail #detail-meta { margin-top:0 !important; margin-bottom:0 !important; line-height:1.3 !important; }
   #activity-detail .detail-main-stats,
   #activity-detail .detail-hr-stats { gap:7px !important; margin-top:0 !important; margin-bottom:0 !important; }
+  #activity-detail .detail-main-stats { margin-top:-24px !important; }
   #activity-detail .stat-card { padding:10px 12px !important; border-radius:14px !important; }
   #activity-detail .stat-card small { font-size:11px !important; line-height:1.25 !important; }
   #activity-detail .stat-card strong { font-size:clamp(17px,4.5vw,23px) !important; line-height:1.15 !important; }
@@ -4543,7 +4646,10 @@
   #activity-detail .detail-main-stats + .detail-hr-stats { margin-top:0 !important; }
   #activity-detail .pace-map-legend { margin-top:4px !important; }
   @media(max-width:420px) {
-    #activity-detail .pace-map { height: min(86vh,720px) !important; min-height:460px !important; }
+    #activity-detail .pace-map { height:min(36vh,300px) !important; min-height:240px !important; }
     #activity-detail .stat-card { padding:8px 10px !important; }
+  }
+  @media(min-width:760px) {
+    #activity-detail .pace-map { height:min(55vh,560px) !important; min-height:360px !important; }
   }
 </style>
