@@ -3116,13 +3116,13 @@
     #activity-detail .pace-map-panel { order:-1; margin:0 -18px; padding:0; border:0; border-radius:0; overflow:hidden; }
     #activity-detail .pace-map-panel h3 { display:none!important; }
     #activity-detail .pace-map-layout { display:block; }
-    #activity-detail .pace-map { height: min(43vh,390px); min-height:250px; border-radius:0; }
+    #activity-detail .pace-map { height: min(86vh,720px); min-height:500px; border-radius:0; }
     #activity-detail .pace-map-legend { display:none; }
     #activity-detail .detail-main-stats { order:1; }
     #activity-detail .detail-hr-stats { order:2; }
     #activity-detail .chart-panel { order:3; flex-shrink:0; }
     body.activity-detail-open { overflow:hidden!important; }
-    @media(min-width:760px) { #activity-detail.activity-detail { padding-left:max(28px,calc((100vw - 900px)/2));padding-right:max(28px,calc((100vw - 900px)/2)); } #activity-detail .pace-map-panel { margin-left:calc(-1 * max(28px,calc((100vw - 900px)/2)));margin-right:calc(-1 * max(28px,calc((100vw - 900px)/2))); } #activity-detail .pace-map { height:45vh; } }
+    @media(min-width:760px) { #activity-detail.activity-detail { padding-left:max(28px,calc((100vw - 900px)/2));padding-right:max(28px,calc((100vw - 900px)/2)); } #activity-detail .pace-map-panel { margin-left:calc(-1 * max(28px,calc((100vw - 900px)/2)));margin-right:calc(-1 * max(28px,calc((100vw - 900px)/2))); } #activity-detail .pace-map { height:min(86vh,720px);min-height:500px; } }
 </style>
 
 </head>
@@ -4258,5 +4258,26 @@
     backdrop-filter:blur(22px) saturate(1.5) !important;
     -webkit-backdrop-filter:blur(22px) saturate(1.5) !important;
     pointer-events:auto !important;
+  }
+</style>
+
+<style id="detail-compact-layout-v7">
+  /* Carte agrandie et espace réduit avant les statistiques */
+  #activity-detail.activity-detail { gap:8px !important; padding-bottom:max(16px,env(safe-area-inset-bottom)) !important; }
+  #activity-detail .pace-map { height:min(86vh,720px) !important; min-height:500px !important; }
+  #activity-detail .pace-map-panel { margin-bottom:0 !important; padding-bottom:0 !important; }
+  #activity-detail #detail-meta { margin-top:0 !important; margin-bottom:0 !important; line-height:1.3 !important; }
+  #activity-detail .detail-main-stats,
+  #activity-detail .detail-hr-stats { gap:7px !important; margin-top:0 !important; margin-bottom:0 !important; }
+  #activity-detail .stat-card { padding:10px 12px !important; border-radius:14px !important; }
+  #activity-detail .stat-card small { font-size:11px !important; line-height:1.25 !important; }
+  #activity-detail .stat-card strong { font-size:clamp(17px,4.5vw,23px) !important; line-height:1.15 !important; }
+  #activity-detail .stat-card h3 { margin:0 0 5px !important; font-size:13px !important; }
+  #activity-detail .chart-panel { margin-top:8px !important; padding:12px !important; }
+  #activity-detail .detail-main-stats + .detail-hr-stats { margin-top:0 !important; }
+  #activity-detail .pace-map-legend { margin-top:4px !important; }
+  @media(max-width:420px) {
+    #activity-detail .pace-map { height: min(86vh,720px) !important; min-height:460px !important; }
+    #activity-detail .stat-card { padding:8px 10px !important; }
   }
 </style>
