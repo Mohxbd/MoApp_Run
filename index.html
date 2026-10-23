@@ -2932,7 +2932,37 @@
         transition-duration: .01ms !important;
       }
     }
-  </style>
+
+    #goal-detail-overlay { position:fixed; z-index:1200; inset:0; width:100%; max-width:none; margin:0; overflow-y:auto; overscroll-behavior:contain; background:var(--bg); padding:calc(12px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom)); }
+    .goal-detail-inner { width:100%; max-width:760px; margin:0 auto; }
+    .goal-detail-head { position:sticky; top:calc(-12px - env(safe-area-inset-top)); z-index:1205; margin:calc(-12px - env(safe-area-inset-top)) -14px 12px; padding:calc(12px + env(safe-area-inset-top)) 14px 10px; background:color-mix(in srgb,var(--bg) 82%,transparent); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); justify-content:flex-start; }
+    #close-goal-detail { display:grid;place-items:center;width:44px;height:44px;min-height:44px;padding:0;border:1px solid #ffffff55;border-radius:50%;background:rgba(30,30,30,.34);color:white;box-shadow:0 6px 24px #0003,inset 0 1px #ffffff55;backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);cursor:pointer;flex:0 0 44px; }
+    #close-goal-detail svg { display:block;width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round; }
+    .goal-detail-head .eyebrow { display:none; }
+    .goal-detail-stats { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
+    .goal-detail-stats .goal-stat { min-width:0; min-height:0; padding:12px 9px; border-radius:15px; background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--panel)),var(--panel) 75%); border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line)); }
+    .goal-detail-stats .goal-stat:nth-child(-n+3) { grid-column:span 2; }
+    .goal-detail-stats .goal-stat:nth-child(n+4) { grid-column:span 3; }
+    .goal-detail-stats .goal-stat small { display:block; color:var(--muted); font-size:11px; }
+    .goal-detail-stats .goal-stat strong { display:block; white-space:nowrap; font-size:clamp(17px,4.5vw,24px); letter-spacing:-.5px; }
+    .goal-detail-panel { padding:14px; border-radius:18px; background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 5%,var(--panel)),var(--panel) 55%); border-color:color-mix(in srgb,var(--accent) 16%,var(--line)); }
+    #goal-route-map .leaflet-control-zoom { display:none!important; }
+    #goal-elevation-chart svg { touch-action:pan-y; }
+    #goal-profile-readout { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:7px; margin-top:9px; text-align:center; }
+    #goal-profile-readout span { padding:7px 10px; border-radius:10px; background:var(--panel2); border:1px solid var(--line); color:var(--text); font-size:12px; font-weight:700; }
+    #goal-detail-overlay[hidden] { display:none!important; }
+    .goal-detail-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .goal-detail-panel { margin:12px 0; }
+    .goal-detail-panel h2 { font-size:17px; margin-bottom:12px; }
+    #goal-route-map { height:300px; min-height:300px; }
+    .goal-advice { padding:12px 0; border-bottom:1px solid var(--line); }
+    .goal-advice:last-child { border-bottom:0; padding-bottom:0; }
+    .goal-advice strong { color:var(--accent-text); font-size:13px; }
+    .goal-advice p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    #goal-km-paces { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+    .goal-km-row { display:flex; justify-content:space-between; gap:8px; padding:10px 11px; border:1px solid var(--line); border-radius:11px; background:var(--panel2); font-size:12px; }
+    .goal-km-row strong { color:var(--accent-text); }
+\n  </style>
   <title>MoApp Run</title>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -3348,7 +3378,7 @@
     <main id="app-main">
       <section id="accueil" class="page active">
         <div class="eyebrow"><span class="pulse"></span> OBJECTIF · HYÈRES 2027</div>
-        <article class="hero-card">
+        <article class="hero-card" id="open-goal-detail" role="button" tabindex="0" aria-label="Ouvrir le détail de l’objectif" style="cursor:pointer">
           <div class="hero-top"><span>OBJECTIF SEMI-MARATHON</span><span class="tag">CIBLE</span></div>
           <div class="hero-time-row">
             <div class="hero-time" id="goal-time-display">1<span>h</span>55<span>min</span></div>
@@ -3359,11 +3389,8 @@
             <div><small>Date visée</small><strong>21 mars 2027</strong></div>
           </div>
           <div class="objective-progress">
-            <div class="progress-copy"><strong id="plan-progress-count">0 / 66 séances</strong><span
-                id="plan-progress-percent">0 %</span></div>
-            <div class="progress-track">
-              <div id="plan-progress-bar" class="progress-fill" style="width:0%"></div>
-            </div>
+            <div class="progress-copy"><strong id="plan-progress-count">0 / 66 séances</strong><span id="plan-progress-percent">0 %</span></div>
+            <div class="progress-track"><div id="plan-progress-bar" class="progress-fill" style="width:0%"></div></div>
           </div>
         </article>
         <div class="section-heading">
@@ -3486,6 +3513,30 @@
         </section>
       </section>
 
+      <section id="goal-detail-overlay" hidden aria-label="Détail de l’objectif">
+        <div class="goal-detail-inner">
+        <div class="goal-detail-head">
+          <button type="button" id="close-goal-detail" aria-label="Retour" title="Retour"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span class="eyebrow">OBJECTIF SEMI-MARATHON</span>
+        </div>
+        <div class="goal-detail-stats">
+          <article class="stat-card goal-stat"><small>Distance</small><strong>21,1 <em>km</em></strong></article>
+          <article class="stat-card goal-stat"><small>D+</small><strong>48 <em>m</em></strong></article>
+          <article class="stat-card goal-stat"><small>D−</small><strong>40 <em>m</em></strong></article>
+          <article class="stat-card goal-stat"><small>Temps cible</small><strong id="goal-detail-time">1h55</strong></article>
+          <article class="stat-card goal-stat"><small>Allure cible</small><strong id="goal-detail-pace">5:27<em>/km</em></strong></article>
+        </div>
+        <section class="panel goal-detail-panel"><h2>Carte du parcours</h2><div id="goal-route-map" class="pace-map"></div></section>
+        <section class="panel goal-detail-panel"><h2>Profil altimétrique</h2><div id="goal-elevation-chart" class="detail-chart"></div><div id="goal-profile-readout"><span>0,0 km</span><span>D+ 0 m</span><span>5:27/km</span></div></section>
+        <section class="panel goal-detail-panel"><h2>Allures par kilomètre</h2><div id="goal-km-paces"></div></section>
+        <section class="panel goal-detail-panel"><h2>Conseils de course</h2>
+          <div class="goal-advice"><strong>Km 1–5 · Contrôle</strong><p>Pars progressivement, sans chercher à gagner du temps dans les premiers kilomètres. Stabilise-toi autour de l’allure cible.</p></div>
+          <div class="goal-advice"><strong>Km 6–15 · Régularité</strong><p>Garde une foulée relâchée et vérifie ton effort dans les faux-plats. Bois régulièrement aux ravitaillements.</p></div>
+          <div class="goal-advice"><strong>Km 16–19 · Patience</strong><p>Concentre-toi sur l’effort et maintiens une cadence confortable. Évite les accélérations brusques.</p></div>
+          <div class="goal-advice"><strong>Km 20–21,1 · Finir fort</strong><p>Si tu te sens bien, augmente progressivement l’effort jusqu’à la ligne d’arrivée.</p></div>
+        </section>
+        </div>
+      </section>
       <section id="performances" class="page">
         <div class="eyebrow">FAITS & ESTIMATIONS</div>
         <h1>Statistiques</h1>
@@ -4797,6 +4848,47 @@
       render();
     })();
   </script>
+
+<script>
+(() => {
+ const coords=[[43.10718,6.12882],[43.11312,6.12867],[43.1132,6.12871],[43.11327,6.1288],[43.11325,6.12896],[43.11273,6.1297],[43.11267,6.12975],[43.10945,6.13022],[43.10931,6.13021],[43.10909,6.13025],[43.10806,6.13039],[43.10796,6.13039],[43.10779,6.13037],[43.10764,6.13034],[43.1075,6.1303],[43.10739,6.13021],[43.10714,6.12999],[43.10699,6.12983],[43.10685,6.12962],[43.10677,6.12944],[43.10673,6.12923],[43.10672,6.12912],[43.10673,6.1287],[43.10665,6.12855],[43.10654,6.12848],[43.10639,6.1285],[43.10623,6.12845],[43.10577,6.12823],[43.105,6.12767],[43.10488,6.12766],[43.10482,6.12769],[43.10256,6.12933],[43.10248,6.1294],[43.10175,6.13028],[43.1008,6.13148],[43.1006,6.13173],[43.10037,6.13195],[43.09629,6.13554],[43.09511,6.13664],[43.09497,6.13679],[43.09456,6.13737],[43.09415,6.13807],[43.09355,6.13918],[43.0932,6.13983],[43.09282,6.14049],[43.0925,6.14105],[43.09203,6.14171],[43.09159,6.14226],[43.09122,6.14266],[43.09074,6.14307],[43.08708,6.14608],[43.08343,6.14958],[43.08316,6.14987],[43.08312,6.14999],[43.08312,6.15012],[43.08314,6.1502],[43.08299,6.15065],[43.0831,6.15093],[43.08317,6.15103],[43.085,6.15353],[43.08538,6.154],[43.08549,6.15416],[43.08559,6.15436],[43.08575,6.15475],[43.08615,6.15601],[43.08648,6.15677],[43.08665,6.15714],[43.08681,6.15728],[43.08719,6.15747],[43.08735,6.15758],[43.08933,6.15966],[43.08947,6.15974],[43.08995,6.15998],[43.09007,6.16001],[43.09019,6.15995],[43.09028,6.15998],[43.09032,6.16008],[43.09034,6.16022],[43.09036,6.16037],[43.09043,6.16054],[43.09062,6.16079],[43.09111,6.16128],[43.09159,6.16175],[43.09231,6.16248],[43.09293,6.1631],[43.09388,6.16405],[43.0957,6.16587],[43.09687,6.16705],[43.09805,6.16823],[43.09924,6.16943],[43.09994,6.17009],[43.1,6.17014],[43.10017,6.17018],[43.10023,6.17025],[43.1003,6.17039],[43.10124,6.17135],[43.10128,6.17146],[43.10131,6.1715],[43.10228,6.17248],[43.10447,6.17465],[43.10544,6.17567],[43.1056,6.17568],[43.10568,6.17574],[43.10573,6.17583],[43.10572,6.176],[43.1065,6.17679],[43.10673,6.17706],[43.10716,6.17765],[43.10769,6.17843],[43.10828,6.17954],[43.10929,6.18149],[43.10937,6.18153],[43.10941,6.18161],[43.10966,6.18217],[43.11158,6.18598],[43.11292,6.18861],[43.11301,6.18875],[43.11317,6.18905],[43.11319,6.18905],[43.11323,6.18903],[43.11329,6.18891],[43.11361,6.18808],[43.1139,6.1874],[43.11418,6.18686],[43.1151,6.18549],[43.11566,6.18472],[43.11645,6.18358],[43.11695,6.18303],[43.11726,6.18279],[43.11754,6.18249],[43.11788,6.18207],[43.11816,6.1816],[43.11853,6.18118],[43.11899,6.18079],[43.11926,6.18063],[43.11947,6.1804],[43.11985,6.17988],[43.1201,6.17946],[43.12034,6.17898],[43.12072,6.17802],[43.12086,6.17776],[43.1211,6.17748],[43.12152,6.17702],[43.12191,6.17656],[43.12226,6.17607],[43.12229,6.17602],[43.12229,6.17597],[43.12219,6.17586],[43.1215,6.17491],[43.1205,6.17391],[43.12047,6.17379],[43.12051,6.17367],[43.12053,6.17343],[43.12051,6.17336],[43.12046,6.17329],[43.11972,6.17279],[43.11838,6.17175],[43.1183,6.17172],[43.11819,6.17173],[43.11802,6.17185],[43.11787,6.17185],[43.11771,6.17173],[43.11743,6.17141],[43.11686,6.17085],[43.11675,6.17075],[43.11663,6.17069],[43.11675,6.17026],[43.1166,6.1708],[43.1154,6.17569],[43.11533,6.17583],[43.11526,6.17589],[43.11519,6.17588],[43.11451,6.1755],[43.11447,6.1755],[43.11441,6.17553],[43.11424,6.17576],[43.11419,6.17578],[43.11394,6.17574],[43.11389,6.17575],[43.11385,6.17578],[43.11364,6.17608],[43.11293,6.17669],[43.11265,6.17704],[43.11241,6.17738],[43.11203,6.17803],[43.11201,6.17815],[43.11201,6.17826],[43.11201,6.1784],[43.11201,6.17849],[43.11198,6.17857],[43.11102,6.17951],[43.11097,6.17955],[43.11094,6.17972],[43.10956,6.1811],[43.10951,6.18115],[43.10948,6.18123],[43.10944,6.18135],[43.10939,6.18146],[43.10935,6.18146],[43.1093,6.18141],[43.10823,6.17933],[43.10779,6.17851],[43.10746,6.17797],[43.107,6.17732],[43.10673,6.17698],[43.10653,6.17676],[43.10581,6.17602],[43.10579,6.17598],[43.10577,6.17581],[43.10572,6.17573],[43.10573,6.17568],[43.10604,6.17538],[43.10623,6.17524],[43.10652,6.17497],[43.10672,6.17481],[43.10715,6.17453],[43.10728,6.17442],[43.10737,6.17435],[43.10753,6.17415],[43.10761,6.17402],[43.10802,6.17321],[43.10824,6.17267],[43.10841,6.17231],[43.10857,6.17203],[43.10883,6.17166],[43.10904,6.17133],[43.1091,6.17127],[43.10914,6.17125],[43.10922,6.17125],[43.10954,6.17096],[43.10975,6.17073],[43.10996,6.17047],[43.11016,6.17013],[43.11035,6.16971],[43.11053,6.16919],[43.11068,6.16849],[43.11076,6.16822],[43.11099,6.16758],[43.11126,6.16696],[43.11162,6.16603],[43.11223,6.16379],[43.11243,6.16309],[43.1127,6.16225],[43.11305,6.1613],[43.11317,6.16088],[43.11332,6.16064],[43.11353,6.16022],[43.11376,6.15965],[43.11391,6.15919],[43.11433,6.15786],[43.11472,6.15649],[43.11474,6.15636],[43.11475,6.15609],[43.11442,6.15538],[43.1143,6.1552],[43.11415,6.15507],[43.11391,6.15496],[43.1135,6.15485],[43.11329,6.15478],[43.11272,6.15449],[43.11265,6.15443],[43.11262,6.15437],[43.11249,6.15375],[43.1124,6.1525],[43.11237,6.15155],[43.11242,6.15105],[43.11248,6.15084],[43.11308,6.14916],[43.11322,6.14874],[43.11403,6.14601],[43.11404,6.14588],[43.11412,6.14553],[43.1143,6.14504],[43.1143,6.14499],[43.11429,6.14494],[43.11425,6.14493],[43.11346,6.14493],[43.11338,6.14491],[43.11275,6.14464],[43.11247,6.14444],[43.112,6.14404],[43.11162,6.14376],[43.11118,6.1435],[43.11057,6.14304],[43.11034,6.14292],[43.10975,6.14279],[43.10921,6.14258],[43.10915,6.1425],[43.10912,6.14243],[43.10926,6.14117],[43.10947,6.14018],[43.10964,6.13976],[43.10995,6.1392],[43.10998,6.13911],[43.10999,6.13902],[43.1098,6.13827],[43.10976,6.13823],[43.10967,6.1382],[43.1096,6.13822],[43.10945,6.13837],[43.10918,6.1389],[43.109,6.1392],[43.10871,6.13956],[43.10717,6.14083],[43.10694,6.14105],[43.10681,6.14123],[43.10671,6.14141],[43.10655,6.14208],[43.10644,6.14228],[43.1064,6.14242],[43.10631,6.14251],[43.10625,6.14249],[43.10601,6.1423],[43.1056,6.14181],[43.10498,6.14127],[43.10475,6.14109],[43.10437,6.14089],[43.10329,6.14042],[43.10316,6.14034],[43.10269,6.13995],[43.10211,6.13955],[43.09915,6.13838],[43.09779,6.13792],[43.09694,6.13757],[43.09697,6.13744],[43.09752,6.13533],[43.0975,6.13523],[43.09751,6.135],[43.09755,6.13487],[43.0976,6.13479],[43.09765,6.13472],[43.09804,6.13447],[43.0982,6.13423],[43.09834,6.13409],[43.09959,6.13302],[43.10036,6.13233],[43.10083,6.13182],[43.10164,6.13082],[43.10211,6.13019],[43.10256,6.12977],[43.10283,6.12954],[43.10324,6.12924],[43.10367,6.12899],[43.10386,6.12885],[43.10444,6.12838],[43.10484,6.12809],[43.10503,6.12801],[43.10514,6.12801],[43.10529,6.12812],[43.10537,6.12819],[43.10544,6.1283],[43.10551,6.12843],[43.10556,6.12846],[43.10564,6.12845],[43.10578,6.12849],[43.10587,6.12858],[43.10607,6.12874],[43.10614,6.12877],[43.1062,6.12884],[43.10629,6.12905],[43.10631,6.12933],[43.10636,6.12955],[43.10638,6.1297],[43.10638,6.12984],[43.10639,6.12997],[43.10634,6.1302],[43.10627,6.13025],[43.10575,6.13017],[43.10565,6.13012],[43.10561,6.13008],[43.10548,6.12987]];
+ const elevations=[12.0,15.0,15.0,15.0,15.0,16.0,16.0,13.0,13.0,12.0,10.0,10.0,10.0,9.0,9.0,9.0,9.0,10.0,11.0,11.0,12.0,12.0,12.0,13.0,13.0,13.0,13.0,13.0,15.0,15.0,15.0,14.0,14.0,12.0,9.0,8.0,9.0,2.0,2.0,2.0,2.0,2.0,2.0,1.0,1.0,2.0,3.0,3.0,3.0,3.0,2.0,3.0,3.0,3.0,3.0,3.0,5.0,5.0,5.0,6.0,7.0,7.0,7.0,7.0,7.0,6.0,5.0,5.0,5.0,5.0,3.0,3.0,5.0,5.0,6.0,6.0,6.0,6.0,6.0,6.0,7.0,5.0,3.0,4.0,5.0,1.0,6.0,5.0,5.0,3.0,4.0,4.0,5.0,5.0,4.0,4.0,4.0,4.0,3.0,4.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,2.0,2.0,4.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,3.0,3.0,3.0,3.0,1.0,0.0,2.0,3.0,3.0,2.0,2.0,2.0,3.0,2.0,2.0,2.0,3.0,3.0,3.0,3.0,2.0,1.0,3.0,4.0,4.0,5.0,5.0,4.0,4.0,4.0,4.0,3.0,2.0,3.0,3.0,3.0,3.0,3.0,4.0,3.0,3.0,3.0,3.0,4.0,4.0,4.0,2.0,2.0,2.0,3.0,2.0,3.0,3.0,3.0,2.0,1.0,1.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,2.0,2.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,2.0,2.0,2.0,2.0,2.0,4.0,3.0,2.0,2.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,4.0,3.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,1.0,1.0,1.0,2.0,2.0,2.0,2.0,2.0,2.0,1.0,2.0,2.0,3.0,3.0,4.0,4.0,5.0,4.0,4.0,3.0,3.0,3.0,3.0,3.0,4.0,5.0,5.0,5.0,4.0,4.0,2.0,2.0,2.0,3.0,3.0,3.0,3.0,3.0,6.0,6.0,10.0,10.0,10.0,11.0,11.0,11.0,11.0,9.0,9.0,9.0,9.0,8.0,7.0,7.0,5.0,5.0,5.0,5.0,5.0,5.0,6.0,7.0,7.0,8.0,8.0,8.0,8.0,8.0,8.0,9.0,9.0,8.0,8.0,7.0,5.0,5.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,5.0,5.0,4.0,4.0,3.0,4.0,4.0,4.0,4.0,4.0,4.0,2.0,2.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,5.0,8.0,8.0,10.0,11.0,11.0,12.0,13.0,13.0,13.0,14.0,14.0,14.0,14.0,13.0,13.0,13.0,13.0,13.0,13.0,13.0,14.0,14.0,13.0,13.0,13.0,13.0,12.0,12.0,11.0,11.0,10.0,10.0,11.0,11.0,11.0,11.0];
+ const overlay=document.getElementById('goal-detail-overlay');
+ const open=document.getElementById('open-goal-detail'), close=document.getElementById('close-goal-detail');
+ function paceText() {
+   const raw=(document.getElementById('goal-pace-display')?.textContent||'5:27').trim();
+   return raw.includes(':')?raw:'5:27';
+ }
+ function drawProfile() {
+   const w=640,h=190,p=24,min=Math.min(...elevations),max=Math.max(...elevations);
+   const distances=[0];
+   for(let i=1;i<coords.length;i++){const a=coords[i-1],b=coords[i],r=Math.PI/180;const dlat=(b[0]-a[0])*r,dlon=(b[1]-a[1])*r;const q=Math.sin(dlat/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dlon/2)**2;distances.push(distances[i-1]+6371000*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q)));}
+   const total=distances[distances.length-1];
+   const sampleDistances=elevations.map((_,i)=>total*i/(elevations.length-1));
+   const xy=elevations.map((v,i)=>[p+sampleDistances[i]/total*(w-2*p),h-p-(v-min)/(Math.max(1,max-min))*(h-2*p)]);
+   const points=xy.map(pt=>pt.join(',')).join(' ');
+   document.getElementById('goal-elevation-chart').innerHTML=`<svg id="goal-profile-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Profil altimétrique interactif du parcours" style="overflow:visible"><polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><line id="goal-profile-cursor" x1="${p}" y1="${p}" x2="${p}" y2="${h-p}" stroke="var(--text)" stroke-opacity=".8" stroke-dasharray="4 4"/><circle id="goal-profile-dot" cx="${p}" cy="${xy[0][1]}" r="5" fill="var(--accent)" stroke="var(--bg)" stroke-width="2"/><text x="${p}" y="${h-3}" fill="var(--muted)" font-size="11">0 km</text><text x="${w-p}" y="${h-3}" text-anchor="end" fill="var(--muted)" font-size="11">${(total/1000).toFixed(1)} km</text><text x="${p}" y="12" fill="var(--muted)" font-size="10">${Math.round(min)} m</text><text x="${w-p}" y="12" text-anchor="end" fill="var(--muted)" font-size="10">${Math.round(max)} m</text><rect id="goal-profile-hit" x="${p}" y="${p}" width="${w-2*p}" height="${h-2*p}" fill="transparent" style="cursor:crosshair;touch-action:pan-y"/></svg>`;
+   const svg=document.getElementById('goal-profile-svg'), hit=document.getElementById('goal-profile-hit');
+   const readout=document.getElementById('goal-profile-readout');
+   function update(ev){const r=svg.getBoundingClientRect();const clientX=ev.clientX??(ev.touches&&ev.touches[0].clientX);if(clientX==null)return;const x=Math.max(p,Math.min(w-p,(clientX-r.left)/r.width*w));const ratio=(x-p)/(w-2*p);const idx=Math.max(0,Math.min(elevations.length-1,Math.round(ratio*(elevations.length-1))));const km=sampleDistances[idx]/1000;const elev=elevations[idx];const line=document.getElementById('goal-profile-cursor'),dot=document.getElementById('goal-profile-dot');line.setAttribute('x1',xy[idx][0]);line.setAttribute('x2',xy[idx][0]);dot.setAttribute('cx',xy[idx][0]);dot.setAttribute('cy',xy[idx][1]);const [mm,ss]=paceText().split(':').map(Number);const base=(mm||5)*60+(ss||27);const sec=base+(km>=16?4:km<=3?2:0);const pace=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');const gain=elevations.slice(0,idx+1).reduce((sum,v,i,a)=>i?sum+Math.max(0,v-a[i-1]):0,0);readout.innerHTML=`<span>${km.toFixed(1).replace('.',',')} km</span><span>D+ ${Math.round(gain)} m</span><span>${pace}/km</span>`;}
+   hit.addEventListener('pointerdown',e=>{update(e);});hit.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')update(e);});hit.addEventListener('click',update);
+ }
+ function renderPaces() {
+   const pace=paceText(); document.getElementById('goal-detail-pace').innerHTML=pace+'<em>/km</em>';
+   const [mm,ss]=pace.split(':').map(Number); const base=(mm||5)*60+(ss||27);
+   document.getElementById('goal-km-paces').innerHTML=Array.from({length:22},(_,i)=>{const km=i+1, sec=base+(km>=16?4:km<=3?2:0); const p=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); return `<div class="goal-km-row"><span>Km ${km===22?'21,1':km}</span><strong>${p}/km</strong></div>`}).join('');
+   document.getElementById('goal-detail-time').textContent=(document.getElementById('goal-time-display')?.textContent||'1h55').replace(/\s+/g,'');
+ }
+ let map=null;
+ function show() {
+   overlay.hidden=false; document.body.style.overflow='hidden'; renderPaces(); drawProfile();
+   if(window.L && !map) { map=L.map('goal-route-map',{zoomControl:false,scrollWheelZoom:false,dragging:true}); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map); const line=L.polyline(coords,{color:'#ef4444',weight:4}).addTo(map); L.circleMarker(coords[0],{radius:5,color:'#c5f36a'}).addTo(map); L.circleMarker(coords[coords.length-1],{radius:5,color:'#ef4444'}).addTo(map); map.fitBounds(line.getBounds(),{padding:[16,16]}); setTimeout(()=>map.invalidateSize(),100); }
+ }
+ function hide() { overlay.hidden=true; document.body.style.overflow=''; }
+ open?.addEventListener('click',show); open?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show();}}); close?.addEventListener('click',hide);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden)hide();});
+})();
+</script>
 </body>
 
 </html>
