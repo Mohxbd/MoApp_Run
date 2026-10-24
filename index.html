@@ -1652,6 +1652,10 @@
     .pace-map .leaflet-control-attribution {
       font-size: 9px;
     }
+    /* Le style sombre ne filtre que les tuiles, pas le tracé d'allure ni les marqueurs. */
+    .moapp-dark-map-tiles {
+      filter: invert(1) hue-rotate(180deg) brightness(.78) saturate(.65);
+    }
 
     .pace-map .leaflet-control-attribution a {
       color: #2563eb;
@@ -1727,12 +1731,16 @@
     }
 
     .feeling-slider {
-      display: block;
-      width: 100%;
-      margin: 16px 0 8px;
-      accent-color: var(--feeling-color, var(--accent));
-      touch-action: pan-y;
+      display:block;width:100%;margin:18px 0 10px;height:10px;border-radius:999px;
+      appearance:none;-webkit-appearance:none;outline:none;cursor:pointer;
+      background:linear-gradient(90deg,#22c55e 0%,#84cc16 28%,#eab308 58%,#f97316 78%,#ef4444 100%);
+      box-shadow:inset 0 1px 3px rgba(0,0,0,.18);touch-action:pan-y;
     }
+    .feeling-slider::-webkit-slider-thumb {appearance:none;-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--panel);border:3px solid var(--feeling-color,var(--accent));box-shadow:0 2px 8px rgba(0,0,0,.22);}
+    .feeling-slider::-moz-range-thumb {width:18px;height:18px;border-radius:50%;background:var(--panel);border:3px solid var(--feeling-color,var(--accent));box-shadow:0 2px 8px rgba(0,0,0,.22);}
+    .feeling-note {display:block;width:100%;margin-top:16px;box-sizing:border-box;min-height:100px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);font:inherit;resize:vertical;}
+    .feeling-note:focus {outline:2px solid var(--accent);outline-offset:2px;}
+    .feeling-note-label {display:block;margin-top:18px;font-size:13px;font-weight:600;color:var(--text);}
 
     .feeling-scale {
       display: flex;
@@ -3354,11 +3362,8 @@
     #detail-title { display:grid;place-items:center;width:44px;height:44px;padding:0!important;border:1px solid #ffffff35!important;border-radius:50%!important;background:#ffffff18!important;box-shadow:0 6px 24px #0002,inset 0 1px #ffffff45;color:var(--text)!important;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);font-size:0!important; }
     #detail-title svg { width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round; }
     #activity-detail #detail-meta { margin:0 0 0; }
-    #activity-detail .pace-map-panel { --plot-accent:var(--pace-color);order:3;margin:0;padding:10px;border:1px solid color-mix(in srgb,var(--pace-color) 24%,var(--line));border-radius:16px;overflow:hidden;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 93%,var(--pace-color) 7%),var(--panel)); }
+    #activity-detail .pace-map-panel { --plot-accent:var(--pace-color);order:3; }
     #activity-detail .pace-map-panel h3 { display:none!important; }
-    #activity-detail .pace-map-layout { display:block; }
-    #activity-detail .pace-map { height: min(86vh,720px); min-height:500px; border-radius:12px; }
-    #activity-detail .pace-map-legend { display:none; }
     #activity-detail .detail-main-stats { order:1; }
     #activity-detail .detail-hr-stats { order:2; }
     #activity-detail .chart-panel { order:4; flex-shrink:0; }
@@ -3508,6 +3513,8 @@
             <input id="activity-feeling" class="feeling-slider" type="range" min="1" max="10" step="1" value="5"
               aria-label="Ressenti de la séance sur 10">
             <div class="feeling-scale"><span>Très facile</span><span>Très difficile</span></div>
+            <label class="feeling-note-label" for="activity-feeling-note">Note personnelle</label>
+            <textarea id="activity-feeling-note" class="feeling-note" rows="3" placeholder="Comment tu t’es senti ? Énergie, respiration, jambes, douleurs, météo, sommeil…"></textarea>
           </section>
           <p id="detail-no-gpx" class="tiny"></p>
         </section>
@@ -3639,6 +3646,19 @@
           </div>
           <p id="accent-color-status" class="muted small" role="status" aria-live="polite"></p>
         </article>
+        <article class="panel" id="map-style-settings">
+          <h2>Fond de carte</h2>
+          <p class="muted small">Choisis le style utilisé sur les cartes des sorties et du parcours. Ton choix est conservé sur cet appareil.</p>
+          <label for="map-style-select">Style de carte</label>
+          <select id="map-style-select" class="theme-select" aria-label="Choisir le fond de carte">
+            <option value="osm">Classique — OpenStreetMap</option>
+            <option value="voyager">Voyager — coloré</option>
+            <option value="light">Clair — minimaliste</option>
+            <option value="dark">Sombre — anthracite</option>
+            <option value="topo">Relief — topographique</option>
+          </select>
+          <p id="map-style-status" class="muted small" role="status" aria-live="polite"></p>
+        </article>
         <article class="panel">
           <h2>Temps objectif</h2>
           <p class="muted small">Définis ton temps cible sur semi-marathon. L’allure théorique et les comparaisons seront mises à jour automatiquement.</p>
@@ -3676,8 +3696,9 @@
         </article>
         <article class="panel settings-export-panel">
           <h2>Sauvegarde</h2>
-          <p class="muted small">Exporte tes activités et leurs données dans un fichier JSON.</p>
-          <button id="export-json" class="button secondary full" type="button">Exporter mes données</button>
+          <p class="muted small">Exporte tes activités, les ressentis sur 10, les notes personnelles et les données servant aux graphiques. Le CSV s’ouvre dans Excel/Sheets ; le JSON conserve aussi les données détaillées (dont les points GPS).</p>
+          <button id="export-csv" class="button primary full" type="button">Exporter le récapitulatif CSV</button>
+          <button id="export-json" class="button secondary full" type="button" style="margin-top:10px">Exporter l’archive complète JSON</button>
         </article>
         <article class="panel">
           <h2>À propos</h2>
@@ -3720,7 +3741,7 @@
     /* MoApp Run — version simple, sans backend ni secrets. */
     (() => {
       "use strict";
-      const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1";
+      const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", NOTE_KEY = "moapp-run-feeling-notes-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1";
       const GOAL_TIME_KEY = "moapp-run-goal-time-v1", DEFAULT_GOAL_TIME_MINUTES = 115;
       function readGoalTimeMinutes() {
         try {
@@ -3817,6 +3838,8 @@
       let manualRecords = readManualRecords();
       const readFeelings = () => { try { return JSON.parse(localStorage.getItem(FEELING_KEY) || "{}") } catch { return {} } };
       let feelings = readFeelings();
+      const readFeelingNotes = () => { try { return JSON.parse(localStorage.getItem(NOTE_KEY) || "{}") } catch { return {} } };
+      let feelingNotes = readFeelingNotes();
       const dateFmt = v => { const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(d) };
       const pace = (km, min) => { if (!(km > 0 && min > 0)) return "—"; const s = Math.round(min * 60 / km); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` };
       const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -4136,6 +4159,13 @@
         feelingSlider.style.setProperty("--feeling-color", color);
         feelingSlider.style.accentColor = color;
       }
+      const feelingNote = $("#activity-feeling-note");
+      feelingNote.addEventListener("input", () => {
+        const id = window.currentDetailActivityId;
+        if (id == null) return;
+        feelingNotes[String(id)] = feelingNote.value;
+        localStorage.setItem(NOTE_KEY, JSON.stringify(feelingNotes));
+      });
       feelingSlider.addEventListener("input", () => updateFeelingDisplay(Number(feelingSlider.value)));
       feelingSlider.addEventListener("change", () => {
         const id = window.currentDetailActivityId;
@@ -4335,7 +4365,38 @@
         else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%;background:var(--pace-color)"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${paceRanges[i]}</span></div>`; }).join("");
       }
 
+      const MAP_STYLE_KEY = "moapp-run-map-style-v1";
+      const MAP_TILE_STYLES = {
+        osm: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19 },
+        voyager: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Sources: Esri, HERE, Garmin, OpenStreetMap contributors', maxZoom: 19 },
+        light: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>', maxZoom: 16 },
+        dark: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; darkened for MoApp Run', maxZoom: 19, className: "moapp-dark-map-tiles" },
+        topo: { url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)', subdomains: "abc", maxZoom: 17 }
+      };
+      function getMapStyle() {
+        try { const saved = localStorage.getItem(MAP_STYLE_KEY); return MAP_TILE_STYLES[saved] ? saved : "osm"; } catch { return "osm"; }
+      }
+      function addSelectedMapTiles(map) {
+        const style = MAP_TILE_STYLES[getMapStyle()];
+        return L.tileLayer(style.url, { maxZoom: style.maxZoom, attribution: style.attribution, subdomains: style.subdomains || "abc", className: style.className || "" }).addTo(map);
+      }
+      window.addSelectedMapTiles = addSelectedMapTiles;
       let paceLeafletMap = null;
+      let paceMapTileLayer = null;
+      const mapStyleSelect = $("#map-style-select"), mapStyleStatus = $("#map-style-status");
+      if (mapStyleSelect) {
+        mapStyleSelect.value = getMapStyle();
+        mapStyleSelect.addEventListener("change", () => {
+          const selected = MAP_TILE_STYLES[mapStyleSelect.value] ? mapStyleSelect.value : "osm";
+          try { localStorage.setItem(MAP_STYLE_KEY, selected); } catch {}
+          if (paceLeafletMap) {
+            if (paceMapTileLayer) paceLeafletMap.removeLayer(paceMapTileLayer);
+            paceMapTileLayer = addSelectedMapTiles(paceLeafletMap);
+          }
+          window.dispatchEvent(new CustomEvent("moapp-map-style-change", { detail: { style: selected } }));
+          if (mapStyleStatus) mapStyleStatus.textContent = "Fond de carte mis à jour.";
+        });
+      }
       function renderPaceMap(activity) {
         const target = $("#detail-pace-map");
         if (paceLeafletMap) {
@@ -4376,10 +4437,7 @@
           return `rgb(${c[0]},${c[1]},${c[2]})`;
         };
         paceLeafletMap = L.map(target, { zoomControl: false, scrollWheelZoom: false, attributionControl: true });
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'
-        }).addTo(paceLeafletMap);
+        paceMapTileLayer = addSelectedMapTiles(paceLeafletMap);
         const latLngs = samples.map(s => [Number(s.lat), Number(s.lon)]);
         for (let i = 1; i < samples.length; i++) {
           const avgPace = (Number(samples[i - 1].pace_sec_km) + Number(samples[i].pace_sec_km)) / 2;
@@ -4404,6 +4462,7 @@
         const savedFeeling = feelings[String(a.id)];
         $("#activity-feeling").value = savedFeeling == null ? 5 : savedFeeling;
         updateFeelingDisplay(savedFeeling == null ? null : savedFeeling);
+        feelingNote.value = feelingNotes[String(a.id)] || "";
         const detailPanel = $("#activity-detail");
         const activityCard = [...document.querySelectorAll("#all-activities [data-activity-id]")].find(el => String(el.dataset.activityId) === String(a.id));
         document.body.append(detailPanel);
@@ -4592,7 +4651,29 @@
       });
       function download(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1200) }
       $("#activity-add").addEventListener("click", () => $("#file-import").click());
-      $("#export-json").addEventListener("click", () => { download(new Blob([JSON.stringify({ app: "MoApp Run", version: 1, exported_at: new Date().toISOString(), activities }, null, 2)], { type: "application/json" }), `moapp-run-${new Date().toISOString().slice(0, 10)}.json`); $("#import-status").textContent = "Sauvegarde JSON prête à enregistrer dans Fichiers." });
+      function activityExportRows() {
+        return activities.map(a => ({ ...a, feeling_10: feelings[String(a.id)] ?? "", feeling_note: feelingNotes[String(a.id)] || "", pace_min_km: Number(a.distance_km) > 0 ? (Number(a.duration_min) / Number(a.distance_km)).toFixed(3) : "", date_iso: a.start_date || "" }));
+      }
+      function csvCell(value) { const v = value == null ? "" : typeof value === "object" ? JSON.stringify(value) : String(value); return `"${v.replace(/"/g, '""')}"`; }
+      $("#export-csv").addEventListener("click", () => {
+        const rows = activityExportRows();
+        const keys = [...new Set(rows.flatMap(r => Object.keys(r)))];
+        const csv = "\ufeff" + [keys.map(csvCell).join(";"), ...rows.map(r => keys.map(k => csvCell(r[k])).join(";"))].join("\r\n");
+        download(new Blob([csv], { type: "text/csv;charset=utf-8" }), `moapp-run-recap-${new Date().toISOString().slice(0, 10)}.csv`);
+        $("#import-status").textContent = "Récapitulatif CSV prêt : activités, ressentis, notes et données disponibles pour reconstruire les graphiques.";
+      });
+      $("#export-json").addEventListener("click", () => {
+        const rows = activityExportRows();
+        const byDate = [...rows].sort((a,b) => new Date(a.start_date) - new Date(b.start_date));
+        const chartData = {
+          volume: byDate.map(a => ({ date:a.start_date, distance_km:Number(a.distance_km)||0 })),
+          pace: byDate.map(a => ({ date:a.start_date, pace_min_km:Number(a.pace_min_km)||null })),
+          duration: byDate.map(a => ({ date:a.start_date, duration_min:Number(a.duration_min)||0 })),
+          feeling: byDate.filter(a => a.feeling_10 !== "").map(a => ({ date:a.start_date, feeling_10:Number(a.feeling_10), note:a.feeling_note }))
+        };
+        download(new Blob([JSON.stringify({ app:"MoApp Run", version:2, exported_at:new Date().toISOString(), activities:rows, feelings, feeling_notes:feelingNotes, chart_data:chartData, records:JSON.parse(localStorage.getItem(PR_KEY)||"{}"), plan_shifts:JSON.parse(localStorage.getItem(PLAN_KEY)||"{}") }, null, 2)], { type:"application/json" }), `moapp-run-archive-${new Date().toISOString().slice(0,10)}.json`);
+        $("#import-status").textContent = "Archive JSON complète prête à enregistrer.";
+      });
       $("#clear-local").addEventListener("click", () => { if (confirm("Effacer toutes les activités enregistrées sur cet appareil ?")) { activities = []; save(); toast("Activités locales effacées.") } });
 
       const CUSTOM_SESSIONS_KEY = "moapp-run-custom-sessions-v1";
@@ -4882,7 +4963,7 @@
  let map=null;
  function show() {
    overlay.hidden=false; document.body.style.overflow='hidden'; renderPaces(); drawProfile();
-   if(window.L && !map) { map=L.map('goal-route-map',{zoomControl:false,scrollWheelZoom:false,dragging:true}); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map); const line=L.polyline(coords,{color:'#ef4444',weight:4}).addTo(map); L.circleMarker(coords[0],{radius:5,color:'#c5f36a'}).addTo(map); L.circleMarker(coords[coords.length-1],{radius:5,color:'#ef4444'}).addTo(map); map.fitBounds(line.getBounds(),{padding:[16,16]}); setTimeout(()=>map.invalidateSize(),100); }
+   if(window.L && !map) { map=L.map('goal-route-map',{zoomControl:false,scrollWheelZoom:false,dragging:true}); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map); window.addEventListener('moapp-map-style-change',()=>{if(map){if(window.__moappGoalRouteTileLayer)map.removeLayer(window.__moappGoalRouteTileLayer);window.__moappGoalRouteTileLayer=window.addSelectedMapTiles(map);}}); const line=L.polyline(coords,{color:'#ef4444',weight:4}).addTo(map); L.circleMarker(coords[0],{radius:5,color:'#c5f36a'}).addTo(map); L.circleMarker(coords[coords.length-1],{radius:5,color:'#ef4444'}).addTo(map); map.fitBounds(line.getBounds(),{padding:[16,16]}); setTimeout(()=>map.invalidateSize(),100); }
  }
  function hide() { overlay.hidden=true; document.body.style.overflow=''; }
  open?.addEventListener('click',show); open?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show();}}); close?.addEventListener('click',hide);
@@ -4949,3 +5030,34 @@
     #activity-detail .pace-map { height:min(48vh,500px) !important; min-height:320px !important; }
   }
 </style>
+<style id="detail-map-full-bleed-fix-v2">
+  /* Correctif final : le conteneur et Leaflet ont exactement la même hauteur. */
+  #activity-detail .pace-map-panel {
+    display:block !important; flex:0 0 auto !important;
+    width:100% !important; min-height:0 !important;
+    margin:0 !important; padding:0 !important; gap:0 !important;
+    box-sizing:border-box !important; overflow:hidden !important;
+    border-radius:16px !important;
+  }
+  #activity-detail .pace-map-panel > .pace-map-layout {
+    display:block !important; position:relative !important;
+    width:100% !important; height:min(48vh,500px) !important;
+    min-height:0 !important; margin:0 !important; padding:0 !important;
+    line-height:0 !important; box-sizing:border-box !important;
+  }
+  #activity-detail .pace-map-panel #detail-pace-map {
+    display:block !important; position:relative !important;
+    width:100% !important; height:100% !important;
+    min-height:0 !important; max-height:none !important;
+    margin:0 !important; padding:0 !important; border:0 !important;
+    border-radius:0 !important; box-sizing:border-box !important;
+  }
+  #activity-detail .pace-map-panel #detail-pace-map .leaflet-container {
+    width:100% !important; height:100% !important;
+  }
+  #activity-detail .pace-map-panel .pace-map-legend { display:none !important; }
+  @media(max-width:759px) {
+    #activity-detail .pace-map-panel > .pace-map-layout { height:min(42vh,360px) !important; }
+  }
+</style>
+
