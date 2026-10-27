@@ -1504,43 +1504,60 @@
     }
 
     .volume-chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 5px;
-      min-height: 150px;
+      display: grid;
+      grid-template-columns: repeat(var(--volume-week-count, 1), minmax(0, 1fr));
+      align-items: stretch;
+      gap: clamp(1px, .45vw, 5px);
+      width: 100%;
+      min-width: 0;
+      height: 230px;
       padding: 10px 0 2px;
-      overflow-x: auto
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .volume-week {
-      flex: 1;
-      min-width: 17px;
+      min-width: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: 16px minmax(0, 1fr) 16px;
+      justify-items: center;
+      align-items: end;
+      gap: 3px;
+    }
+
+    .volume-bar-track {
+      width: 100%;
+      height: 100%;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      height: 135px;
-      gap: 6px
+      align-items: flex-end;
+      justify-content: center;
+      min-height: 0;
     }
 
     .volume-bar {
-      width: 100%;
-      max-width: 30px;
+      width: min(100%, 30px);
       min-height: 2px;
-      background: var(--accent);
-      border-radius: 5px 5px 1px 1px
+      flex: 0 0 auto;
+      background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 38%, #35402b));
+      border-radius: 5px 5px 1px 1px;
     }
 
-    .volume-value {
-      font-size: 9px;
+    .volume-value,
+    .volume-label {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: clip;
+      font-size: clamp(7px, 1.35vw, 9px);
+      line-height: 16px;
       color: var(--muted);
-      white-space: nowrap
+      white-space: nowrap;
     }
 
     .volume-label {
-      font-size: 9px;
-      color: var(--muted);
-      white-space: nowrap
+      font-weight: 600;
     }
 
     .activity-item {
@@ -5031,17 +5048,17 @@
         render();
         toast("Temps objectif mis à jour.");
       });
-      const readPlanDates = () => { try { return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") } catch { return {} } };
+      const readPlanDates = () => {try {return JSON.parse(localStorage.getItem(PLAN_KEY) || "{}")} catch {return {}} };
       let planDates = readPlanDates();
       const DISABLED_SESSIONS_KEY = "moapp-run-disabled-sessions-v1";
-      const readDisabledSessions = () => { try { return JSON.parse(localStorage.getItem(DISABLED_SESSIONS_KEY) || localStorage.getItem("moapp-run-deleted-sessions-v1") || "[]") } catch { return [] } };
+      const readDisabledSessions = () => {try {return JSON.parse(localStorage.getItem(DISABLED_SESSIONS_KEY) || localStorage.getItem("moapp-run-deleted-sessions-v1") || "[]")} catch {return []} };
       let disabledSessions = new Set(readDisabledSessions());
       const DELETED_SESSIONS_KEY = "moapp-run-deleted-plan-sessions-v1";
-      const readDeletedPlanSessions = () => { try { return JSON.parse(localStorage.getItem(DELETED_SESSIONS_KEY) || "[]") } catch { return [] } };
+      const readDeletedPlanSessions = () => {try {return JSON.parse(localStorage.getItem(DELETED_SESSIONS_KEY) || "[]")} catch {return []} };
       let deletedPlanSessions = new Set(readDeletedPlanSessions());
       const isSessionDeleted = (w, j) => deletedPlanSessions.has(`${w}-${j}`);
       const isSessionDisabled = (w, j) => disabledSessions.has(`${w}-${j}`);
-      const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]") } catch { return [] } };
+      const read = () => {try {return JSON.parse(localStorage.getItem(KEY) || "[]")} catch {return []} };
       let activities = read();
       function readManualRecords() {
         try {
@@ -5052,17 +5069,17 @@
           };
         } catch (error) {
           console.error("Impossible de lire les records personnels.", error);
-          return { fiveKm: null, tenKm: null };
+          return {fiveKm: null, tenKm: null};
         }
       }
       let manualRecords = readManualRecords();
-      const readFeelings = () => { try { return JSON.parse(localStorage.getItem(FEELING_KEY) || "{}") } catch { return {} } };
+      const readFeelings = () => {try {return JSON.parse(localStorage.getItem(FEELING_KEY) || "{}")} catch {return {}} };
       let feelings = readFeelings();
-      const readFeelingNotes = () => { try { return JSON.parse(localStorage.getItem(NOTE_KEY) || "{}") } catch { return {} } };
+      const readFeelingNotes = () => {try {return JSON.parse(localStorage.getItem(NOTE_KEY) || "{}")} catch {return {}} };
       let feelingNotes = readFeelingNotes();
-      const dateFmt = v => { const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" }).format(d) };
-      const pace = (km, min) => { if (!(km > 0 && min > 0)) return "—"; const s = Math.round(min * 60 / km); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}` };
-      const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const dateFmt = v => {const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", {day: "2-digit", month: "short", year: "numeric"}).format(d)};
+      const pace = (km, min) => {if (!(km > 0 && min > 0)) return "—"; const s = Math.round(min * 60 / km); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`};
+      const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
       const THEME_KEY = "moapp-run-theme-v1";
       const ACCENT_KEY = "moapp-run-accent-v1", DEFAULT_ACCENT = "#c5f36a";
       const themeToggle = $("#light-theme-toggle");
@@ -5072,22 +5089,22 @@
         document.documentElement.style.colorScheme = light ? "light" : "dark";
         if (themeToggle) themeToggle.checked = light;
         if (persist) {
-          try { localStorage.setItem(THEME_KEY, light ? "light" : "dark"); } catch { }
+          try {localStorage.setItem(THEME_KEY, light ? "light" : "dark");} catch { }
         }
       }
       let savedTheme = "dark";
-      try { savedTheme = localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark"; } catch { }
+      try {savedTheme = localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";} catch { }
       applyTheme(savedTheme, false);
       const accentInput = $("#accent-color-input"), accentStatus = $("#accent-color-status");
       const defaultAccentForTheme = theme => theme === "light" ? "#4d7f20" : DEFAULT_ACCENT;
-      function isValidAccent(value) { return /^#[0-9a-f]{6}$/i.test(value); }
+      function isValidAccent(value) {return /^#[0-9a-f]{6}$/i.test(value);}
       function getReadableAccent(hex, theme) {
         const rgb = hex.slice(1).match(/../g).map(channel => parseInt(channel, 16));
-        const linear = values => values.map(value => { const channel = value / 255; return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4; });
+        const linear = values => values.map(value => {const channel = value / 255; return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;});
         const luminance = values => linear(values).reduce((sum, channel, index) => sum + channel * [.2126, .7152, .0722][index], 0);
         const background = theme === "light" ? [244, 245, 242] : [11, 13, 11];
         const backgroundLum = luminance(background);
-        const contrast = values => { const valueLum = luminance(values); return (Math.max(valueLum, backgroundLum) + .05) / (Math.min(valueLum, backgroundLum) + .05); };
+        const contrast = values => {const valueLum = luminance(values); return (Math.max(valueLum, backgroundLum) + .05) / (Math.min(valueLum, backgroundLum) + .05);};
         if (contrast(rgb) >= 4.5) return hex;
         const target = theme === "light" ? 0 : 255;
         for (let amount = .02; amount <= 1; amount += .02) {
@@ -5150,18 +5167,18 @@
         }
         toast("Couleur d’accentuation réinitialisée.");
       });
-      function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2800) }
-      function save() { localStorage.setItem(KEY, JSON.stringify(activities)); render() }
+      function toast(msg) {const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2800)}
+      function save() {localStorage.setItem(KEY, JSON.stringify(activities)); render()}
       const pageOrder = [...document.querySelectorAll(".page")].map(page => page.id);
       function navigate(id) {
         if (!pageOrder.includes(id)) return;
         document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id));
         document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.go === id));
         history.replaceState(null, "", "#" + id);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({top: 0, behavior: "smooth"});
       }
       document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => navigate(b.dataset.go)));
-      window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if ($("#" + id)?.classList.contains("page")) navigate(id) });
+      window.addEventListener("hashchange", () => {const id = location.hash.slice(1); if ($("#" + id)?.classList.contains("page")) navigate(id)});
 
       // Navigation par balayage horizontal sur la zone de contenu, sans bouton supplémentaire.
       (() => {
@@ -5170,10 +5187,10 @@
         let startX = 0, startY = 0, startTime = 0, tracking = false;
         const ignored = "button, a, input, select, textarea, label, [role='button'], [contenteditable='true'], .pace-map, .leaflet-container, .hr-type-chart, .hr-evolution-scroll, .line-chart-scroll, .detail-chart, .volume-chart";
         swipeArea.addEventListener("touchstart", event => {
-          if (event.touches.length !== 1 || event.target.closest(ignored)) { tracking = false; return; }
+          if (event.touches.length !== 1 || event.target.closest(ignored)) {tracking = false; return;}
           const touch = event.touches[0];
           startX = touch.clientX; startY = touch.clientY; startTime = Date.now(); tracking = true;
-        }, { passive: true });
+        }, {passive: true});
         swipeArea.addEventListener("touchend", event => {
           if (!tracking || event.changedTouches.length !== 1) return;
           tracking = false;
@@ -5186,12 +5203,12 @@
           if (index < 0) return;
           const nextIndex = dx < 0 ? index + 1 : index - 1;
           if (nextIndex >= 0 && nextIndex < pageOrder.length) navigate(pageOrder[nextIndex]);
-        }, { passive: true });
-        swipeArea.addEventListener("touchcancel", () => { tracking = false; }, { passive: true });
+        }, {passive: true});
+        swipeArea.addEventListener("touchcancel", () => {tracking = false;}, {passive: true});
       })();
       const now = new Date(); const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() + 6) % 7); monday.setHours(0, 0, 0, 0); const next = new Date(monday); next.setDate(next.getDate() + 7);
-      $("#week-range").textContent = `${monday.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} – ${new Date(+next - 86400000).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`;
-      const item = a => `<article class="activity-item"><button class="activity-open-button" type="button" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(a.name || "Course à pied")}"><div class="activity-info"><strong>${esc(a.name || "Course à pied")}</strong><p>${dateFmt(a.start_date)}${a.avg_hr ? ` · ${Math.round(Number(a.avg_hr))} bpm` : ""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} km<small>${formatDuration(Number(a.duration_min))} · ${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></button><button class="activity-delete-button" type="button" data-delete-activity="${esc(a.id)}" aria-label="Supprimer l’activité ${esc(a.name || "Course à pied")}" title="Supprimer l’activité"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 2 1 12h12l1-12M10 11v6M14 11v6"/></svg></button></article>`;
+      $("#week-range").textContent = `${monday.toLocaleDateString("fr-FR", {day: "numeric", month: "short"})} – ${new Date(+next - 86400000).toLocaleDateString("fr-FR", {day: "numeric", month: "short"})}`;
+      const item = a => `<article class="activity-item"><button class="activity-open-button" type="button" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(a.name || "Course à pied")}"><div class="activity-info"><strong>${esc(a.name || "Course à pied")}</strong><p>${dateFmt(a.start_date)}${a.avg_hr ? ` · ${Math.round(Number(a.avg_hr))} bpm` : ""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2})} km<small>${formatDuration(Number(a.duration_min))} · ${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></button><button class="activity-delete-button" type="button" data-delete-activity="${esc(a.id)}" aria-label="Supprimer l’activité ${esc(a.name || "Course à pied")}" title="Supprimer l’activité"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 2 1 12h12l1-12M10 11v6M14 11v6"/></svg></button></article>`;
       function bestDistanceTime(targetKm) {
         let best = null;
         for (const activity of activities) {
@@ -5203,7 +5220,7 @@
             if (window.some((split, j) => j > 0 && Number(split.km) !== Number(window[j - 1].km) + 1)) continue;
             const seconds = window.reduce((sum, split) => sum + Number(split.seconds), 0);
             if (seconds > 0 && (best == null || seconds < best.seconds)) {
-              best = { seconds, date: sessionActivityDate(activity), pace: pace(targetKm, seconds / 60) };
+              best = {seconds, date: sessionActivityDate(activity), pace: pace(targetKm, seconds / 60)};
             }
           }
         }
@@ -5239,7 +5256,7 @@
         const el = $("#hr-type-chart"); if (!el) return;
         const rows = activities.map(a => {
           const date = sessionActivityDate(a);
-          return { activity: a, date, hr: activityAverageHR(a), category: plannedCategoryForDate(date) };
+          return {activity: a, date, hr: activityAverageHR(a), category: plannedCategoryForDate(date)};
         }).filter(r => r.date >= HR_CHART_START && r.hr > 0)
           .sort((a, b) => a.date.localeCompare(b.date) || new Date(a.activity.start_date) - new Date(b.activity.start_date));
         if (!rows.length) {
@@ -5289,14 +5306,14 @@
           point.addEventListener("pointerdown", () => showTip(point));
           point.addEventListener("mouseenter", () => showTip(point));
           point.addEventListener("focus", () => showTip(point));
-          point.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showTip(point); } });
+          point.addEventListener("keydown", e => {if (e.key === "Enter" || e.key === " ") {e.preventDefault(); showTip(point);} });
         });
       }
       function renderRacePredictor(best5, best10) {
         const targetKm = 21.0975, targetSeconds = goalTimeMinutes * 60;
         const estimates = [];
-        if (best5) estimates.push({ distance: 5, seconds: best5.seconds, source: "5 km" });
-        if (best10) estimates.push({ distance: 10, seconds: best10.seconds, source: "10 km" });
+        if (best5) estimates.push({distance: 5, seconds: best5.seconds, source: "5 km"});
+        if (best10) estimates.push({distance: 10, seconds: best10.seconds, source: "10 km"});
         const estimate = estimates.length ? estimates.map(x => x.seconds * Math.pow(targetKm / x.distance, 1.06)).sort((a, b) => a - b)[Math.floor((estimates.length - 1) / 2)] : null;
         const predictFrom = (distance) => {
           if (best5) return best5.seconds * Math.pow(distance / 5, 1.06);
@@ -5323,27 +5340,27 @@
         updateGoalTimeDisplays();
         const sorted = [...activities].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         const week = activities.filter(a => new Date(a.start_date) >= monday && new Date(a.start_date) < next);
-        const plannedThisWeek = planWeeks.reduce((count, w, wi) => count + w[1].filter((_, di) => { const d = sessionDate(wi, di); return !isSessionDeleted(wi, di) && d >= monday && d < next; }).length, 0) + customSessions.filter(x => !x.disabled).filter(x => { const [y, m, d] = x.date.split("-").map(Number); const dt = new Date(y, m - 1, d, 12); return dt >= monday && dt < next; }).length;
-        $("#week-distance").textContent = week.reduce((s, a) => s + Number(a.distance_km || 0), 0).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+        const plannedThisWeek = planWeeks.reduce((count, w, wi) => count + w[1].filter((_, di) => {const d = sessionDate(wi, di); return !isSessionDeleted(wi, di) && d >= monday && d < next;}).length, 0) + customSessions.filter(x => !x.disabled).filter(x => {const [y, m, d] = x.date.split("-").map(Number); const dt = new Date(y, m - 1, d, 12); return dt >= monday && dt < next;}).length;
+        $("#week-distance").textContent = week.reduce((s, a) => s + Number(a.distance_km || 0), 0).toLocaleString("fr-FR", {maximumFractionDigits: 1});
         $("#week-sessions").innerHTML = `${week.length} <em>/ ${plannedThisWeek}</em>`;
         const plannedDaysEl = $("#week-planned-days");
         if (plannedDaysEl) {
           const dayEntries = [];
           planWeeks.forEach((w, wi) => w[1].forEach((_, di) => {
             const d = sessionDate(wi, di);
-            if (d >= monday && d < next) dayEntries.push({ wi, di, d, label: d.toLocaleDateString("fr-FR", { weekday: "long" }) });
+            if (d >= monday && d < next) dayEntries.push({wi, di, d, label: d.toLocaleDateString("fr-FR", {weekday: "long"})});
           }));
-          customSessions.filter(x => !x.disabled).forEach(x => { const [y, m, d] = x.date.split("-").map(Number); const dt = new Date(y, m - 1, d, 12); if (dt >= monday && dt < next) dayEntries.push({ wi: -1, di: -1, d: dt, label: dt.toLocaleDateString("fr-FR", { weekday: "long" }) }) });
+          customSessions.filter(x => !x.disabled).forEach(x => {const [y, m, d] = x.date.split("-").map(Number); const dt = new Date(y, m - 1, d, 12); if (dt >= monday && dt < next) dayEntries.push({wi: -1, di: -1, d: dt, label: dt.toLocaleDateString("fr-FR", {weekday: "long"})})});
           dayEntries.sort((a, b) => a.d - b.d);
           plannedDaysEl.innerHTML = dayEntries.length ? dayEntries.map(x => `<span class="${isSessionDisabled(x.wi, x.di) ? "disabled-day" : ""}">${esc(x.label)}</span>`).join('<span aria-hidden="true">·</span>') : "Aucune séance prévue";
         }
         $("#activity-count").textContent = `${activities.length} sortie${activities.length > 1 ? "s" : ""}`;
         const detailPanel = $("#activity-detail");
-        if (detailPanel) { detailPanel.hidden = true; $("#activites").append(detailPanel); }
+        if (detailPanel) {detailPanel.hidden = true; $("#activites").append(detailPanel);}
         $("#all-activities").innerHTML = sorted.map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
         const detected5 = bestDistanceTime(5), detected10 = bestDistanceTime(10);
-        const best5 = manualRecords.fiveKm == null ? detected5 : { seconds: manualRecords.fiveKm, date: null, pace: pace(5, manualRecords.fiveKm / 60), manual: true };
-        const best10 = manualRecords.tenKm == null ? detected10 : { seconds: manualRecords.tenKm, date: null, pace: pace(10, manualRecords.tenKm / 60), manual: true };
+        const best5 = manualRecords.fiveKm == null ? detected5 : {seconds: manualRecords.fiveKm, date: null, pace: pace(5, manualRecords.fiveKm / 60), manual: true};
+        const best10 = manualRecords.tenKm == null ? detected10 : {seconds: manualRecords.tenKm, date: null, pace: pace(10, manualRecords.tenKm / 60), manual: true};
         renderRacePredictor(best5, best10);
         $("#pr-5k-display").textContent = best5 == null ? "—" : formatRaceTime(best5.seconds);
         $("#pr-10k-display").textContent = best10 == null ? "—" : formatRaceTime(best10.seconds);
@@ -5362,9 +5379,9 @@
       }
       const detailTitle = $("#detail-title");
       const detailOriginalParent = $("#activity-detail").parentElement;
-      const closeActivityDetail = () => { const panel = $("#activity-detail"); panel.hidden = true; document.body.classList.remove("activity-detail-open"); if (detailOriginalParent && panel.parentElement !== detailOriginalParent) detailOriginalParent.append(panel); window.currentDetailActivityId = null; };
-      detailTitle.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); closeActivityDetail(); });
-      detailTitle.addEventListener("touchend", e => { e.preventDefault(); closeActivityDetail(); }, { passive: false });
+      const closeActivityDetail = () => {const panel = $("#activity-detail"); panel.hidden = true; document.body.classList.remove("activity-detail-open"); if (detailOriginalParent && panel.parentElement !== detailOriginalParent) detailOriginalParent.append(panel); window.currentDetailActivityId = null;};
+      detailTitle.addEventListener("click", e => {e.preventDefault(); e.stopPropagation(); closeActivityDetail();});
+      detailTitle.addEventListener("touchend", e => {e.preventDefault(); closeActivityDetail();}, {passive: false});
       const feelingSlider = $("#activity-feeling");
       function feelingColor(value) {
         if (value == null || value <= 3) return "#22c55e";
@@ -5420,10 +5437,10 @@
         if (activityButton) openActivityDetail(activityButton.dataset.activityId);
       });
       document.addEventListener("keydown", e => {
-        if ((e.key === "Enter" || e.key === " ") && e.target.matches(".activity-open-button[data-activity-id]")) { e.preventDefault(); openActivityDetail(e.target.dataset.activityId) }
+        if ((e.key === "Enter" || e.key === " ") && e.target.matches(".activity-open-button[data-activity-id]")) {e.preventDefault(); openActivityDetail(e.target.dataset.activityId)}
       });
-      function formatDuration(min) { if (!(min > 0)) return "—"; const sec = Math.round(min * 60); return `${Math.floor(sec / 3600)}:${String(Math.floor(sec % 3600 / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}` }
-      function formatRaceTime(totalSeconds) { const sec = Math.round(totalSeconds); const hours = Math.floor(sec / 3600); const minutes = Math.floor((sec % 3600) / 60); const seconds = sec % 60; return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}` : `${minutes}:${String(seconds).padStart(2, "0")}` }
+      function formatDuration(min) {if (!(min > 0)) return "—"; const sec = Math.round(min * 60); return `${Math.floor(sec / 3600)}:${String(Math.floor(sec % 3600 / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`}
+      function formatRaceTime(totalSeconds) {const sec = Math.round(totalSeconds); const hours = Math.floor(sec / 3600); const minutes = Math.floor((sec % 3600) / 60); const seconds = sec % 60; return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}` : `${minutes}:${String(seconds).padStart(2, "0")}`}
       function parseRaceTime(value) {
         const match = /^(\d{1,2}):([0-5]\d)(?::([0-5]\d))?$/.exec(value.trim());
         if (!match) return null;
@@ -5447,7 +5464,7 @@
           manualRecordInputs[invalidIndex].reportValidity();
           return;
         }
-        const nextRecords = { fiveKm: values[0], tenKm: values[1] };
+        const nextRecords = {fiveKm: values[0], tenKm: values[1]};
         try {
           localStorage.setItem(PR_KEY, JSON.stringify(nextRecords));
         } catch (error) {
@@ -5471,7 +5488,7 @@
         const hi = label.includes("cardiaque") ? Math.ceil((maxV + 8) / 10) * 10 : Math.ceil((maxV + 25) / 30) * 30;
         const span = Math.max(1, hi - lo), n = usable.length, slot = innerW / n, bw = Math.max(3, slot * .64);
         const axisLabel = val => label.includes("cardiaque") ? `${Math.round(val)}` : `${Math.floor(Math.round(val) / 60)}:${String(Math.round(val) % 60).padStart(2, "0")}`;
-        const grid = [0, 1, 2, 3].map(i => { const y = T + i * innerH / 3; const val = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${L - 5}" y="${y + 3}" fill="var(--muted)" font-size="9" text-anchor="end">${axisLabel(val)}</text>` }).join("");
+        const grid = [0, 1, 2, 3].map(i => {const y = T + i * innerH / 3; const val = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${L - 5}" y="${y + 3}" fill="var(--muted)" font-size="9" text-anchor="end">${axisLabel(val)}</text>`}).join("");
         const bars = usable.map((v, i) => {
           const x = L + i * slot + (slot - bw) / 2;
           const h = Math.max(1, (v.value - lo) / span * innerH);
@@ -5491,10 +5508,10 @@
           const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "chart-value-bg"); r.style.fill = getComputedStyle(document.documentElement).getPropertyValue(isPace ? "--pace-color" : "--accent").trim(); r.setAttribute("x", tx - width / 2); r.setAttribute("y", Math.max(1, y - 22)); r.setAttribute("width", width); r.setAttribute("height", 19); r.setAttribute("rx", 4);
           const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("class", "chart-value-label"); t.style.fill = isPace ? "#fff" : "var(--accent-foreground)"; t.setAttribute("x", tx); t.setAttribute("y", Math.max(14, y - 9)); t.setAttribute("text-anchor", "middle"); t.textContent = value; g.append(r, t); svg.append(g); timer = setTimeout(clear, 1600)
         };
-        svg.querySelectorAll(".chart-bar, .chart-point").forEach(bar => { bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("mouseenter", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(bar) } }) });
+        svg.querySelectorAll(".chart-bar, .chart-point").forEach(bar => {bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("mouseenter", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => {if (e.key === "Enter" || e.key === " ") {e.preventDefault(); show(bar)} })});
       }
       function preciseLineSVG(samples, metric) {
-        const vals = samples.map(s => ({ x: Number(s.distance_km), value: Number(metric === "hr" ? s.hr : s.pace_sec_km) })).filter(v => Number.isFinite(v.x) && Number.isFinite(v.value) && v.value > 0);
+        const vals = samples.map(s => ({x: Number(s.distance_km), value: Number(metric === "hr" ? s.hr : s.pace_sec_km)})).filter(v => Number.isFinite(v.x) && Number.isFinite(v.value) && v.value > 0);
         if (vals.length < 2) return '<div class="chart-empty">Pas de données GPS assez détaillées pour cette mesure. Réimporte le fichier GPX pour générer la vue précise.</div>';
         const W = 340, H = 220, L = 42, R = 16, T = 18, B = 32, iw = W - L - R, ih = H - T - B;
         const rawMin = Math.min(...vals.map(v => v.value)), rawMax = Math.max(...vals.map(v => v.value));
@@ -5503,11 +5520,11 @@
         const xAt = i => L + (vals.length < 2 ? 0 : i / (vals.length - 1) * iw);
         const yAt = v => T + (hi - v) / span * ih;
         const label = v => metric === "hr" ? `${Math.round(v)}` : `${Math.floor(Math.round(v) / 60)}:${String(Math.round(v) % 60).padStart(2, "0")}`;
-        const grid = [0, 1, 2, 3].map(i => { const y = T + i * ih / 3, v = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)"/><text x="${L - 7}" y="${y + 3}" fill="var(--muted)" font-size="10" text-anchor="end">${label(v)}</text>` }).join("");
-        const kmMarks = []; for (let km = Math.ceil(vals[0].x); km <= vals[vals.length - 1].x; km++) { const idx = vals.findIndex(v => v.x >= km); if (idx >= 0) { const x = xAt(idx); kmMarks.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${H - B}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${x}" y="${H - 10}" fill="var(--muted)" font-size="10" text-anchor="middle">${km} km</text>`) } }
+        const grid = [0, 1, 2, 3].map(i => {const y = T + i * ih / 3, v = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)"/><text x="${L - 7}" y="${y + 3}" fill="var(--muted)" font-size="10" text-anchor="end">${label(v)}</text>`}).join("");
+        const kmMarks = []; for (let km = Math.ceil(vals[0].x); km <= vals[vals.length - 1].x; km++) {const idx = vals.findIndex(v => v.x >= km); if (idx >= 0) {const x = xAt(idx); kmMarks.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${H - B}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${x}" y="${H - 10}" fill="var(--muted)" font-size="10" text-anchor="middle">${km} km</text>`)} }
         const pts = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
         const plotColor = metric === "pace" ? "var(--pace-color)" : "var(--accent)";
-        const dots = vals.map((v, i) => { const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${plotColor}" stroke="var(--panel)" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>` }).join("");
+        const dots = vals.map((v, i) => {const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${plotColor}" stroke="var(--panel)" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>`}).join("");
         return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise">${grid}${kmMarks.join("")}<polyline points="${pts}" fill="none" stroke="${plotColor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
       }
       document.querySelectorAll(".chart-mode-toggle").forEach(button => button.addEventListener("click", () => {
@@ -5518,7 +5535,7 @@
         const metric = button.dataset.chart, target = $(metric === "hr" ? "#detail-hr-chart" : "#detail-pace-chart");
         if (target.dataset.mode === "precise") {
           target.dataset.mode = "km";
-          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "var(--pace-color)");
+          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({km: s.km, value: s.avg_hr})), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({km: s.km, value: s.pace_sec})), "Allure par kilomètre", " s/km", "var(--pace-color)");
           attachChartInteractions(target); button.textContent = "Détails";
         } else {
           target.dataset.mode = "precise";
@@ -5531,7 +5548,7 @@
       function renderZoneChart(target, values, zones, emptyMessage, ranges = []) {
         if (!target) return;
         const valid = values.filter(v => Number.isFinite(v) && v > 0);
-        if (!valid.length) { target.innerHTML = `<div class="zone-empty">${emptyMessage}</div>`; return; }
+        if (!valid.length) {target.innerHTML = `<div class="zone-empty">${emptyMessage}</div>`; return;}
         const counts = [0, 0, 0, 0, 0];
         valid.forEach(value => {
           let zone = zones.findIndex((limit, i) => i < zones.length - 1 && value >= limit && value < zones[i + 1]);
@@ -5557,7 +5574,7 @@
         }
         return Math.round(detected);
       }
-      function formatPaceSeconds(seconds) { const value = Math.round(seconds); return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, "0")}/km`; }
+      function formatPaceSeconds(seconds) {const value = Math.round(seconds); return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, "0")}/km`;}
       function renderActivityZones(activity) {
         const samples = activity.track_samples || [];
         const heartRates = samples.map(sample => Number(sample.hr)).filter(value => Number.isFinite(value) && value > 0 && value <= 250);
@@ -5568,7 +5585,7 @@
         if (heartRates.length) {
           const limits = [0, .65, .81, .89, .97, Infinity].map(ratio => ratio === Infinity ? Infinity : maxHr * ratio);
           renderZoneChart($("#detail-hr-zones"), heartRates, limits, "Données FC indisponibles", [`0–${Math.round(maxHr * .65) - 1} bpm`, `${Math.round(maxHr * .65)}–${Math.round(maxHr * .81) - 1} bpm`, `${Math.round(maxHr * .81)}–${Math.round(maxHr * .89) - 1} bpm`, `${Math.round(maxHr * .89)}–${Math.round(maxHr * .97) - 1} bpm`, `≥${Math.round(maxHr * .97)} bpm`]);
-        } else { renderZoneChart($("#detail-hr-zones"), [], [], "Données FC indisponibles"); }
+        } else {renderZoneChart($("#detail-hr-zones"), [], [], "Données FC indisponibles");}
         const paces = samples.map(sample => Number(sample.pace_sec_km)).filter(value => Number.isFinite(value) && value > 0 && value < 1800);
         // Zones d’allure relatives à l’allure cible du semi, de la plus lente à la plus rapide.
         const targetPace = goalPaceSeconds();
@@ -5582,23 +5599,23 @@
         const paceShort = seconds => formatPaceSeconds(seconds).replace("/km", "");
         const paceRanges = [`> ${paceShort(targetPace * 1.2)}/km`, `${paceShort(targetPace * 1.1)}-${paceShort(targetPace * 1.2)}/km`, `${paceShort(targetPace)}-${paceShort(targetPace * 1.1)}/km`, `${paceShort(targetPace * .9)}-${paceShort(targetPace)}/km`, `< ${paceShort(targetPace * .9)}/km`];
         if (!paces.length) paceTarget.innerHTML = '<div class="zone-empty">Données d’allure indisponibles</div>';
-        else paceTarget.innerHTML = paceCounts.map((count, i) => { const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%;background:var(--pace-color)"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${paceRanges[i]}</span></div>`; }).join("");
+        else paceTarget.innerHTML = paceCounts.map((count, i) => {const pct = count / paces.length * 100; return `<div class="zone-row"><span class="zone-label">Z${i + 1}</span><div class="zone-track"><div class="zone-fill" style="width:${pct.toFixed(1)}%;background:var(--pace-color)"></div></div><span class="zone-value">${Math.round(pct)} %</span><span class="zone-range">${paceRanges[i]}</span></div>`;}).join("");
       }
 
       const MAP_STYLE_KEY = "moapp-run-map-style-v1";
       const MAP_TILE_STYLES = {
-        osm: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19 },
-        voyager: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Sources: Esri, HERE, Garmin, OpenStreetMap contributors', maxZoom: 19 },
-        light: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>', maxZoom: 16 },
-        dark: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; darkened for MoApp Run', maxZoom: 19, className: "moapp-dark-map-tiles" },
-        topo: { url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)', subdomains: "abc", maxZoom: 17 }
+        osm: {url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19},
+        voyager: {url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Sources: Esri, HERE, Garmin, OpenStreetMap contributors', maxZoom: 19},
+        light: {url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>', maxZoom: 16},
+        dark: {url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; darkened for MoApp Run', maxZoom: 19, className: "moapp-dark-map-tiles"},
+        topo: {url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)', subdomains: "abc", maxZoom: 17}
       };
       function getMapStyle() {
-        try { const saved = localStorage.getItem(MAP_STYLE_KEY); return MAP_TILE_STYLES[saved] ? saved : "osm"; } catch { return "osm"; }
+        try {const saved = localStorage.getItem(MAP_STYLE_KEY); return MAP_TILE_STYLES[saved] ? saved : "osm";} catch {return "osm";}
       }
       function addSelectedMapTiles(map) {
         const style = MAP_TILE_STYLES[getMapStyle()];
-        return L.tileLayer(style.url, { maxZoom: style.maxZoom, attribution: style.attribution, subdomains: style.subdomains || "abc", className: style.className || "" }).addTo(map);
+        return L.tileLayer(style.url, {maxZoom: style.maxZoom, attribution: style.attribution, subdomains: style.subdomains || "abc", className: style.className || ""}).addTo(map);
       }
       window.addSelectedMapTiles = addSelectedMapTiles;
       let paceLeafletMap = null;
@@ -5608,12 +5625,12 @@
         mapStyleSelect.value = getMapStyle();
         mapStyleSelect.addEventListener("change", () => {
           const selected = MAP_TILE_STYLES[mapStyleSelect.value] ? mapStyleSelect.value : "osm";
-          try { localStorage.setItem(MAP_STYLE_KEY, selected); } catch { }
+          try {localStorage.setItem(MAP_STYLE_KEY, selected);} catch { }
           if (paceLeafletMap) {
             if (paceMapTileLayer) paceLeafletMap.removeLayer(paceMapTileLayer);
             paceMapTileLayer = addSelectedMapTiles(paceLeafletMap);
           }
-          window.dispatchEvent(new CustomEvent("moapp-map-style-change", { detail: { style: selected } }));
+          window.dispatchEvent(new CustomEvent("moapp-map-style-change", {detail: {style: selected}}));
           if (mapStyleStatus) mapStyleStatus.textContent = "Fond de carte mis à jour.";
         });
       }
@@ -5656,7 +5673,7 @@
           const c = stops[i].map((n, j) => Math.round(n + (stops[i + 1][j] - n) * f));
           return `rgb(${c[0]},${c[1]},${c[2]})`;
         };
-        paceLeafletMap = L.map(target, { zoomControl: false, scrollWheelZoom: false, attributionControl: true });
+        paceLeafletMap = L.map(target, {zoomControl: false, scrollWheelZoom: false, attributionControl: true});
         paceMapTileLayer = addSelectedMapTiles(paceLeafletMap);
         const latLngs = samples.map(s => [Number(s.lat), Number(s.lon)]);
         for (let i = 1; i < samples.length; i++) {
@@ -5665,14 +5682,14 @@
             color: color(avgPace), weight: 5, opacity: .95, lineCap: 'round', lineJoin: 'round'
           }).addTo(paceLeafletMap);
         }
-        L.circleMarker(latLngs[0], { radius: 5, color: '#16a34a', weight: 2, fillColor: '#fff', fillOpacity: 1 }).bindTooltip('Départ').addTo(paceLeafletMap);
-        L.circleMarker(latLngs[latLngs.length - 1], { radius: 5, color: '#ef4444', weight: 2, fillColor: '#fff', fillOpacity: 1 }).bindTooltip('Arrivée').addTo(paceLeafletMap);
+        L.circleMarker(latLngs[0], {radius: 5, color: '#16a34a', weight: 2, fillColor: '#fff', fillOpacity: 1}).bindTooltip('Départ').addTo(paceLeafletMap);
+        L.circleMarker(latLngs[latLngs.length - 1], {radius: 5, color: '#ef4444', weight: 2, fillColor: '#fff', fillOpacity: 1}).bindTooltip('Arrivée').addTo(paceLeafletMap);
         const routeBounds = L.latLngBounds(latLngs);
-        paceLeafletMap.fitBounds(routeBounds, { padding: [32, 32], maxZoom: 15 });
+        paceLeafletMap.fitBounds(routeBounds, {padding: [32, 32], maxZoom: 15});
         setTimeout(() => {
           if (!paceLeafletMap) return;
           paceLeafletMap.invalidateSize();
-          paceLeafletMap.fitBounds(routeBounds, { padding: [32, 32], maxZoom: 15 });
+          paceLeafletMap.fitBounds(routeBounds, {padding: [32, 32], maxZoom: 15});
         }, 120);
       }
 
@@ -5691,7 +5708,7 @@
         $("#detail-title").dataset.activityName = activityName;
         $("#detail-activity-name").textContent = activityName;
         $("#detail-meta").textContent = `${dateFmt(a.start_date)} · ${a.source_label || "Import manuel"}`;
-        $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " km";
+        $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2}) + " km";
         $("#detail-duration").textContent = formatDuration(Number(a.duration_min));
         $("#detail-pace").textContent = pace(Number(a.distance_km), Number(a.duration_min)) + "/km";
         const planned = getPlannedMetricsForActivity(a);
@@ -5702,8 +5719,8 @@
         $("#detail-avg-hr").textContent = a.avg_hr ? `${Math.round(a.avg_hr)} bpm` : "—";
         $("#detail-hr-chart").dataset.mode = "km";
         $("#detail-pace-chart").dataset.mode = "km";
-        $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({ km: s.km, value: s.avg_hr })), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)");
-        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({ km: s.km, value: s.pace_sec })), "Allure par kilomètre", " s/km", "var(--pace-color)");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
+        $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({km: s.km, value: s.avg_hr})), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)");
+        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({km: s.km, value: s.pace_sec})), "Allure par kilomètre", " s/km", "var(--pace-color)");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
         const hasHr = Number(a.max_hr) > 0 || Number(a.avg_hr) > 0 || (a.km_splits || []).some(s => Number(s.avg_hr) > 0) || (a.track_samples || []).some(s => Number(s.hr) > 0);
         $(".detail-hr-stats").hidden = !hasHr;
         $("#detail-hr-chart").closest(".chart-panel").hidden = !hasHr;
@@ -5713,7 +5730,7 @@
         renderPaceMap(a);
         $("#detail-no-gpx").textContent = "";
         detailPanel.scrollTop = 0;
-        requestAnimationFrame(() => { if (paceLeafletMap) paceLeafletMap.invalidateSize(); });
+        requestAnimationFrame(() => {if (paceLeafletMap) paceLeafletMap.invalidateSize();});
       }
 
 
@@ -5724,25 +5741,25 @@
           if (e.touches.length !== 1) return;
           startY = e.touches[0].clientY; startX = e.touches[0].clientX;
           startedAtTop = window.scrollY <= 2 && document.querySelector("#accueil.page.active") !== null;
-        }, { passive: true });
+        }, {passive: true});
         document.addEventListener("touchend", e => {
           if (!startedAtTop || !e.changedTouches.length) return;
           const dy = e.changedTouches[0].clientY - startY;
           const dx = e.changedTouches[0].clientX - startX;
           if (dy > 100 && Math.abs(dx) < 70 && window.scrollY <= 2) {
-            try { render(); } catch (_) { window.location.reload(); }
+            try {render();} catch (_) {window.location.reload();}
           }
           startedAtTop = false;
-        }, { passive: true });
+        }, {passive: true});
       })();
 
       function parseCSV(text) {
         const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(x => x.trim()); if (lines.length < 2) return [];
-        const line = s => { const out = []; let v = "", q = false; for (let i = 0; i < s.length; i++) { const c = s[i]; if (c === '"' && s[i + 1] === '"' && q) { v += '"'; i++ } else if (c === '"') q = !q; else if ((c === "," || c === ";") && !q) { out.push(v); v = "" } else v += c } out.push(v); return out };
+        const line = s => {const out = []; let v = "", q = false; for (let i = 0; i < s.length; i++) {const c = s[i]; if (c === '"' && s[i + 1] === '"' && q) {v += '"'; i++} else if (c === '"') q = !q; else if ((c === "," || c === ";") && !q) {out.push(v); v = ""} else v += c} out.push(v); return out};
         const headers = line(lines.shift()).map(x => x.trim().toLowerCase());
         return lines.map(s => Object.fromEntries(line(s).map((v, i) => [headers[i], v.trim()])));
       }
-      function normalizeDate(r) { return r.start_date_local || r.start_date || r.date || r["date de l'activité"] || "" }
+      function normalizeDate(r) {return r.start_date_local || r.start_date || r.date || r["date de l'activité"] || ""}
       function normalizeActivity(r, i) {
         const distRaw = r.distance_km ?? r.distance ?? r.distance_m;
         let km = Number(String(distRaw ?? "").replace(",", "."));
@@ -5752,7 +5769,7 @@
         let duration = Number(String(r.duration_min ?? r.moving_time ?? r.elapsed_time ?? r.moving_time_seconds ?? "").replace(",", "."));
         if (r.moving_time !== undefined || r.elapsed_time !== undefined || r.moving_time_seconds !== undefined) duration /= 60;
         const hr = r.average_heartrate ?? r.avg_hr ?? r.average_heart_rate;
-        return { id: r.id || r.activity_id || `import-${Date.now()}-${i}`, source_id: r.id || r.activity_id || null, source_label: "Import CSV", name: r.name || r.activity_name || "Course à pied", start_date: normalizeDate(r), distance_km: km, duration_min: duration, avg_hr: hr ? Number(hr) : null, notes: "" };
+        return {id: r.id || r.activity_id || `import-${Date.now()}-${i}`, source_id: r.id || r.activity_id || null, source_label: "Import CSV", name: r.name || r.activity_name || "Course à pied", start_date: normalizeDate(r), distance_km: km, duration_min: duration, avg_hr: hr ? Number(hr) : null, notes: ""};
       }
       function parseGPX(text, fileName, index) {
         const doc = new DOMParser().parseFromString(text, "application/xml");
@@ -5765,7 +5782,7 @@
           const t = getChild(p, "time")?.textContent?.trim();
           const hrNode = [...p.getElementsByTagNameNS("*", "hr")][0];
           const time = t ? new Date(t) : null;
-          return { lat, lon, time: time && !Number.isNaN(+time) ? time : null, hr: hrNode ? Number(hrNode.textContent) : null };
+          return {lat, lon, time: time && !Number.isNaN(+time) ? time : null, hr: hrNode ? Number(hrNode.textContent) : null};
         }).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
         if (parsed.length < 2) throw Error(`Pas assez de points GPS dans ${fileName}.`);
         const rad = x => x * Math.PI / 180, segments = [];
@@ -5774,7 +5791,7 @@
           const a = parsed[i - 1], b = parsed[i], dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
           const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
           const dist = 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(Math.max(0, 1 - h)));
-          if (dist > 0 && dist < 250) { meters += dist; segments.push({ from: a, to: b, meters: dist }) }
+          if (dist > 0 && dist < 250) {meters += dist; segments.push({from: a, to: b, meters: dist})}
         }
         const times = parsed.map(p => p.time).filter(Boolean).sort((a, b) => a - b);
         if (meters < 50) throw Error(`Distance trop faible ou invalide dans ${fileName}.`);
@@ -5790,30 +5807,30 @@
           while (nextMark <= cumulativeMeters + dist) {
             const f = dist ? (nextMark - cumulativeMeters) / dist : 0;
             const hr = Number.isFinite(a.hr) && a.hr > 0 && Number.isFinite(b.hr) && b.hr > 0 ? a.hr + (b.hr - a.hr) * f : (Number.isFinite(a.hr) && a.hr > 0 ? a.hr : (Number.isFinite(b.hr) && b.hr > 0 ? b.hr : null));
-            rawSamples.push({ distance_km: nextMark / 1000, elapsed_sec: elapsedSeconds + dt * f, hr, lat: a.lat + (b.lat - a.lat) * f, lon: a.lon + (b.lon - a.lon) * f });
+            rawSamples.push({distance_km: nextMark / 1000, elapsed_sec: elapsedSeconds + dt * f, hr, lat: a.lat + (b.lat - a.lat) * f, lon: a.lon + (b.lon - a.lon) * f});
             nextMark += 100;
           }
           cumulativeMeters += dist; elapsedSeconds += dt;
         }
         const trackSamples = rawSamples.slice(1).map((sample, i) => {
           const prev = rawSamples[i];
-          return { distance_km: sample.distance_km, pace_sec_km: sample.elapsed_sec > prev.elapsed_sec ? (sample.elapsed_sec - prev.elapsed_sec) * 10 : null, hr: sample.hr, lat: sample.lat, lon: sample.lon };
+          return {distance_km: sample.distance_km, pace_sec_km: sample.elapsed_sec > prev.elapsed_sec ? (sample.elapsed_sec - prev.elapsed_sec) * 10 : null, hr: sample.hr, lat: sample.lat, lon: sample.lon};
         }).filter(sample => Number.isFinite(sample.pace_sec_km) && sample.pace_sec_km > 0 && sample.pace_sec_km < 1800 || Number.isFinite(sample.hr));
         // Split each GPS segment at exact kilometre boundaries, interpolating elapsed time and heart rate.
         const splits = []; let kmBucket = 0, timeBucket = 0, hrSum = 0, hrCount = 0, hrMax = 0, covered = 0;
-        const flushSplit = (km, sec, hs, hc) => splits.push({ km, seconds: Math.round(sec), pace_sec: Math.round(sec), avg_hr: hc ? Math.round(hs / hc) : null });
+        const flushSplit = (km, sec, hs, hc) => splits.push({km, seconds: Math.round(sec), pace_sec: Math.round(sec), avg_hr: hc ? Math.round(hs / hc) : null});
         for (const seg of segments) {
           const a = seg.from, b = seg.to;
           const dt = (a.time && b.time) ? Math.max(0, (b.time - a.time) / 1000) : 0;
           const dist = seg.meters;
           const hrValues = [a.hr, b.hr].filter(v => Number.isFinite(v) && v > 0);
-          hrValues.forEach(v => { if (v > hrMax) hrMax = v });
+          hrValues.forEach(v => {if (v > hrMax) hrMax = v});
           let remaining = dist, offset = 0;
           while (remaining > 0.0001) {
             const take = Math.min(remaining, 1000 - kmBucket);
             const frac = dist ? take / dist : 0;
             timeBucket += dt * frac;
-            if (hrValues.length) { hrSum += hrValues.reduce((s, v) => s + v, 0) / hrValues.length; hrCount++ }
+            if (hrValues.length) {hrSum += hrValues.reduce((s, v) => s + v, 0) / hrValues.length; hrCount++}
             kmBucket += take; covered += take; remaining -= take; offset += take;
             if (kmBucket >= 999.9) {
               flushSplit(splits.length + 1, timeBucket, hrSum, hrCount);
@@ -5822,7 +5839,7 @@
           }
         }
         // Add a partial final kilometre for context, but its pace is normalized to one km only if distance is complete.
-        if (kmBucket > 100 && timeBucket > 0) splits.push({ km: splits.length + 1, seconds: Math.round(timeBucket), pace_sec: Math.round(timeBucket * 1000 / kmBucket), avg_hr: hrCount ? Math.round(hrSum / hrCount) : null, partial: true });
+        if (kmBucket > 100 && timeBucket > 0) splits.push({km: splits.length + 1, seconds: Math.round(timeBucket), pace_sec: Math.round(timeBucket * 1000 / kmBucket), avg_hr: hrCount ? Math.round(hrSum / hrCount) : null, partial: true});
         const trk = [...doc.getElementsByTagNameNS("*", "trk")][0];
         const trkName = trk && getChild(trk, "name")?.textContent?.trim();
         const start = parsed.find(p => p.time)?.time;
@@ -5861,43 +5878,43 @@
           if (!valid.length) throw Error("Aucune activité valide trouvée.");
           const duplicates = a => activities.find(x => (a.source_id && x.source_id && String(x.source_id) === String(a.source_id)) || (Math.abs(new Date(x.start_date) - new Date(a.start_date)) < 120000 && Math.abs(Number(x.distance_km) - Number(a.distance_km)) < .03));
           const fresh = valid.filter(a => !duplicates(a));
-          const upgrades = valid.filter(a => { const old = duplicates(a); return old && a.track_samples?.length && !old.track_samples?.length; });
+          const upgrades = valid.filter(a => {const old = duplicates(a); return old && a.track_samples?.length && !old.track_samples?.length;});
           const ignored = valid.length - fresh.length - upgrades.length;
           if (!confirm(`${valid.length} activité(s) valide(s), ${fresh.length} nouvelle(s), ${upgrades.length} activité(s) existante(s) enrichie(s) avec les points GPS, ${ignored} doublon(s) probable(s). Continuer ?`)) return;
-          upgrades.forEach(a => { const old = duplicates(a); if (old) Object.assign(old, a, { id: old.id }); });
+          upgrades.forEach(a => {const old = duplicates(a); if (old) Object.assign(old, a, {id: old.id});});
           activities.push(...fresh); save(); $("#import-status").textContent = `Import terminé : ${fresh.length} ajoutée(s), ${upgrades.length} activité(s) enrichie(s), ${ignored} doublon(s) ignoré(s).`; toast("Import terminé.");
-        } catch (err) { $("#import-status").textContent = `Import impossible : ${err.message}` }
-        finally { e.target.value = "" }
+        } catch (err) {$("#import-status").textContent = `Import impossible : ${err.message}`}
+        finally {e.target.value = ""}
       });
-      function download(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1200) }
+      function download(blob, name) {const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1200)}
       $("#activity-add").addEventListener("click", () => $("#file-import").click());
       function activityExportRows() {
-        return activities.map(a => ({ ...a, feeling_10: feelings[String(a.id)] ?? "", feeling_note: feelingNotes[String(a.id)] || "", pace_min_km: Number(a.distance_km) > 0 ? (Number(a.duration_min) / Number(a.distance_km)).toFixed(3) : "", date_iso: a.start_date || "" }));
+        return activities.map(a => ({...a, feeling_10: feelings[String(a.id)] ?? "", feeling_note: feelingNotes[String(a.id)] || "", pace_min_km: Number(a.distance_km) > 0 ? (Number(a.duration_min) / Number(a.distance_km)).toFixed(3) : "", date_iso: a.start_date || ""}));
       }
-      function csvCell(value) { const v = value == null ? "" : typeof value === "object" ? JSON.stringify(value) : String(value); return `"${v.replace(/"/g, '""')}"`; }
+      function csvCell(value) {const v = value == null ? "" : typeof value === "object" ? JSON.stringify(value) : String(value); return `"${v.replace(/"/g, '""')}"`;}
       $("#export-csv").addEventListener("click", () => {
         const rows = activityExportRows();
         const keys = [...new Set(rows.flatMap(r => Object.keys(r)))];
         const csv = "\ufeff" + [keys.map(csvCell).join(";"), ...rows.map(r => keys.map(k => csvCell(r[k])).join(";"))].join("\r\n");
-        download(new Blob([csv], { type: "text/csv;charset=utf-8" }), `moapp-run-recap-${new Date().toISOString().slice(0, 10)}.csv`);
+        download(new Blob([csv], {type: "text/csv;charset=utf-8"}), `moapp-run-recap-${new Date().toISOString().slice(0, 10)}.csv`);
         $("#import-status").textContent = "Récapitulatif CSV prêt : activités, ressentis, notes et données disponibles pour reconstruire les graphiques.";
       });
       $("#export-json").addEventListener("click", () => {
         const rows = activityExportRows();
         const byDate = [...rows].sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
         const chartData = {
-          volume: byDate.map(a => ({ date: a.start_date, distance_km: Number(a.distance_km) || 0 })),
-          pace: byDate.map(a => ({ date: a.start_date, pace_min_km: Number(a.pace_min_km) || null })),
-          duration: byDate.map(a => ({ date: a.start_date, duration_min: Number(a.duration_min) || 0 })),
-          feeling: byDate.filter(a => a.feeling_10 !== "").map(a => ({ date: a.start_date, feeling_10: Number(a.feeling_10), note: a.feeling_note }))
+          volume: byDate.map(a => ({date: a.start_date, distance_km: Number(a.distance_km) || 0})),
+          pace: byDate.map(a => ({date: a.start_date, pace_min_km: Number(a.pace_min_km) || null})),
+          duration: byDate.map(a => ({date: a.start_date, duration_min: Number(a.duration_min) || 0})),
+          feeling: byDate.filter(a => a.feeling_10 !== "").map(a => ({date: a.start_date, feeling_10: Number(a.feeling_10), note: a.feeling_note}))
         };
-        download(new Blob([JSON.stringify({ app: "MoApp Run", version: 2, exported_at: new Date().toISOString(), activities: rows, feelings, feeling_notes: feelingNotes, chart_data: chartData, records: JSON.parse(localStorage.getItem(PR_KEY) || "{}"), plan_shifts: JSON.parse(localStorage.getItem(PLAN_KEY) || "{}") }, null, 2)], { type: "application/json" }), `moapp-run-archive-${new Date().toISOString().slice(0, 10)}.json`);
+        download(new Blob([JSON.stringify({app: "MoApp Run", version: 2, exported_at: new Date().toISOString(), activities: rows, feelings, feeling_notes: feelingNotes, chart_data: chartData, records: JSON.parse(localStorage.getItem(PR_KEY) || "{}"), plan_shifts: JSON.parse(localStorage.getItem(PLAN_KEY) || "{}")}, null, 2)], {type: "application/json"}), `moapp-run-archive-${new Date().toISOString().slice(0, 10)}.json`);
         $("#import-status").textContent = "Archive JSON complète prête à enregistrer.";
       });
-      $("#clear-local").addEventListener("click", () => { if (confirm("Effacer toutes les activités enregistrées sur cet appareil ?")) { activities = []; save(); toast("Activités locales effacées.") } });
+      $("#clear-local").addEventListener("click", () => {if (confirm("Effacer toutes les activités enregistrées sur cet appareil ?")) {activities = []; save(); toast("Activités locales effacées.")} });
 
       const CUSTOM_SESSIONS_KEY = "moapp-run-custom-sessions-v1";
-      const readCustomSessions = () => { try { return JSON.parse(localStorage.getItem(CUSTOM_SESSIONS_KEY) || "[]") } catch { return [] } };
+      const readCustomSessions = () => {try {return JSON.parse(localStorage.getItem(CUSTOM_SESSIONS_KEY) || "[]")} catch {return []} };
       let customSessions = readCustomSessions();
       const planWeeks = [
         ["Reprise", ["30 min en endurance facile, sans chercher la vitesse", "30 min faciles + 4 × 20 s d’accélérations relâchées, récupération en marchant", "8 km faciles, marche autorisée si besoin"]],
@@ -5927,17 +5944,17 @@
       let workoutCarouselIndex = -1;
       function getWorkoutCards() {
         const cards = [];
-        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => { if (!isSessionDisabled(i, j) && !isSessionDeleted(i, j)) cards.push({ week: i, day: j, date: sessionDate(i, j), desc: resolveGoalPace(desc), isRace: i === 21 && j === 2, done: isSessionDone(i, j) }); }));
-        customSessions.filter(session => !session.disabled).forEach(session => { const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); cards.push({ custom: true, id: session.id, week: Math.max(0, Math.floor((date - calendarStart) / (7 * 86400000))), day: session.type === "Endurance fondamentale" ? 0 : session.type === "Tempo" ? 1 : 2, date, desc: `${session.distance} km · ${session.pace}/km`, title: session.type, done: activities.some(a => sessionActivityDate(a) === session.date) }); });
+        planWeeks.forEach((week, i) => week[1].forEach((desc, j) => {if (!isSessionDisabled(i, j) && !isSessionDeleted(i, j)) cards.push({week: i, day: j, date: sessionDate(i, j), desc: resolveGoalPace(desc), isRace: i === 21 && j === 2, done: isSessionDone(i, j)});}));
+        customSessions.filter(session => !session.disabled).forEach(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); cards.push({custom: true, id: session.id, week: Math.max(0, Math.floor((date - calendarStart) / (7 * 86400000))), day: session.type === "Endurance fondamentale" ? 0 : session.type === "Tempo" ? 1 : 2, date, desc: `${session.distance} km · ${session.pace}/km`, title: session.type, done: activities.some(a => sessionActivityDate(a) === session.date)});});
         return cards.sort((a, b) => a.date - b.date);
       }
       function renderNextWorkout() {
         const cardEl = $("#next-workout-card"); if (!cardEl) return;
         const cards = getWorkoutCards(); if (!cards.length) return;
         const today = new Date(); today.setHours(0, 0, 0, 0);
-        if (workoutCarouselIndex < 0) { const upcoming = cards.findIndex(c => { const d = new Date(c.date); d.setHours(0, 0, 0, 0); return d >= today }); workoutCarouselIndex = upcoming < 0 ? cards.length - 1 : upcoming }
+        if (workoutCarouselIndex < 0) {const upcoming = cards.findIndex(c => {const d = new Date(c.date); d.setHours(0, 0, 0, 0); return d >= today}); workoutCarouselIndex = upcoming < 0 ? cards.length - 1 : upcoming}
         workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex));
-        const c = cards[workoutCarouselIndex], date = c.date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+        const c = cards[workoutCarouselIndex], date = c.date.toLocaleDateString("fr-FR", {weekday: "long", day: "numeric", month: "long"});
         const title = c.title || (c.isRace ? "Semi-marathon d’Hyères" : (["Endurance facile", "Séance qualité", "Sortie longue"][c.day] || "Séance"));
         const day = new Date(c.date); day.setHours(0, 0, 0, 0);
         const status = c.done ? "✓ Séance validée" : (day < today ? "Séance passée" : "À venir");
@@ -5946,23 +5963,23 @@
         $("#workout-prev").disabled = workoutCarouselIndex === 0; $("#workout-next").disabled = workoutCarouselIndex === cards.length - 1;
       }
       function setupWorkoutCarousel() {
-        $("#workout-prev")?.addEventListener("click", () => { workoutCarouselIndex = Math.max(0, workoutCarouselIndex - 1); renderNextWorkout() });
-        $("#workout-next")?.addEventListener("click", () => { const cards = getWorkoutCards(); workoutCarouselIndex = Math.min(cards.length - 1, workoutCarouselIndex + 1); renderNextWorkout() });
+        $("#workout-prev")?.addEventListener("click", () => {workoutCarouselIndex = Math.max(0, workoutCarouselIndex - 1); renderNextWorkout()});
+        $("#workout-next")?.addEventListener("click", () => {const cards = getWorkoutCards(); workoutCarouselIndex = Math.min(cards.length - 1, workoutCarouselIndex + 1); renderNextWorkout()});
         const el = $("#next-workout-carousel"); if (!el) return; let startX = null, startY = null;
-        el.addEventListener("touchstart", e => { const t = e.changedTouches[0]; startX = t.clientX; startY = t.clientY }, { passive: true });
-        el.addEventListener("touchend", e => { if (startX === null) return; const t = e.changedTouches[0], dx = t.clientX - startX, dy = t.clientY - startY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { const cards = getWorkoutCards(); workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex + (dx < 0 ? 1 : -1))); renderNextWorkout() } startX = null; startY = null }, { passive: true });
+        el.addEventListener("touchstart", e => {const t = e.changedTouches[0]; startX = t.clientX; startY = t.clientY}, {passive: true});
+        el.addEventListener("touchend", e => {if (startX === null) return; const t = e.changedTouches[0], dx = t.clientX - startX, dy = t.clientY - startY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {const cards = getWorkoutCards(); workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex + (dx < 0 ? 1 : -1))); renderNextWorkout()} startX = null; startY = null}, {passive: true});
       }
       const calendarStart = new Date(2026, 9, 19, 12);
       const raceDay = new Date(2027, 2, 21, 12);
-      const fmtPlan = d => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-      function isoDay(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` }
+      const fmtPlan = d => d.toLocaleDateString("fr-FR", {day: "numeric", month: "short"});
+      function isoDay(d) {return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`}
       function sessionDate(weekIndex, dayIndex) {
         const key = `${weekIndex}-${dayIndex}`;
-        if (typeof planDates[key] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(planDates[key])) { const [y, m, d] = planDates[key].split("-").map(Number); return new Date(y, m - 1, d, 12) }
+        if (typeof planDates[key] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(planDates[key])) {const [y, m, d] = planDates[key].split("-").map(Number); return new Date(y, m - 1, d, 12)}
         const d = new Date(calendarStart); d.setDate(calendarStart.getDate() + weekIndex * 7 + (weekIndex === 21 && dayIndex === 2 ? 6 : [0, 2, 5][dayIndex]));
         return d;
       }
-      function sessionActivityDate(a) { const d = new Date(a.start_date); return Number.isNaN(+d) ? "" : isoDay(d) }
+      function sessionActivityDate(a) {const d = new Date(a.start_date); return Number.isNaN(+d) ? "" : isoDay(d)}
       function isSessionDone(w, j) {
         const date = isoDay(sessionDate(w, j));
         return activities.some(a => sessionActivityDate(a) === date);
@@ -5971,13 +5988,13 @@
         if (wi === 21 && di === 2) return "21,1 km";
         // Les distances explicites de sortie longue priment sur les distances des blocs rapides.
         const explicit = [...desc.matchAll(/(\d+(?:[.,]\d+)?)\s*km/gi)].map(m => Number(m[1].replace(",", ".")));
-        if (di === 2 && explicit.length) return `${explicit[0].toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+        if (di === 2 && explicit.length) return `${explicit[0].toLocaleString("fr-FR", {maximumFractionDigits: 1})} km`;
         // Pour les séances exprimées en durée, estimation du volume total à partir de l’allure facile.
         const minutes = [...desc.matchAll(/(\d+)\s*min/gi)].map(m => Number(m[1]));
-        if (explicit.length && di !== 1) return `${explicit[0].toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+        if (explicit.length && di !== 1) return `${explicit[0].toLocaleString("fr-FR", {maximumFractionDigits: 1})} km`;
         if (di === 0) {
           const totalMin = minutes.reduce((sum, n) => sum + n, 0);
-          if (totalMin) return `~${(totalMin / 6.9).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+          if (totalMin) return `~${(totalMin / 6.9).toLocaleString("fr-FR", {maximumFractionDigits: 1})} km`;
           return "~5–7 km";
         }
         if (di === 1) {
@@ -5987,8 +6004,8 @@
           if (reps.length) estimatedMinutes += reps.reduce((sum, m) => sum + Number(m[1]) * Number(m[2]), 0);
           const kmBlocks = [...desc.matchAll(/(\d+)\s*[×x]\s*(\d+(?:[.,]\d+)?)\s*km/gi)];
           const fastKm = kmBlocks.reduce((sum, m) => sum + Number(m[1]) * Number(m[2].replace(",", ".")), 0);
-          if (fastKm) return `~${(fastKm + 3.5).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
-          if (estimatedMinutes) return `~${(estimatedMinutes / 6.5).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+          if (fastKm) return `~${(fastKm + 3.5).toLocaleString("fr-FR", {maximumFractionDigits: 1})} km`;
+          if (estimatedMinutes) return `~${(estimatedMinutes / 6.5).toLocaleString("fr-FR", {maximumFractionDigits: 1})} km`;
           return "~6–8 km";
         }
         return "—";
@@ -6002,12 +6019,12 @@
             const durationMatches = [...desc.matchAll(/(\d+)\s*min/gi)].map(m => m[1] + " min");
             const paceMatches = [...desc.matchAll(/(\d:\d{2})\s*[–-]\s*(\d:\d{2})\s*\/km/g)].map(m => `${m[1]}–${m[2]}/km`);
             const paceText = paceMatches.length ? paceMatches.join(" · ") : (desc.toLowerCase().includes("facile") || desc.toLowerCase().includes("faciles") ? "6:35–7:15/km" : wi === 21 && di === 2 ? `${formatGoalPace()}/km (objectif)` : "Selon les blocs");
-            return { distance: plannedDistanceForSession(desc, wi, di), duration: durationMatches.length ? durationMatches.join(" · ") : "—", pace: paceText, description: desc };
+            return {distance: plannedDistanceForSession(desc, wi, di), duration: durationMatches.length ? durationMatches.join(" · ") : "—", pace: paceText, description: desc};
           }
         }
-        return { distance: "—", duration: "—", pace: "—" };
+        return {distance: "—", duration: "—", pace: "—"};
       }
-      let currentPlanWeek = (() => { const now = new Date(); now.setHours(12, 0, 0, 0); return Math.max(0, Math.min(21, Math.floor((now - calendarStart) / (7 * 86400000)))) })();
+      let currentPlanWeek = (() => {const now = new Date(); now.setHours(12, 0, 0, 0); return Math.max(0, Math.min(21, Math.floor((now - calendarStart) / (7 * 86400000))))})();
       function renderPlan() {
         const calendar = $("#plan-calendar"); if (!calendar) return;
         const i = currentPlanWeek, w = planWeeks[i];
@@ -6018,15 +6035,15 @@
           const desc = resolveGoalPace(rawDesc);
           const d = sessionDate(i, j), date = fmtPlan(d), isRace = i === 21 && j === 2, done = isSessionDone(i, j), key = `${i}-${j}`;
           const disabled = isSessionDisabled(i, j);
-          const dayLabel = d.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "").toLocaleUpperCase("fr-FR");
+          const dayLabel = d.toLocaleDateString("fr-FR", {weekday: "short"}).replace(".", "").toLocaleUpperCase("fr-FR");
           const paceHint = isRace ? `Objectif indicatif : ${formatGoalPace()}/km si confirmé` : desc.toLowerCase().includes("facile") ? "6:35–7:15/km" : desc.includes("5:") ? "Respecte la plage d’allure écrite dans la séance" : "Effort régulier, contrôlé";
           const completedActivity = activities.find(a => sessionActivityDate(a) === isoDay(d));
           const feeling = completedActivity ? feelings[String(completedActivity.id)] : null;
           return `<div class="workout plan-workout ${done ? "completed" : ""} ${disabled ? "disabled-session" : ""}"><div class="plan-day-column"><span class="day">${dayLabel}<br><small>${date}</small></span><label class="plan-session-switch" title="${disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-session="${key}" ${disabled ? "" : "checked"} aria-label="${disabled ? "Activer" : "Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(isRace ? "Course" : ["Endurance facile", "Séance qualité", "Sortie longue"][j])}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-pick-date="${key}" type="button" aria-label="Décaler la date de ${esc(isRace ? "la course" : ["l’endurance facile", "la séance qualité", "la sortie longue"][j])}" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button><button class="plan-delete-button" data-delete-plan="${key}" type="button" aria-label="Supprimer cette séance" title="Supprimer la séance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p>${esc(desc)}<br><span class="muted">${esc(paceHint)}</span><br><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(plannedDistanceForSession(desc, i, j))}</span>${feeling != null ? `<span class="feeling-badge" style="color:${feelingColor(feeling)}" aria-label="Ressenti : ${feeling} sur 10">Ressenti : ${feeling}/10</span>` : ""}</span></p><label class="plan-date-picker" hidden>Date choisie<input type="date" data-plan-date="${key}" value="${isoDay(d)}"></label></div></div>`;
         }).join("");
-        const customForWeek = customSessions.filter(session => { const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); return date >= monday && date <= sunday; }).sort((a, b) => a.date.localeCompare(b.date)).map(session => {
+        const customForWeek = customSessions.filter(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); return date >= monday && date <= sunday;}).sort((a, b) => a.date.localeCompare(b.date)).map(session => {
           const [y, m, d] = session.date.split("-").map(Number), date = new Date(y, m - 1, d, 12), done = activities.some(a => sessionActivityDate(a) === session.date);
-          return `<div class="workout plan-workout ${done ? "completed" : ""}"><div class="plan-day-column"><span class="day">${esc(date.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "").toLocaleUpperCase("fr-FR"))}<br><small>${fmtPlan(date)}</small></span><label class="plan-session-switch" title="${session.disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-custom="${esc(session.id)}" ${session.disabled ? "" : "checked"} aria-label="${session.disabled ? "Activer" : "Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(session.type)}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-edit-custom-date="${esc(session.id)}" type="button" aria-label="Changer la date" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.7 6.3 3 3M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20z"/></svg></button><button class="plan-delete-button" data-remove-custom="${esc(session.id)}" type="button" aria-label="Supprimer cette séance" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(session.distance)} km</span></span><br><span class="muted">Allure prévue : ${esc(session.pace)}/km</span></p></div></div>`;
+          return `<div class="workout plan-workout ${done ? "completed" : ""}"><div class="plan-day-column"><span class="day">${esc(date.toLocaleDateString("fr-FR", {weekday: "short"}).replace(".", "").toLocaleUpperCase("fr-FR"))}<br><small>${fmtPlan(date)}</small></span><label class="plan-session-switch" title="${session.disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-custom="${esc(session.id)}" ${session.disabled ? "" : "checked"} aria-label="${session.disabled ? "Activer" : "Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(session.type)}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-edit-custom-date="${esc(session.id)}" type="button" aria-label="Changer la date" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.7 6.3 3 3M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20z"/></svg></button><button class="plan-delete-button" data-remove-custom="${esc(session.id)}" type="button" aria-label="Supprimer cette séance" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(session.distance)} km</span></span><br><span class="muted">Allure prévue : ${esc(session.pace)}/km</span></p></div></div>`;
         }).join("");
         calendar.innerHTML = `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${[workouts, customForWeek].filter(Boolean).join("")}<button class="custom-session-add" id="open-custom-session"><span>＋</span> Ajouter une séance</button></article>`;
         const weekCard = calendar.querySelector(".plan-week"), addSessionButton = weekCard.querySelector("#open-custom-session");
@@ -6051,7 +6068,7 @@
         }));
         calendar.querySelectorAll("[data-pick-date]").forEach(btn => btn.addEventListener("click", () => {
           const picker = calendar.querySelector(`[data-plan-date="${btn.dataset.pickDate}"]`);
-          if (picker) { picker.parentElement.hidden = false; picker.focus(); picker.showPicker?.() }
+          if (picker) {picker.parentElement.hidden = false; picker.focus(); picker.showPicker?.()}
         }));
         calendar.querySelectorAll("[data-plan-date]").forEach(input => input.addEventListener("change", () => {
           const key = input.dataset.planDate; if (!input.value) return;
@@ -6061,7 +6078,7 @@
         calendar.querySelector("#open-custom-session")?.addEventListener("click", () => {
           const form = $("#custom-session-form"); const dateInput = $("#custom-session-date");
           const mondayDate = new Date(calendarStart); mondayDate.setDate(calendarStart.getDate() + currentPlanWeek * 7);
-          dateInput.value = isoDay(mondayDate); form.hidden = false; form.scrollIntoView({ behavior: "smooth", block: "center" });
+          dateInput.value = isoDay(mondayDate); form.hidden = false; form.scrollIntoView({behavior: "smooth", block: "center"});
         });
         calendar.querySelectorAll("[data-remove-custom]").forEach(btn => btn.addEventListener("click", () => {
           customSessions = customSessions.filter(x => x.id !== btn.dataset.removeCustom); localStorage.setItem(CUSTOM_SESSIONS_KEY, JSON.stringify(customSessions)); render(); toast("Séance supprimée.");
@@ -6072,25 +6089,25 @@
         }));
         calendar.querySelectorAll("[data-edit-custom-date]").forEach(btn => btn.addEventListener("click", () => {
           const item = customSessions.find(x => x.id === btn.dataset.editCustomDate); if (!item) return;
-          const form = $("#custom-session-form"); form.hidden = false; $("#custom-session-date").value = item.date; $("#custom-session-type").value = item.type; $("#custom-session-distance").value = item.distance; $("#custom-session-distance-value").textContent = `${item.distance} km`; $("#custom-session-pace").value = Math.round((Number(item.pace.split(":")[0]) * 60 + Number(item.pace.split(":")[1])) / 5) * 5; $("#custom-session-pace-value").textContent = item.pace + "/km"; form.dataset.editId = item.id; form.scrollIntoView({ behavior: "smooth", block: "center" });
+          const form = $("#custom-session-form"); form.hidden = false; $("#custom-session-date").value = item.date; $("#custom-session-type").value = item.type; $("#custom-session-distance").value = item.distance; $("#custom-session-distance-value").textContent = `${item.distance} km`; $("#custom-session-pace").value = Math.round((Number(item.pace.split(":")[0]) * 60 + Number(item.pace.split(":")[1])) / 5) * 5; $("#custom-session-pace-value").textContent = item.pace + "/km"; form.dataset.editId = item.id; form.scrollIntoView({behavior: "smooth", block: "center"});
         }));
         calendar.querySelectorAll("[data-delete-plan]").forEach(btn => btn.addEventListener("click", () => {
           deletedPlanSessions.add(btn.dataset.deletePlan); localStorage.setItem(DELETED_SESSIONS_KEY, JSON.stringify([...deletedPlanSessions])); render(); toast("Séance supprimée du plan.");
         }));
       }
       function setupPlanWeekSwipe() {
-        $("#plan-week-prev")?.addEventListener("click", () => { currentPlanWeek = Math.max(0, currentPlanWeek - 1); renderPlan() });
-        $("#plan-week-next")?.addEventListener("click", () => { currentPlanWeek = Math.min(planWeeks.length - 1, currentPlanWeek + 1); renderPlan() });
+        $("#plan-week-prev")?.addEventListener("click", () => {currentPlanWeek = Math.max(0, currentPlanWeek - 1); renderPlan()});
+        $("#plan-week-next")?.addEventListener("click", () => {currentPlanWeek = Math.min(planWeeks.length - 1, currentPlanWeek + 1); renderPlan()});
         const el = $("#plan-calendar"); if (!el) return; let sx = null, sy = null;
-        el.addEventListener("touchstart", e => { if (!e.touches.length) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY }, { passive: true });
-        el.addEventListener("touchend", e => { if (sx === null || !e.changedTouches.length) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) { currentPlanWeek = Math.max(0, Math.min(planWeeks.length - 1, currentPlanWeek + (dx < 0 ? 1 : -1))); renderPlan() } sx = sy = null }, { passive: true });
+        el.addEventListener("touchstart", e => {if (!e.touches.length) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY}, {passive: true});
+        el.addEventListener("touchend", e => {if (sx === null || !e.changedTouches.length) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {currentPlanWeek = Math.max(0, Math.min(planWeeks.length - 1, currentPlanWeek + (dx < 0 ? 1 : -1))); renderPlan()} sx = sy = null}, {passive: true});
       }
       function renderProgress() {
         let total = 0, done = 0;
         planWeeks.forEach((w, i) => w[1].forEach((_, j) => {
           if (isSessionDeleted(i, j) || isSessionDisabled(i, j)) return;
           const d = sessionDate(i, j);
-          if (d <= raceDay) { total++; if (isSessionDone(i, j)) done++ }
+          if (d <= raceDay) {total++; if (isSessionDone(i, j)) done++}
         }));
         customSessions.forEach(session => {
           if (session.disabled) return;
@@ -6109,31 +6126,31 @@
         const el = $("#weekly-volume-chart"); if (!el) return;
         const current = new Date(); current.setHours(0, 0, 0, 0);
         const thisMonday = new Date(current); thisMonday.setDate(current.getDate() - (current.getDay() + 6) % 7);
-        // Le plan commence la semaine du 19 octobre 2026 : conserver ce point de départ
-        // fixe permet à la semaine précédente de rester visible quand la semaine change.
+        // Afficher tout le plan, y compris les semaines futures encore vides.
         const planStart = new Date(2026, 9, 19); planStart.setHours(0, 0, 0, 0);
+        const planEnd = new Date(2027, 2, 21); planEnd.setHours(0, 0, 0, 0);
         const firstMonday = new Date(planStart); firstMonday.setDate(planStart.getDate() - (planStart.getDay() + 6) % 7);
+        const lastMonday = new Date(planEnd); lastMonday.setDate(planEnd.getDate() - (lastMonday.getDay() + 6) % 7);
         const weeks = [];
-        for (let start = new Date(firstMonday), index = 0; start <= thisMonday; index++, start.setDate(start.getDate() + 7)) {
+        for (let start = new Date(firstMonday), index = 0; start <= lastMonday; index++, start.setDate(start.getDate() + 7)) {
           const weekStart = new Date(start);
           const end = new Date(weekStart); end.setDate(end.getDate() + 7);
-          const km = activities.filter(a => { const d = new Date(a.start_date); return !Number.isNaN(d.getTime()) && d >= weekStart && d < end; }).reduce((sum, a) => sum + Number(a.distance_km || 0), 0);
-          weeks.push({ start: weekStart, km, number: index + 1 });
+          const km = activities.filter(a => {const d = new Date(a.start_date); return !Number.isNaN(d.getTime()) && d >= weekStart && d < end;}).reduce((sum, a) => sum + Number(a.distance_km || 0), 0);
+          weeks.push({start: weekStart, km, number: index + 1});
         }
-        if (!weeks.length) weeks.push({ start: firstMonday, km: 0, number: 1 });
         const max = Math.max(1, ...weeks.map(w => w.km));
         el.style.setProperty("--volume-week-count", weeks.length);
         el.innerHTML = weeks.map(w => {
           const h = Math.max(2, w.km / max * 100);
           const value = w.km ? (Math.round(w.km * 10) / 10).toLocaleString("fr-FR") : "0";
           const label = `S${w.number}`;
-          const dateLabel = w.start.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
-          return `<div class="volume-week" title="Semaine ${w.number} · ${dateLabel} · ${value} km"><span class="volume-value">${value}</span><div class="volume-bar" style="height:${h}%"></div><span class="volume-label">${label}</span></div>`;
+          const dateLabel = w.start.toLocaleDateString("fr-FR", {day: "2-digit", month: "2-digit"});
+          return `<div class="volume-week" title="Semaine ${w.number} · ${dateLabel} · ${value} km"><span class="volume-value">${value}</span><div class="volume-bar-track"><div class="volume-bar" style="height:${h}%"></div></div><span class="volume-label">${label}</span></div>`;
         }).join("");
       }
 
 
-      const params = new URLSearchParams(location.search); if (params.get("strava")) { history.replaceState(null, "", location.pathname + location.hash) }
+      const params = new URLSearchParams(location.search); if (params.get("strava")) {history.replaceState(null, "", location.pathname + location.hash)}
       setupWorkoutCarousel();
       setupPlanWeekSwipe();
       const customForm = $("#custom-session-form");
@@ -6146,13 +6163,13 @@
         else range.value = 410;
         $("#custom-session-pace-value").textContent = formatPaceSeconds(range.value) + "/km";
       });
-      $("#custom-session-cancel").addEventListener("click", () => { customForm.hidden = true; delete customForm.dataset.editId; });
+      $("#custom-session-cancel").addEventListener("click", () => {customForm.hidden = true; delete customForm.dataset.editId;});
       customForm.addEventListener("submit", e => {
         e.preventDefault();
         const date = $("#custom-session-date").value; if (!date) return;
         const editedId = customForm.dataset.editId;
-        if (editedId) { const item = customSessions.find(x => x.id === editedId); if (item) Object.assign(item, { type: $("#custom-session-type").value, date, distance: Number($("#custom-session-distance").value), pace: formatPaceSeconds($("#custom-session-pace").value).replace("/km", "") }); delete customForm.dataset.editId; }
-        else customSessions.push({ id: `custom-${Date.now()}`, type: $("#custom-session-type").value, date, distance: Number($("#custom-session-distance").value), pace: formatPaceSeconds($("#custom-session-pace").value).replace("/km", "") });
+        if (editedId) {const item = customSessions.find(x => x.id === editedId); if (item) Object.assign(item, {type: $("#custom-session-type").value, date, distance: Number($("#custom-session-distance").value), pace: formatPaceSeconds($("#custom-session-pace").value).replace("/km", "")}); delete customForm.dataset.editId;}
+        else customSessions.push({id: `custom-${Date.now()}`, type: $("#custom-session-type").value, date, distance: Number($("#custom-session-distance").value), pace: formatPaceSeconds($("#custom-session-pace").value).replace("/km", "")});
         customSessions.sort((a, b) => a.date.localeCompare(b.date));
         localStorage.setItem(CUSTOM_SESSIONS_KEY, JSON.stringify(customSessions));
         const [y, m, d] = date.split("-").map(Number), chosen = new Date(y, m - 1, d, 12);
@@ -6176,7 +6193,7 @@
       function drawProfile() {
         const w = 640, h = 190, p = 24, min = Math.min(...elevations), max = Math.max(...elevations);
         const distances = [0];
-        for (let i = 1; i < coords.length; i++) { const a = coords[i - 1], b = coords[i], r = Math.PI / 180; const dlat = (b[0] - a[0]) * r, dlon = (b[1] - a[1]) * r; const q = Math.sin(dlat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dlon / 2) ** 2; distances.push(distances[i - 1] + 6371000 * 2 * Math.atan2(Math.sqrt(q), Math.sqrt(1 - q))); }
+        for (let i = 1; i < coords.length; i++) {const a = coords[i - 1], b = coords[i], r = Math.PI / 180; const dlat = (b[0] - a[0]) * r, dlon = (b[1] - a[1]) * r; const q = Math.sin(dlat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dlon / 2) ** 2; distances.push(distances[i - 1] + 6371000 * 2 * Math.atan2(Math.sqrt(q), Math.sqrt(1 - q)));}
         const total = distances[distances.length - 1];
         const sampleDistances = elevations.map((_, i) => total * i / (elevations.length - 1));
         const xy = elevations.map((v, i) => [p + sampleDistances[i] / total * (w - 2 * p), h - p - (v - min) / (Math.max(1, max - min)) * (h - 2 * p)]);
@@ -6184,23 +6201,23 @@
         document.getElementById('goal-elevation-chart').innerHTML = `<svg id="goal-profile-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Profil altimétrique interactif du parcours" style="overflow:visible"><polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><line id="goal-profile-cursor" x1="${p}" y1="${p}" x2="${p}" y2="${h - p}" stroke="var(--text)" stroke-opacity=".8" stroke-dasharray="4 4"/><circle id="goal-profile-dot" cx="${p}" cy="${xy[0][1]}" r="5" fill="var(--accent)" stroke="var(--bg)" stroke-width="2"/><text x="${p}" y="${h - 3}" fill="var(--muted)" font-size="11">0 km</text><text x="${w - p}" y="${h - 3}" text-anchor="end" fill="var(--muted)" font-size="11">${(total / 1000).toFixed(1)} km</text><text x="${p}" y="12" fill="var(--muted)" font-size="10">${Math.round(min)} m</text><text x="${w - p}" y="12" text-anchor="end" fill="var(--muted)" font-size="10">${Math.round(max)} m</text><rect id="goal-profile-hit" x="${p}" y="${p}" width="${w - 2 * p}" height="${h - 2 * p}" fill="transparent" style="cursor:crosshair;touch-action:pan-y"/></svg>`;
         const svg = document.getElementById('goal-profile-svg'), hit = document.getElementById('goal-profile-hit');
         const readout = document.getElementById('goal-profile-readout');
-        function update(ev) { const r = svg.getBoundingClientRect(); const clientX = ev.clientX ?? (ev.touches && ev.touches[0].clientX); if (clientX == null) return; const x = Math.max(p, Math.min(w - p, (clientX - r.left) / r.width * w)); const ratio = (x - p) / (w - 2 * p); const idx = Math.max(0, Math.min(elevations.length - 1, Math.round(ratio * (elevations.length - 1)))); const km = sampleDistances[idx] / 1000; const elev = elevations[idx]; const line = document.getElementById('goal-profile-cursor'), dot = document.getElementById('goal-profile-dot'); line.setAttribute('x1', xy[idx][0]); line.setAttribute('x2', xy[idx][0]); dot.setAttribute('cx', xy[idx][0]); dot.setAttribute('cy', xy[idx][1]); const [mm, ss] = paceText().split(':').map(Number); const base = (mm || 5) * 60 + (ss || 27); const sec = base + (km >= 16 ? 4 : km <= 3 ? 2 : 0); const pace = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); const gain = elevations.slice(0, idx + 1).reduce((sum, v, i, a) => i ? sum + Math.max(0, v - a[i - 1]) : 0, 0); readout.innerHTML = `<span>${km.toFixed(1).replace('.', ',')} km</span><span>D+ ${Math.round(gain)} m</span><span>${pace}/km</span>`; }
-        hit.addEventListener('pointerdown', e => { update(e); }); hit.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') update(e); }); hit.addEventListener('click', update);
+        function update(ev) {const r = svg.getBoundingClientRect(); const clientX = ev.clientX ?? (ev.touches && ev.touches[0].clientX); if (clientX == null) return; const x = Math.max(p, Math.min(w - p, (clientX - r.left) / r.width * w)); const ratio = (x - p) / (w - 2 * p); const idx = Math.max(0, Math.min(elevations.length - 1, Math.round(ratio * (elevations.length - 1)))); const km = sampleDistances[idx] / 1000; const elev = elevations[idx]; const line = document.getElementById('goal-profile-cursor'), dot = document.getElementById('goal-profile-dot'); line.setAttribute('x1', xy[idx][0]); line.setAttribute('x2', xy[idx][0]); dot.setAttribute('cx', xy[idx][0]); dot.setAttribute('cy', xy[idx][1]); const [mm, ss] = paceText().split(':').map(Number); const base = (mm || 5) * 60 + (ss || 27); const sec = base + (km >= 16 ? 4 : km <= 3 ? 2 : 0); const pace = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); const gain = elevations.slice(0, idx + 1).reduce((sum, v, i, a) => i ? sum + Math.max(0, v - a[i - 1]) : 0, 0); readout.innerHTML = `<span>${km.toFixed(1).replace('.', ',')} km</span><span>D+ ${Math.round(gain)} m</span><span>${pace}/km</span>`;}
+        hit.addEventListener('pointerdown', e => {update(e);}); hit.addEventListener('pointermove', e => {if (e.buttons || e.pointerType === 'touch') update(e);}); hit.addEventListener('click', update);
       }
       function renderPaces() {
         const pace = paceText(); document.getElementById('goal-detail-pace').innerHTML = pace + '<em>/km</em>';
         const [mm, ss] = pace.split(':').map(Number); const base = (mm || 5) * 60 + (ss || 27);
-        document.getElementById('goal-km-paces').innerHTML = Array.from({ length: 22 }, (_, i) => { const km = i + 1, sec = base + (km >= 16 ? 4 : km <= 3 ? 2 : 0); const p = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); return `<div class="goal-km-row"><span>Km ${km === 22 ? '21,1' : km}</span><strong>${p}/km</strong></div>` }).join('');
+        document.getElementById('goal-km-paces').innerHTML = Array.from({length: 22}, (_, i) => {const km = i + 1, sec = base + (km >= 16 ? 4 : km <= 3 ? 2 : 0); const p = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); return `<div class="goal-km-row"><span>Km ${km === 22 ? '21,1' : km}</span><strong>${p}/km</strong></div>`}).join('');
         document.getElementById('goal-detail-time').textContent = (document.getElementById('goal-time-display')?.textContent || '1h55').replace(/\s+/g, '');
       }
       let map = null;
       function show() {
         overlay.hidden = false; document.body.style.overflow = 'hidden'; renderPaces(); drawProfile();
-        if (window.L && !map) { map = L.map('goal-route-map', { zoomControl: false, scrollWheelZoom: false, dragging: true }); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map); window.addEventListener('moapp-map-style-change', () => { if (map) { if (window.__moappGoalRouteTileLayer) map.removeLayer(window.__moappGoalRouteTileLayer); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map); } }); const line = L.polyline(coords, { color: '#ef4444', weight: 4 }).addTo(map); L.circleMarker(coords[0], { radius: 5, color: '#c5f36a' }).addTo(map); L.circleMarker(coords[coords.length - 1], { radius: 5, color: '#ef4444' }).addTo(map); map.fitBounds(line.getBounds(), { padding: [16, 16] }); setTimeout(() => map.invalidateSize(), 100); }
+        if (window.L && !map) {map = L.map('goal-route-map', {zoomControl: false, scrollWheelZoom: false, dragging: true}); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map); window.addEventListener('moapp-map-style-change', () => {if (map) {if (window.__moappGoalRouteTileLayer) map.removeLayer(window.__moappGoalRouteTileLayer); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map);} }); const line = L.polyline(coords, {color: '#ef4444', weight: 4}).addTo(map); L.circleMarker(coords[0], {radius: 5, color: '#c5f36a'}).addTo(map); L.circleMarker(coords[coords.length - 1], {radius: 5, color: '#ef4444'}).addTo(map); map.fitBounds(line.getBounds(), {padding: [16, 16]}); setTimeout(() => map.invalidateSize(), 100);}
       }
-      function hide() { overlay.hidden = true; document.body.style.overflow = ''; }
-      open?.addEventListener('click', show); open?.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); } }); close?.addEventListener('click', hide);
-      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) hide(); });
+      function hide() {overlay.hidden = true; document.body.style.overflow = '';}
+      open?.addEventListener('click', show); open?.addEventListener('keydown', e => {if (e.key === 'Enter' || e.key === ' ') {e.preventDefault(); show();} }); close?.addEventListener('click', hide);
+      document.addEventListener('keydown', e => {if (e.key === 'Escape' && !overlay.hidden) hide();});
     })();
   </script>
 </body>
