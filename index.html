@@ -5699,18 +5699,10 @@
         $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2}) + " km";
         $("#detail-duration").textContent = formatDuration(Number(a.duration_min));
         $("#detail-pace").textContent = pace(Number(a.distance_km), Number(a.duration_min)) + "/km";
-        const activityDay = sessionActivityDate(a);
-        const isNamedCooperFile = /cooper|vma/i.test(`${a.import_file_name || ""} ${a.name || ""}`);
-        const plannedCooperSession = customSessions.some(session =>
-          /cooper|vma/i.test(`${session.type || ""} ${session.name || ""}`) &&
-          session.date === activityDay && !session.disabled
-        ) || planWeeks.some((week, wi) => week[1].some((desc, di) =>
-          /demi.?cooper|test.{0,20}vma/i.test(desc) &&
-          !isSessionDeleted(wi, di) && isoDay(sessionDate(wi, di)) === activityDay
-        ));
-        // Le nom du fichier/activité suffit à identifier un test Cooper/VMA.
-        // Le rapprochement avec une séance prévue par date sert aussi pour les fichiers génériques.
-        const isCooperTest = Boolean(a.is_cooper_test || isNamedCooperFile || plannedCooperSession);
+        const isCooperFile = /cooper|vma/i.test(String(a.import_file_name || ""));
+        // La détection se fait exclusivement sur le nom du fichier importé (pas le titre
+        // de la trace, pas le nom affiché et pas la séance prévue à cette date).
+        const isCooperTest = isCooperFile;
         const vmaCard = $("#detail-vma-card");
         const statsGrid = document.querySelector("#activity-detail .detail-main-stats");
         vmaCard.hidden = !isCooperTest;
@@ -5856,7 +5848,7 @@
           source_label: "Import GPX",
           name: trkName || fileName.replace(/\.gpx$/i, "") || "Course à pied",
           import_file_name: fileName,
-          is_cooper_test: /cooper|vma/i.test(`${fileName} ${trkName || ""}`),
+          is_cooper_test: /cooper|vma/i.test(fileName),
           start_date: new Date(start.getTime() - start.getTimezoneOffset() * 60000).toISOString().slice(0, 16),
           distance_km: Math.round(meters / 10) / 100,
           duration_min: Math.round(duration * 100) / 100,
@@ -5954,7 +5946,7 @@
       function getWorkoutCards() {
         const cards = [];
         planWeeks.forEach((week, i) => week[1].forEach((desc, j) => {if (!isSessionDisabled(i, j) && !isSessionDeleted(i, j)) cards.push({week: i, day: j, date: sessionDate(i, j), desc: resolveGoalPace(desc), isRace: i === 21 && j === 2, done: isSessionDone(i, j)});}));
-        customSessions.filter(session => !session.disabled).forEach(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); cards.push({custom: true, id: session.id, week: Math.max(0, Math.floor((date - calendarStart) / (7 * 86400000))), day: session.type === "Endurance fondamentale" ? 0 : session.type === "Tempo" ? 1 : 2, date, desc: `${session.distance} km · ${session.pace}/km`, title: session.type, done: activities.some(a => sessionActivityDate(a) === session.date && (/cooper|vma/i.test(`${session.type || ""} ${session.name || ""}`) ? Boolean(a.is_cooper_test || /cooper|vma/i.test(`${a.import_file_name || ""} ${a.name || ""}`)) : true))});});
+        customSessions.filter(session => !session.disabled).forEach(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); cards.push({custom: true, id: session.id, week: Math.max(0, Math.floor((date - calendarStart) / (7 * 86400000))), day: session.type === "Endurance fondamentale" ? 0 : session.type === "Tempo" ? 1 : 2, date, desc: `${session.distance} km · ${session.pace}/km`, title: session.type, done: activities.some(a => sessionActivityDate(a) === session.date && (/cooper|vma/i.test(`${session.type || ""} ${session.name || ""}`) ? /cooper|vma/i.test(String(a.import_file_name || "")) : true))});});
         return cards.sort((a, b) => a.date - b.date);
       }
       function renderNextWorkout() {
