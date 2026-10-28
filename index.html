@@ -1504,60 +1504,39 @@
     }
 
     .volume-chart {
-      display: grid;
-      grid-template-columns: repeat(var(--volume-week-count, 1), minmax(0, 1fr));
-      align-items: stretch;
-      gap: clamp(1px, .45vw, 5px);
       width: 100%;
       min-width: 0;
-      height: 230px;
-      padding: 10px 0 2px;
+      padding: 8px 0 2px;
       overflow: hidden;
-      box-sizing: border-box;
     }
 
-    .volume-week {
-      min-width: 0;
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-rows: 16px minmax(0, 1fr) 16px;
-      justify-items: center;
-      align-items: end;
-      gap: 3px;
-    }
-
-    .volume-bar-track {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      min-height: 0;
-    }
-
-    .volume-bar {
-      width: min(100%, 30px);
-      min-height: 2px;
-      flex: 0 0 auto;
-      background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 38%, #35402b));
-      border-radius: 5px 5px 1px 1px;
-    }
-
-    .volume-value,
-    .volume-label {
+    .volume-line-svg {
       display: block;
+      width: 100%;
+      height: auto;
       max-width: 100%;
-      overflow: hidden;
-      text-overflow: clip;
-      font-size: clamp(7px, 1.35vw, 9px);
-      line-height: 16px;
-      color: var(--muted);
-      white-space: nowrap;
+      overflow: visible;
     }
 
-    .volume-label {
-      font-weight: 600;
+    .volume-point {
+      cursor: pointer;
+      touch-action: manipulation;
+      outline: none;
+    }
+
+    .volume-point:focus-visible {
+      stroke: var(--text);
+      stroke-width: 3;
+    }
+
+    .volume-tooltip-bg {
+      fill: var(--accent);
+    }
+
+    .volume-tooltip-text {
+      fill: var(--accent-foreground);
+      font-size: 11px;
+      font-weight: 800;
     }
 
     .activity-item {
@@ -5287,7 +5266,9 @@
         }).join("");
         const usedCategories = [...new Set(rows.map(r => r.category))];
         const legend = `<div class="hr-evolution-legend">${usedCategories.map(c => `<span><i style="background:${HR_CATEGORY_COLORS[c] || HR_CATEGORY_COLORS["Non planifiée"]}"></i>${esc(c)}</span>`).join("")}</div>`;
-        el.innerHTML = `<div class="hr-evolution-scroll"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="Évolution chronologique de la fréquence cardiaque moyenne en battements par minute">${grid}<polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${labels}${dots}</svg></div>${legend}`;
+        const areaPoints = rows.map((r, i) => `${xAt(i).toFixed(1)},${yAt(r.hr).toFixed(1)}`).join(" ");
+        const area = rows.length ? `${areaPoints} ${xAt(rows.length - 1).toFixed(1)},${(H - 39).toFixed(1)} ${xAt(0).toFixed(1)},${(H - 39).toFixed(1)}` : "";
+        el.innerHTML = `<div class="hr-evolution-scroll"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="Évolution chronologique de la fréquence cardiaque moyenne en battements par minute"><defs><linearGradient id="hr-evolution-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".32"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".015"/></linearGradient></defs>${grid}<polygon points="${area}" fill="url(#hr-evolution-area-gradient)" stroke="none"/><polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${labels}${dots}</svg></div>${legend}`;
         const svg = el.querySelector("svg");
         const clearTip = () => svg.querySelector(".hr-evolution-tooltip")?.remove();
         let tipTimer;
@@ -5525,7 +5506,10 @@
         const pts = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
         const plotColor = metric === "pace" ? "var(--pace-color)" : "var(--accent)";
         const dots = vals.map((v, i) => {const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${plotColor}" stroke="var(--panel)" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>`}).join("");
-        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise">${grid}${kmMarks.join("")}<polyline points="${pts}" fill="none" stroke="${plotColor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
+        const areaPoints = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
+        const area = `${areaPoints} ${xAt(vals.length - 1).toFixed(1)},${(H - B).toFixed(1)} ${xAt(0).toFixed(1)},${(H - B).toFixed(1)}`;
+        const gradientId = `detail-${metric}-area-gradient`;
+        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${plotColor}" stop-opacity=".32"/><stop offset="100%" stop-color="${plotColor}" stop-opacity=".015"/></linearGradient></defs>${grid}${kmMarks.join("")}<polygon points="${area}" fill="url(#${gradientId})" stroke="none"/><polyline points="${pts}" fill="none" stroke="${plotColor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
       }
       document.querySelectorAll(".chart-mode-toggle").forEach(button => button.addEventListener("click", () => {
         const a = activities.find(x => String(x.id) === String(document.querySelector("[data-activity-id][aria-current='true']")?.dataset.activityId));
@@ -5918,7 +5902,7 @@
       let customSessions = readCustomSessions();
       const planWeeks = [
         ["Reprise", ["30 min en endurance facile, sans chercher la vitesse", "30 min faciles + 4 × 20 s d’accélérations relâchées, récupération en marchant", "8 km faciles, marche autorisée si besoin"]],
-        ["Base", ["35 min faciles", "10 min faciles + 6 × 1 min à 5:20–5:35/km, récup. 1 min lente + 10 min faciles", "9 km faciles"]],
+        ["Base", ["35 min faciles", "Échauffement : 15–20 min en endurance facile, puis quelques accélérations progressives. Garder le test demi-Cooper comme séance séparée le même jour.", "9 km faciles"]],
         ["Base", ["35 min faciles", "10 min faciles + 2 × 6 min à 5:55–6:05/km, récup. 3 min en trottinant + 10 min faciles", "10 km faciles"]],
         ["Assimilation", ["30 min faciles", "30 min faciles + 4 × 20 s d’accélérations relâchées", "8 km faciles"]],
         ["Endurance", ["40 min faciles", "12 min d’échauffement + 8 × 1 min vive (5:25–5:40/km), récup. 90 s lente + 10 min retour au calme", "10 km faciles"]],
@@ -5970,6 +5954,12 @@
         el.addEventListener("touchend", e => {if (startX === null) return; const t = e.changedTouches[0], dx = t.clientX - startX, dy = t.clientY - startY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {const cards = getWorkoutCards(); workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex + (dx < 0 ? 1 : -1))); renderNextWorkout()} startX = null; startY = null}, {passive: true});
       }
       const calendarStart = new Date(2026, 9, 19, 12);
+      // Semaine 2 : la séance qualité est remplacée par un échauffement et un test demi-Cooper distincts, le même jour.
+      const week2TestDate = "2026-10-28";
+      if (!customSessions.some(session => session.date === week2TestDate && /demi.?cooper/i.test(session.type))) {
+        customSessions.push({id: "custom-week2-demi-cooper", type: "Test demi-Cooper", date: week2TestDate, distance: 0, pace: "—"});
+        localStorage.setItem(CUSTOM_SESSIONS_KEY, JSON.stringify(customSessions));
+      }
       const raceDay = new Date(2027, 2, 21, 12);
       const fmtPlan = d => d.toLocaleDateString("fr-FR", {day: "numeric", month: "short"});
       function isoDay(d) {return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`}
@@ -6043,7 +6033,7 @@
         }).join("");
         const customForWeek = customSessions.filter(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); return date >= monday && date <= sunday;}).sort((a, b) => a.date.localeCompare(b.date)).map(session => {
           const [y, m, d] = session.date.split("-").map(Number), date = new Date(y, m - 1, d, 12), done = activities.some(a => sessionActivityDate(a) === session.date);
-          return `<div class="workout plan-workout ${done ? "completed" : ""}"><div class="plan-day-column"><span class="day">${esc(date.toLocaleDateString("fr-FR", {weekday: "short"}).replace(".", "").toLocaleUpperCase("fr-FR"))}<br><small>${fmtPlan(date)}</small></span><label class="plan-session-switch" title="${session.disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-custom="${esc(session.id)}" ${session.disabled ? "" : "checked"} aria-label="${session.disabled ? "Activer" : "Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(session.type)}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-edit-custom-date="${esc(session.id)}" type="button" aria-label="Changer la date" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.7 6.3 3 3M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20z"/></svg></button><button class="plan-delete-button" data-remove-custom="${esc(session.id)}" type="button" aria-label="Supprimer cette séance" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${esc(session.distance)} km</span></span><br><span class="muted">Allure prévue : ${esc(session.pace)}/km</span></p></div></div>`;
+          return `<div class="workout plan-workout ${done ? "completed" : ""}"><div class="plan-day-column"><span class="day">${esc(date.toLocaleDateString("fr-FR", {weekday: "short"}).replace(".", "").toLocaleUpperCase("fr-FR"))}<br><small>${fmtPlan(date)}</small></span><label class="plan-session-switch" title="${session.disabled ? "Activer" : "Désactiver"} cette séance"><input type="checkbox" data-toggle-custom="${esc(session.id)}" ${session.disabled ? "" : "checked"} aria-label="${session.disabled ? "Activer" : "Désactiver"} cette séance"><span class="switch-track" aria-hidden="true"></span></label></div><div class="plan-workout-body"><div class="plan-workout-title-row"><strong>${esc(session.type)}</strong>${done ? '<span class="plan-detected">✓ Activité détectée</span>' : ""}<button class="plan-calendar-button" data-edit-custom-date="${esc(session.id)}" type="button" aria-label="Changer la date" title="Changer la date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.7 6.3 3 3M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20z"/></svg></button><button class="plan-delete-button" data-remove-custom="${esc(session.id)}" type="button" aria-label="Supprimer cette séance" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6"/></svg></button></div><p><span class="plan-distance-row"><span class="planned-stat">Distance prévue : ${Number(session.distance) > 0 ? `${esc(session.distance)} km` : "À mesurer après le test"}</span></span><br><span class="muted">${session.pace && session.pace !== "—" ? `Allure prévue : ${esc(session.pace)}/km` : "Test chronométré : noter la distance parcourue en 6 minutes"}</span></p></div></div>`;
         }).join("");
         calendar.innerHTML = `<article class="plan-week"><div class="plan-week-head"><div><h2>Semaine ${i + 1} · ${esc(w[0])}</h2><small>${fmtPlan(monday)} – ${fmtPlan(sunday)}</small></div><span class="tag ${i === 21 ? "" : "neutral"}">${i === 21 ? "COURSE" : `${i + 1}/22`}</span></div>${[workouts, customForWeek].filter(Boolean).join("")}<button class="custom-session-add" id="open-custom-session"><span>＋</span> Ajouter une séance</button></article>`;
         const weekCard = calendar.querySelector(".plan-week"), addSessionButton = weekCard.querySelector("#open-custom-session");
@@ -6126,11 +6116,11 @@
         const el = $("#weekly-volume-chart"); if (!el) return;
         const current = new Date(); current.setHours(0, 0, 0, 0);
         const thisMonday = new Date(current); thisMonday.setDate(current.getDate() - (current.getDay() + 6) % 7);
-        // Afficher tout le plan, y compris les semaines futures encore vides.
+        // Conserver toutes les semaines du plan, y compris les semaines futures sans activité.
         const planStart = new Date(2026, 9, 19); planStart.setHours(0, 0, 0, 0);
         const planEnd = new Date(2027, 2, 21); planEnd.setHours(0, 0, 0, 0);
         const firstMonday = new Date(planStart); firstMonday.setDate(planStart.getDate() - (planStart.getDay() + 6) % 7);
-        const lastMonday = new Date(planEnd); lastMonday.setDate(planEnd.getDate() - (lastMonday.getDay() + 6) % 7);
+        const lastMonday = new Date(planEnd); lastMonday.setDate(planEnd.getDate() - (planEnd.getDay() + 6) % 7);
         const weeks = [];
         for (let start = new Date(firstMonday), index = 0; start <= lastMonday; index++, start.setDate(start.getDate() + 7)) {
           const weekStart = new Date(start);
@@ -6138,15 +6128,55 @@
           const km = activities.filter(a => {const d = new Date(a.start_date); return !Number.isNaN(d.getTime()) && d >= weekStart && d < end;}).reduce((sum, a) => sum + Number(a.distance_km || 0), 0);
           weeks.push({start: weekStart, km, number: index + 1});
         }
-        const max = Math.max(1, ...weeks.map(w => w.km));
-        el.style.setProperty("--volume-week-count", weeks.length);
-        el.innerHTML = weeks.map(w => {
-          const h = Math.max(2, w.km / max * 100);
-          const value = w.km ? (Math.round(w.km * 10) / 10).toLocaleString("fr-FR") : "0";
-          const label = `S${w.number}`;
-          const dateLabel = w.start.toLocaleDateString("fr-FR", {day: "2-digit", month: "2-digit"});
-          return `<div class="volume-week" title="Semaine ${w.number} · ${dateLabel} · ${value} km"><span class="volume-value">${value}</span><div class="volume-bar-track"><div class="volume-bar" style="height:${h}%"></div></div><span class="volume-label">${label}</span></div>`;
-        }).join("");
+        const width = 760, height = 250, left = 34, right = 18, top = 30, bottom = 34;
+        const plotW = width - left - right, plotH = height - top - bottom;
+        // Les semaines futures restent sur l'axe horizontal, mais n'ont ni point, ni valeur à 0.
+        const elapsedWeeks = weeks.filter(w => w.start <= thisMonday);
+        const max = Math.max(5, ...elapsedWeeks.map(w => w.km)) * 1.12;
+        const x = i => left + (weeks.length <= 1 ? plotW / 2 : i * plotW / (weeks.length - 1));
+        const y = km => top + plotH - (km / max) * plotH;
+        const points = elapsedWeeks.map(w => ({...w, x: x(w.number - 1), y: y(w.km)}));
+        const line = points.map((p, i) => `${i ? 'L' : 'M'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+        const area = points.length ? `${line} L ${points[points.length - 1].x.toFixed(1)} ${(top + plotH).toFixed(1)} L ${points[0].x.toFixed(1)} ${(top + plotH).toFixed(1)} Z` : '';
+        const grid = [0, .25, .5, .75, 1].map(r => {
+          const gy = top + plotH * r, val = max * (1 - r);
+          return `<line x1="${left}" y1="${gy.toFixed(1)}" x2="${width - right}" y2="${gy.toFixed(1)}" stroke="var(--line)" stroke-width="1"/><text x="${left - 7}" y="${(gy + 3).toFixed(1)}" text-anchor="end" fill="var(--muted)" font-size="10">${Math.round(val)}</text>`;
+        }).join('');
+        const dots = points.map(p => {
+          const dateLabel = p.start.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'});
+          const value = `${(Math.round(p.km * 10) / 10).toLocaleString('fr-FR')} km`;
+          const detail = `Semaine ${p.number} · ${dateLabel} · ${value}`;
+          return `<circle class="volume-point" tabindex="0" role="button" aria-label="${detail}" data-value="${value}" data-detail="Semaine ${p.number} · ${dateLabel}" data-x="${p.x.toFixed(1)}" data-y="${Math.max(17, p.y - 9).toFixed(1)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="var(--accent)" stroke="var(--panel)" stroke-width="2"><title>${detail}</title></circle>`;
+        }).join('');
+        const labels = weeks.map((w, i) => (i === 0 || i === weeks.length - 1 || w.number % 3 === 1) ? `<text x="${x(i).toFixed(1)}" y="${height - 10}" text-anchor="middle" fill="var(--muted)" font-size="10">S${w.number}</text>` : '').join('');
+        el.innerHTML = `<svg class="volume-line-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Évolution du volume hebdomadaire en kilomètres"><defs><linearGradient id="volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".38"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".02"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}<g class="volume-value-tip" hidden><rect class="volume-tooltip-bg" x="0" y="0" width="90" height="22" rx="5"/><text class="volume-tooltip-text" x="45" y="15" text-anchor="middle"></text></g></svg>`;
+        const svg = el.querySelector('svg');
+        const tip = svg.querySelector('.volume-value-tip');
+        let tipTimer;
+        const showTip = point => {
+          const text = `${point.dataset.value}`;
+          const detail = point.dataset.detail;
+          const txt = tip.querySelector('text');
+          txt.textContent = text;
+          const w = Math.max(54, text.length * 7 + 16);
+          tip.querySelector('rect').setAttribute('width', w);
+          txt.setAttribute('x', w / 2);
+          tip.querySelector('rect').setAttribute('x', 0);
+          const tx = Math.max(2, Math.min(width - w - 2, Number(point.dataset.x) - w / 2));
+          const ty = Math.max(2, Number(point.dataset.y) - 25);
+          tip.setAttribute('transform', `translate(${tx},${ty})`);
+          tip.removeAttribute('hidden');
+          svg.querySelectorAll('.volume-point').forEach(p => p.setAttribute('aria-pressed', p === point ? 'true' : 'false'));
+          clearTimeout(tipTimer); tipTimer = setTimeout(() => tip.setAttribute('hidden', ''), 3000);
+          tip.querySelector('rect').setAttribute('aria-label', detail);
+        };
+        svg.querySelectorAll('.volume-point').forEach(point => {
+          point.addEventListener('click', () => showTip(point));
+          point.addEventListener('pointerdown', () => showTip(point));
+          point.addEventListener('mouseenter', () => showTip(point));
+          point.addEventListener('focus', () => showTip(point));
+          point.addEventListener('keydown', e => {if (e.key === 'Enter' || e.key === ' ') {e.preventDefault(); showTip(point);} });
+        });
       }
 
 
@@ -6198,7 +6228,8 @@
         const sampleDistances = elevations.map((_, i) => total * i / (elevations.length - 1));
         const xy = elevations.map((v, i) => [p + sampleDistances[i] / total * (w - 2 * p), h - p - (v - min) / (Math.max(1, max - min)) * (h - 2 * p)]);
         const points = xy.map(pt => pt.join(',')).join(' ');
-        document.getElementById('goal-elevation-chart').innerHTML = `<svg id="goal-profile-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Profil altimétrique interactif du parcours" style="overflow:visible"><polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><line id="goal-profile-cursor" x1="${p}" y1="${p}" x2="${p}" y2="${h - p}" stroke="var(--text)" stroke-opacity=".8" stroke-dasharray="4 4"/><circle id="goal-profile-dot" cx="${p}" cy="${xy[0][1]}" r="5" fill="var(--accent)" stroke="var(--bg)" stroke-width="2"/><text x="${p}" y="${h - 3}" fill="var(--muted)" font-size="11">0 km</text><text x="${w - p}" y="${h - 3}" text-anchor="end" fill="var(--muted)" font-size="11">${(total / 1000).toFixed(1)} km</text><text x="${p}" y="12" fill="var(--muted)" font-size="10">${Math.round(min)} m</text><text x="${w - p}" y="12" text-anchor="end" fill="var(--muted)" font-size="10">${Math.round(max)} m</text><rect id="goal-profile-hit" x="${p}" y="${p}" width="${w - 2 * p}" height="${h - 2 * p}" fill="transparent" style="cursor:crosshair;touch-action:pan-y"/></svg>`;
+        const areaPoints = `${points} ${w - p},${h - p} ${p},${h - p}`;
+        document.getElementById('goal-elevation-chart').innerHTML = `<svg id="goal-profile-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Profil altimétrique interactif du parcours" style="overflow:visible"><defs><linearGradient id="goal-elevation-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".32"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".015"/></linearGradient></defs><polygon points="${areaPoints}" fill="url(#goal-elevation-area-gradient)" stroke="none"/><polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><line id="goal-profile-cursor" x1="${p}" y1="${p}" x2="${p}" y2="${h - p}" stroke="var(--text)" stroke-opacity=".8" stroke-dasharray="4 4"/><circle id="goal-profile-dot" cx="${p}" cy="${xy[0][1]}" r="5" fill="var(--accent)" stroke="var(--bg)" stroke-width="2"/><text x="${p}" y="${h - 3}" fill="var(--muted)" font-size="11">0 km</text><text x="${w - p}" y="${h - 3}" text-anchor="end" fill="var(--muted)" font-size="11">${(total / 1000).toFixed(1)} km</text><text x="${p}" y="12" fill="var(--muted)" font-size="10">${Math.round(min)} m</text><text x="${w - p}" y="12" text-anchor="end" fill="var(--muted)" font-size="10">${Math.round(max)} m</text><rect id="goal-profile-hit" x="${p}" y="${p}" width="${w - 2 * p}" height="${h - 2 * p}" fill="transparent" style="cursor:crosshair;touch-action:pan-y"/></svg>`;
         const svg = document.getElementById('goal-profile-svg'), hit = document.getElementById('goal-profile-hit');
         const readout = document.getElementById('goal-profile-readout');
         function update(ev) {const r = svg.getBoundingClientRect(); const clientX = ev.clientX ?? (ev.touches && ev.touches[0].clientX); if (clientX == null) return; const x = Math.max(p, Math.min(w - p, (clientX - r.left) / r.width * w)); const ratio = (x - p) / (w - 2 * p); const idx = Math.max(0, Math.min(elevations.length - 1, Math.round(ratio * (elevations.length - 1)))); const km = sampleDistances[idx] / 1000; const elev = elevations[idx]; const line = document.getElementById('goal-profile-cursor'), dot = document.getElementById('goal-profile-dot'); line.setAttribute('x1', xy[idx][0]); line.setAttribute('x2', xy[idx][0]); dot.setAttribute('cx', xy[idx][0]); dot.setAttribute('cy', xy[idx][1]); const [mm, ss] = paceText().split(':').map(Number); const base = (mm || 5) * 60 + (ss || 27); const sec = base + (km >= 16 ? 4 : km <= 3 ? 2 : 0); const pace = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); const gain = elevations.slice(0, idx + 1).reduce((sum, v, i, a) => i ? sum + Math.max(0, v - a[i - 1]) : 0, 0); readout.innerHTML = `<span>${km.toFixed(1).replace('.', ',')} km</span><span>D+ ${Math.round(gain)} m</span><span>${pace}/km</span>`;}
