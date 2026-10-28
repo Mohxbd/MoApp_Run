@@ -6130,12 +6130,13 @@
         }
         const width = 760, height = 250, left = 34, right = 18, top = 30, bottom = 34;
         const plotW = width - left - right, plotH = height - top - bottom;
-        // Les semaines futures restent sur l'axe horizontal, mais n'ont ni point, ni valeur à 0.
+        // Zoom dynamique : semaines écoulées + une semaine à venir, puis extension au fil du temps.
         const elapsedWeeks = weeks.filter(w => w.start <= thisMonday);
+        const visibleWeeks = weeks.slice(0, Math.min(weeks.length, elapsedWeeks.length + 1));
         const max = Math.max(5, ...elapsedWeeks.map(w => w.km)) * 1.12;
-        const x = i => left + (weeks.length <= 1 ? plotW / 2 : i * plotW / (weeks.length - 1));
+        const x = i => left + (visibleWeeks.length <= 1 ? plotW / 2 : i * plotW / (visibleWeeks.length - 1));
         const y = km => top + plotH - (km / max) * plotH;
-        const points = elapsedWeeks.map(w => ({...w, x: x(w.number - 1), y: y(w.km)}));
+        const points = elapsedWeeks.map((w, i) => ({...w, x: x(i), y: y(w.km)}));
         const line = points.map((p, i) => `${i ? 'L' : 'M'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
         const area = points.length ? `${line} L ${points[points.length - 1].x.toFixed(1)} ${(top + plotH).toFixed(1)} L ${points[0].x.toFixed(1)} ${(top + plotH).toFixed(1)} Z` : '';
         const grid = [0, .25, .5, .75, 1].map(r => {
@@ -6148,7 +6149,7 @@
           const detail = `Semaine ${p.number} · ${dateLabel} · ${value}`;
           return `<circle class="volume-point" tabindex="0" role="button" aria-label="${detail}" data-value="${value}" data-detail="Semaine ${p.number} · ${dateLabel}" data-x="${p.x.toFixed(1)}" data-y="${Math.max(17, p.y - 9).toFixed(1)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="var(--accent)" stroke="var(--panel)" stroke-width="2"><title>${detail}</title></circle>`;
         }).join('');
-        const labels = weeks.map((w, i) => (i === 0 || i === weeks.length - 1 || w.number % 3 === 1) ? `<text x="${x(i).toFixed(1)}" y="${height - 10}" text-anchor="middle" fill="var(--muted)" font-size="10">S${w.number}</text>` : '').join('');
+        const labels = visibleWeeks.map((w, i) => (i === 0 || i === visibleWeeks.length - 1 || w.number % 3 === 1) ? `<text x="${x(i).toFixed(1)}" y="${height - 10}" text-anchor="middle" fill="var(--muted)" font-size="10">S${w.number}</text>` : '').join('');
         el.innerHTML = `<svg class="volume-line-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Évolution du volume hebdomadaire en kilomètres"><defs><linearGradient id="volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".38"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".02"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}<g class="volume-value-tip" hidden><rect class="volume-tooltip-bg" x="0" y="0" width="90" height="22" rx="5"/><text class="volume-tooltip-text" x="45" y="15" text-anchor="middle"></text></g></svg>`;
         const svg = el.querySelector('svg');
         const tip = svg.querySelector('.volume-value-tip');
