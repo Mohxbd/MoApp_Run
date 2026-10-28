@@ -2203,15 +2203,22 @@
       gap: 10px;
     }
 
-    #activity-detail .detail-main-stats .distance-stat {
-      grid-column: 1 / -1 !important;
-      width: 100%;
-    }
-
-    #activity-detail .detail-main-stats .stat-card:not(.distance-stat) {
-      grid-column: span 1;
+    #activity-detail .detail-main-stats .stat-card,
+    #activity-detail .detail-main-stats .distance-stat,
+    #activity-detail .detail-main-stats .vma-stat {
+      grid-column: span 1 !important;
+      width: auto;
       min-width: 0;
     }
+
+    #activity-detail .detail-main-stats .vma-stat[hidden] {
+      display: none !important;
+    }
+    #activity-detail .detail-main-stats .distance-stat { grid-column: 1 / -1 !important; }
+    #activity-detail .detail-main-stats.cooper-test-detail .distance-stat { grid-column: 1 !important; grid-row: 1; }
+    #activity-detail .detail-main-stats.cooper-test-detail .vma-stat:not([hidden]) { grid-column: 2 !important; grid-row: 1; }
+    #activity-detail .detail-main-stats > .stat-card:nth-child(3) { grid-column: 1 !important; grid-row: 2; }
+    #activity-detail .detail-main-stats .pace-stat { grid-column: 2 !important; grid-row: 2; }
 
     #activity-detail .detail-hr-stats {
       display: grid !important;
@@ -4630,13 +4637,10 @@
           </div>
           <p id="detail-meta" class="muted small"></p>
           <div class="stats-grid detail-stats detail-main-stats">
-            <article class="stat-card distance-stat"><small>Distance</small><strong
-                id="detail-distance">—</strong><small id="detail-distance-planned" class="planned-stat">Prévu :
-                —</small></article>
-            <article class="stat-card"><small>Durée</small><strong id="detail-duration">—</strong><small
-                id="detail-duration-planned" class="planned-stat">Prévu : —</small></article>
-            <article class="stat-card pace-stat"><small>Allure moyenne</small><strong id="detail-pace">—</strong><small
-                id="detail-pace-planned" class="planned-stat">Prévu : —</small></article>
+            <article class="stat-card distance-stat"><small>Distance</small><strong id="detail-distance">—</strong></article>
+            <article class="stat-card vma-stat" id="detail-vma-card" hidden><small>VMA estimée</small><strong id="detail-vma">—</strong></article>
+            <article class="stat-card"><small>Durée</small><strong id="detail-duration">—</strong></article>
+            <article class="stat-card pace-stat"><small>Allure moyenne</small><strong id="detail-pace">—</strong></article>
           </div>
           <div class="stat-card pace-map-panel">
             <h3>Carte d’allure</h3>
@@ -5512,9 +5516,9 @@
         return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${plotColor}" stop-opacity=".32"/><stop offset="100%" stop-color="${plotColor}" stop-opacity=".015"/></linearGradient></defs>${grid}${kmMarks.join("")}<polygon points="${area}" fill="url(#${gradientId})" stroke="none"/><polyline points="${pts}" fill="none" stroke="${plotColor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
       }
       document.querySelectorAll(".chart-mode-toggle").forEach(button => button.addEventListener("click", () => {
-        const a = activities.find(x => String(x.id) === String(document.querySelector("[data-activity-id][aria-current='true']")?.dataset.activityId));
-        const detailTitle = $("#detail-title").dataset.activityName || "";
-        const activity = activities.find(x => (x.name || "Course à pied") === detailTitle && !$("#activity-detail").hidden) || activities.find(x => !$("#activity-detail").hidden && String(x.id) === String(window.currentDetailActivityId));
+        // Toujours utiliser l'identifiant de l'activité ouverte : plusieurs activités
+        // peuvent partager le même nom ou la même date.
+        const activity = activities.find(x => !$("#activity-detail").hidden && String(x.id) === String(window.currentDetailActivityId));
         if (!activity) return;
         const metric = button.dataset.chart, target = $(metric === "hr" ? "#detail-hr-chart" : "#detail-pace-chart");
         if (target.dataset.mode === "precise") {
@@ -5695,10 +5699,28 @@
         $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2}) + " km";
         $("#detail-duration").textContent = formatDuration(Number(a.duration_min));
         $("#detail-pace").textContent = pace(Number(a.distance_km), Number(a.duration_min)) + "/km";
-        const planned = getPlannedMetricsForActivity(a);
-        $("#detail-distance-planned").textContent = `Prévu : ${planned.distance || "—"}`;
-        $("#detail-duration-planned").textContent = `Prévu : ${planned.duration || "—"}`;
-        $("#detail-pace-planned").textContent = `Prévu : ${planned.pace || "—"}`;
+        const activityDay = sessionActivityDate(a);
+        const isNamedCooperFile = /cooper|vma/i.test(`${a.import_file_name || ""} ${a.name || ""}`);
+        const plannedCooperSession = customSessions.some(session =>
+          /cooper|vma/i.test(`${session.type || ""} ${session.name || ""}`) &&
+          session.date === activityDay && !session.disabled
+        ) || planWeeks.some((week, wi) => week[1].some((desc, di) =>
+          /demi.?cooper|test.{0,20}vma/i.test(desc) &&
+          !isSessionDeleted(wi, di) && isoDay(sessionDate(wi, di)) === activityDay
+        ));
+        // Le nom du fichier/activité suffit à identifier un test Cooper/VMA.
+        // Le rapprochement avec une séance prévue par date sert aussi pour les fichiers génériques.
+        const isCooperTest = Boolean(a.is_cooper_test || isNamedCooperFile || plannedCooperSession);
+        const vmaCard = $("#detail-vma-card");
+        const statsGrid = document.querySelector("#activity-detail .detail-main-stats");
+        vmaCard.hidden = !isCooperTest;
+        statsGrid?.classList.toggle("cooper-test-detail", isCooperTest);
+        if (isCooperTest) {
+          const duration = Number(a.duration_min);
+          const distance = Number(a.distance_km);
+          const vma = duration > 0 && distance > 0 ? distance * 60 / duration : 0;
+          $("#detail-vma").textContent = vma > 0 ? `${vma.toLocaleString("fr-FR", {minimumFractionDigits: 1, maximumFractionDigits: 2})} km/h` : "—";
+        }
         $("#detail-max-hr").textContent = a.max_hr ? `${a.max_hr} bpm` : "—";
         $("#detail-avg-hr").textContent = a.avg_hr ? `${Math.round(a.avg_hr)} bpm` : "—";
         $("#detail-hr-chart").dataset.mode = "km";
@@ -5753,7 +5775,8 @@
         let duration = Number(String(r.duration_min ?? r.moving_time ?? r.elapsed_time ?? r.moving_time_seconds ?? "").replace(",", "."));
         if (r.moving_time !== undefined || r.elapsed_time !== undefined || r.moving_time_seconds !== undefined) duration /= 60;
         const hr = r.average_heartrate ?? r.avg_hr ?? r.average_heart_rate;
-        return {id: r.id || r.activity_id || `import-${Date.now()}-${i}`, source_id: r.id || r.activity_id || null, source_label: "Import CSV", name: r.name || r.activity_name || "Course à pied", start_date: normalizeDate(r), distance_km: km, duration_min: duration, avg_hr: hr ? Number(hr) : null, notes: ""};
+        const name = r.name || r.activity_name || "Course à pied";
+        return {id: r.id || r.activity_id || `import-${Date.now()}-${i}`, source_id: r.id || r.activity_id || null, source_label: "Import CSV", name, is_cooper_test: /cooper|vma/i.test(name), start_date: normalizeDate(r), distance_km: km, duration_min: duration, avg_hr: hr ? Number(hr) : null, notes: ""};
       }
       function parseGPX(text, fileName, index) {
         const doc = new DOMParser().parseFromString(text, "application/xml");
@@ -5832,6 +5855,8 @@
           id: `gpx-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 7)}`,
           source_label: "Import GPX",
           name: trkName || fileName.replace(/\.gpx$/i, "") || "Course à pied",
+          import_file_name: fileName,
+          is_cooper_test: /cooper|vma/i.test(`${fileName} ${trkName || ""}`),
           start_date: new Date(start.getTime() - start.getTimezoneOffset() * 60000).toISOString().slice(0, 16),
           distance_km: Math.round(meters / 10) / 100,
           duration_min: Math.round(duration * 100) / 100,
@@ -5929,7 +5954,7 @@
       function getWorkoutCards() {
         const cards = [];
         planWeeks.forEach((week, i) => week[1].forEach((desc, j) => {if (!isSessionDisabled(i, j) && !isSessionDeleted(i, j)) cards.push({week: i, day: j, date: sessionDate(i, j), desc: resolveGoalPace(desc), isRace: i === 21 && j === 2, done: isSessionDone(i, j)});}));
-        customSessions.filter(session => !session.disabled).forEach(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); cards.push({custom: true, id: session.id, week: Math.max(0, Math.floor((date - calendarStart) / (7 * 86400000))), day: session.type === "Endurance fondamentale" ? 0 : session.type === "Tempo" ? 1 : 2, date, desc: `${session.distance} km · ${session.pace}/km`, title: session.type, done: activities.some(a => sessionActivityDate(a) === session.date)});});
+        customSessions.filter(session => !session.disabled).forEach(session => {const [y, m, d] = session.date.split("-").map(Number); const date = new Date(y, m - 1, d, 12); cards.push({custom: true, id: session.id, week: Math.max(0, Math.floor((date - calendarStart) / (7 * 86400000))), day: session.type === "Endurance fondamentale" ? 0 : session.type === "Tempo" ? 1 : 2, date, desc: `${session.distance} km · ${session.pace}/km`, title: session.type, done: activities.some(a => sessionActivityDate(a) === session.date && (/cooper|vma/i.test(`${session.type || ""} ${session.name || ""}`) ? Boolean(a.is_cooper_test || /cooper|vma/i.test(`${a.import_file_name || ""} ${a.name || ""}`)) : true))});});
         return cards.sort((a, b) => a.date - b.date);
       }
       function renderNextWorkout() {
@@ -6467,4 +6492,21 @@
       height: min(42vh, 360px) !important;
     }
   }
+
+    /* Disposition explicite : hors test Cooper, Distance occupe toute la ligne.
+       Pour un test Cooper/VMA, Distance et VMA sont côte à côte. */
+    #activity-detail .detail-main-stats:not(.cooper-test-detail) .distance-stat {
+      grid-column: 1 / -1 !important;
+      grid-row: auto !important;
+    }
+    #activity-detail .detail-main-stats.cooper-test-detail .distance-stat {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+    }
+    #activity-detail .detail-main-stats.cooper-test-detail .vma-stat:not([hidden]) {
+      display: flex !important;
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+    }
+    #activity-detail .detail-main-stats .vma-stat[hidden] { display: none !important; }
 </style>
