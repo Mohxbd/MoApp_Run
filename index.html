@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#10120f">
-  <meta name="description" content="MoApp Run — ton coach pour le semi-marathon d'Hyères 2027.">
+  <meta name="description" content="MoApp Run">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <style>
@@ -241,7 +241,7 @@
 
     .hero-time-row {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
       gap: 8px;
       min-width: 0
@@ -2527,13 +2527,14 @@
     }
 
     .topbar {
-      height: 70px;
+      height: 56px;
+      position: static;
       padding: env(safe-area-inset-top) clamp(18px, 4vw, 34px) 0;
-      background: rgba(11, 13, 11, .78);
-      border-bottom: 1px solid rgba(255, 255, 255, .055);
+      background: rgba(11, 13, 11, 0);
+      border-bottom: 1px solid rgba(255, 255, 255, 0);
       backdrop-filter: saturate(150%) blur(24px);
       -webkit-backdrop-filter: saturate(150%) blur(24px);
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .brand {
@@ -2560,22 +2561,24 @@
     }
 
     main {
-      padding: 30px clamp(16px, 4vw, 34px) 42px;
+      padding: 4px clamp(16px, 4vw, 34px) 42px;
     }
 
     .page {
       animation: premium-enter .36s var(--ease-out) both;
     }
 
+    .page:not(#accueil) {
+      padding-top: 4px;
+    }
+
     @keyframes premium-enter {
       from {
         opacity: 0;
-        transform: translateY(9px);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0);
       }
     }
 
@@ -2632,8 +2635,8 @@
       position: relative;
       isolation: isolate;
       overflow: hidden;
-      padding: clamp(22px, 4vw, 34px);
-      margin: 22px 0 30px;
+      padding: 12px clamp(18px, 3vw, 26px);
+      margin: 4px 0 12px;
       border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
       border-radius: 28px;
       background:
@@ -2647,7 +2650,7 @@
       position: absolute;
       z-index: -1;
       width: 240px;
-      height: 240px;
+      height: 20px;
       right: -110px;
       bottom: -150px;
       border: 1px solid color-mix(in srgb, var(--accent) 13%, transparent);
@@ -2678,7 +2681,7 @@
     }
 
     .hero-time {
-      margin: 14px 0 18px;
+      margin: 8px 0 9px;
       font-size: clamp(52px, 11vw, 78px);
       line-height: .98;
       letter-spacing: -.075em;
@@ -2702,6 +2705,7 @@
     .hero-countdown {
       gap: 7px;
       padding-left: 14px;
+      margin-bottom: 9px;
     }
 
     .hero-countdown small {
@@ -2714,13 +2718,49 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .hero-bottom {
-      gap: clamp(22px, 5vw, 48px);
-      padding-top: 18px;
-      border-top-color: rgba(255, 255, 255, .11);
+    #countdown.live-countdown {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      column-gap: 7px;
+      row-gap: 2px;
+      max-width: 200px;
+      line-height: 1;
     }
 
-    .hero-bottom div {
+    .countdown-part {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 1px;
+      white-space: nowrap;
+    }
+
+    .countdown-label {
+      color: #fff;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .03em;
+    }
+
+    .countdown-value {
+      color: var(--accent-text);
+      font-size: clamp(16px, 4vw, 21px);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: auto auto minmax(84px, 1fr);
+      align-items: start;
+      gap: clamp(12px, 3vw, 32px);
+      padding-top: 9px;
+      border-top: 0;
+    }
+
+    .hero-bottom > div {
+      display: grid;
       gap: 4px;
     }
 
@@ -2735,12 +2775,50 @@
     }
 
     .objective-progress {
-      margin-top: 22px;
+      margin-top: 10px;
+    }
+
+    .hero-bottom .hero-progress {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 4px;
+      align-self: stretch;
+      min-width: 0;
+      margin: 0 0 0 clamp(5px, 1.5vw, 10px);
+    }
+
+    .hero-bottom .progress-copy {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+
+    .hero-bottom .progress-copy strong {
+      color: #aeb8a6;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: normal;
+    }
+
+    .hero-bottom .progress-track {
+      display: block;
+      height: 7px;
+      align-self: center;
+    }
+
+    .hero-bottom .progress-fill {
+      display: block;
+      height: 100%;
     }
 
     .progress-copy {
       align-items: center;
-      margin-bottom: 9px;
+      margin-bottom: 4px;
       font-size: 12px;
     }
 
@@ -2779,6 +2857,24 @@
       font-variant-numeric: tabular-nums;
     }
 
+    #accueil .hero-card + .section-heading,
+    #accueil .week-summary-card + .section-heading {
+      margin-top: 0;
+    }
+
+    #accueil .week-summary-card {
+      margin-bottom: 8px;
+    }
+
+    #reglages > .eyebrow,
+    #reglages > h1 {
+      display: none;
+    }
+
+    #reglages > .appearance-panel {
+      margin-top: 0;
+    }
+
     .panel,
     .stat-card,
     .next-card,
@@ -2796,12 +2892,12 @@
     }
 
     .week-summary-card {
-      padding: 19px 22px;
+      padding: 12px 18px;
       background: linear-gradient(135deg, #171b16, #121511);
     }
 
     .week-summary-item {
-      gap: 9px;
+      gap: 6px;
     }
 
     .week-summary-item .stat-icon {
@@ -3321,11 +3417,11 @@
 
     @media (min-width: 760px) {
       main {
-        padding-top: 38px;
+        padding-top: 4px;
       }
 
       .hero-card {
-        margin-top: 25px;
+        margin-top: 4px;
       }
 
       .stats-grid {
@@ -3347,21 +3443,21 @@
       }
 
       .topbar {
-        height: 64px;
+        height: 52px;
         padding-left: 18px;
       }
 
       main {
-        padding: 24px 16px 30px;
+        padding: 4px 16px 30px;
       }
 
       .hero-card {
-        padding: 22px 18px;
+        padding: 11px 18px;
         border-radius: 23px;
       }
 
       .hero-time-row {
-        align-items: center;
+        align-items: flex-end;
         gap: 4px;
       }
 
@@ -3395,7 +3491,7 @@
       }
 
       .week-summary-card {
-        padding: 17px 15px;
+        padding: 12px 14px;
       }
 
       .week-summary-item {
@@ -4369,37 +4465,53 @@
       outline-offset: 3px;
     }
 
-    .activity-add-glass {
+    .activity-add-glass,
+    .page-reload-glass {
       position: fixed;
-      z-index: 30;
-      top: calc(env(safe-area-inset-top) + 16px);
-      right: 16px;
-      left: auto;
-      width: 48px;
-      height: 48px;
+      z-index: 1100;
+      top: calc(env(safe-area-inset-top) + 6px);
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      border: 1px solid #ffffff42;
-      background: color-mix(in srgb, var(--panel) 56%, transparent);
+      border: 1px solid rgba(255, 255, 255, .34);
+      background: color-mix(in srgb, var(--panel) 38%, transparent);
       color: var(--text);
       font-size: 0;
       font-weight: 300;
       line-height: 1;
       display: grid;
       place-items: center;
-      box-shadow: 0 8px 28px #0003, inset 0 1px #ffffff55;
-      backdrop-filter: blur(24px) saturate(1.6);
-      -webkit-backdrop-filter: blur(24px) saturate(1.6);
-      cursor: pointer
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .52), inset 0 -1px 0 rgba(0, 0, 0, .14);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      transition: transform .2s var(--ease-out), background .2s ease, box-shadow .2s ease;
     }
 
-    .activity-add-glass svg {
-      width: 22px;
-      height: 22px;
+    .activity-add-glass {
+      right: 14px;
+    }
+
+    .page-reload-glass {
+      left: 14px;
+    }
+
+    .activity-add-glass svg,
+    .page-reload-glass svg {
+      width: 20px;
+      height: 20px;
       display: block;
       stroke: currentColor;
       stroke-width: 1.8;
       stroke-linecap: round;
       fill: none;
+    }
+
+    .activity-add-glass:hover,
+    .page-reload-glass:hover {
+      transform: scale(1.06);
+      background: color-mix(in srgb, var(--panel2) 56%, transparent);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .62);
     }
 
     .activity-file-hidden {
@@ -4416,14 +4528,16 @@
       pointer-events: none !important;
     }
 
-    #activites:not(.active) .activity-add-glass {
-      display: none;
+    html[data-theme="light"] .activity-add-glass,
+    html[data-theme="light"] .page-reload-glass {
+      background: rgba(255, 255, 255, .48);
+      border-color: rgba(255, 255, 255, .72);
+      box-shadow: 0 6px 18px rgba(38, 52, 74, .12), inset 0 1px rgba(255, 255, 255, .88);
     }
 
-    html[data-theme="light"] .activity-add-glass {
-      background: #ffffffa8;
-      border-color: #ffffffd9;
-      box-shadow: 0 8px 28px #26344a20, inset 0 1px #fff;
+    body.activity-detail-open .floating-actions,
+    body.goal-detail-open .floating-actions {
+      display: none;
     }
 
     #activity-detail[hidden] {
@@ -4536,30 +4650,29 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="#accueil" aria-label="MoApp Run, accueil"><span class="brand-mark">M</span><span>MoApp
+      <a class="brand" href="#accueil" aria-label="MoApp Run, accueil"><span>MoApp
           <b>Run</b></span></a>
     </header>
 
     <main id="app-main">
       <section id="accueil" class="page active">
-        <div class="eyebrow"><span class="pulse"></span> OBJECTIF · HYÈRES 2027</div>
         <article class="hero-card" id="open-goal-detail" role="button" tabindex="0"
           aria-label="Ouvrir le détail de l’objectif" style="cursor:pointer">
           <div class="hero-top"><span>OBJECTIF SEMI-MARATHON</span><span class="tag">CIBLE</span></div>
           <div class="hero-time-row">
             <div class="hero-time" id="goal-time-display">1<span>h</span>55<span>min</span></div>
-            <div class="hero-countdown"><small>JUSQU’AU SEMI</small><strong id="countdown">J-152</strong></div>
+            <div class="hero-countdown"><strong id="countdown">J-152</strong></div>
           </div>
           <div class="hero-bottom">
             <div><small>Allure théorique</small><strong><span id="goal-pace-display">5:27</span> <small>/
                   km</small></strong></div>
             <div><small>Date visée</small><strong>21 mars 2027</strong></div>
-          </div>
-          <div class="objective-progress">
-            <div class="progress-copy"><strong id="plan-progress-count">0 / 66 séances</strong><span
-                id="plan-progress-percent">0 %</span></div>
-            <div class="progress-track">
-              <div id="plan-progress-bar" class="progress-fill" style="width:0%"></div>
+              <div class="hero-progress">
+                <div class="progress-copy"><strong id="plan-progress-count">0 / 66 séances</strong><span
+                  id="plan-progress-percent">0 %</span></div>
+                <div class="progress-track">
+                  <div id="plan-progress-bar" class="progress-fill" style="width:0%"></div>
+                </div>
             </div>
           </div>
         </article>
@@ -4593,35 +4706,13 @@
         </section>
         <div class="section-heading">
           <h2>Volume hebdomadaire</h2>
-        </div>
+        </div> 
         <article class="panel">
           <div id="weekly-volume-chart" class="volume-chart" aria-label="Kilomètres par semaine"></div>
         </article>
       </section>
 
       <section id="activites" class="page">
-        <div class="eyebrow">TON HISTORIQUE</div>
-        <h1>Activités</h1>
-
-        <!-- Saisie manuelle désactivée : les activités sont ajoutées par import de fichier.
-        <form id="activity-form" class="panel form-grid">
-          <h2>Ajouter une activité</h2>
-          <label>Date et heure<input class="date-input" name="start_date" type="datetime-local" required></label>
-          <label>Distance (km)<input name="distance_km" type="number" min="0.01" max="500" step="0.01" placeholder="ex. 8,42" required></label>
-          <label>Durée (minutes)<input name="duration_min" type="number" min="0.1" max="2000" step="0.1" placeholder="ex. 48,5" required></label>
-          <label>Fréquence cardiaque moyenne (bpm, facultatif)<input name="avg_hr" type="number" min="30" max="250" placeholder="—"></label>
-          <label>Ressenti<select name="effort"><option value="">Non renseigné</option><option value="1">1 — Très facile</option><option value="2">2 — Facile</option><option value="3">3 — Modéré</option><option value="4">4 — Difficile</option><option value="5">5 — Très difficile</option></select></label>
-          <label>Notes (facultatif)<textarea name="notes" rows="2" maxlength="1000" placeholder="Terrain, météo, sensations…"></textarea></label>
-          <button class="button primary full" type="submit">Enregistrer l’activité</button>
-          <p class="tiny full">Les activités sont enregistrées sur cet appareil. Exporte régulièrement tes données pour les sauvegarder.</p>
-        </form>
-        -->
-        <button id="activity-add" class="activity-add-glass" type="button" aria-label="Importer des activités"
-          title="Importer des activités"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 5v14M5 12h14" />
-          </svg></button>
-        <input id="file-import" class="activity-file-hidden" type="file"
-          accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json" multiple>
         <p id="import-status" class="status-note" role="status"></p>
         <div class="section-heading">
           <h2>Toutes les activités</h2><span id="activity-count" class="muted small">0 sortie</span>
@@ -4745,9 +4836,6 @@
         </div>
       </section>
       <section id="performances" class="page">
-        <div class="eyebrow">FAITS & ESTIMATIONS</div>
-        <h1>Statistiques</h1>
-
         <div class="stats-grid">
           <article class="stat-card"><small>Meilleur 5 km</small><strong id="pr-5k-display">—</strong><span
               id="pr-5k-meta" class="record-meta">Date et allure —</span></article>
@@ -4783,8 +4871,6 @@
       </section>
 
       <section id="plan" class="page">
-        <div class="eyebrow">OBJECTIF · 21 MARS 2027</div>
-        <h1>Plan d’entraînement</h1>
         <div class="plan-week-switch">
           <button id="plan-week-prev" class="carousel-arrow" type="button" aria-label="Semaine précédente"><svg
               viewBox="0 0 24 24" aria-hidden="true">
@@ -4828,8 +4914,6 @@
       </section>
 
       <section id="reglages" class="page">
-        <div class="eyebrow">CONFIGURATION</div>
-        <h1>Réglages</h1>
         <article class="panel appearance-panel">
           <div class="appearance-copy">
             <span class="appearance-icon" aria-hidden="true">☼</span>
@@ -4955,6 +5039,20 @@
             <circle cx="10" cy="18" r="2" />
           </svg></span><small>Réglages</small></button>
     </nav>
+    <div class="floating-actions">
+      <button id="page-reload" class="page-reload-glass" type="button" aria-label="Recharger la page" title="Recharger la page">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M19 12a7 7 0 1 1-2.05-4.95" />
+          <path d="M19 4v5h-5" />
+        </svg>
+      </button>
+      <button id="activity-add" class="activity-add-glass" type="button" aria-label="Importer des activités"
+        title="Importer des activités"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 5v14M5 12h14" />
+        </svg></button>
+      <input id="file-import" class="activity-file-hidden" type="file"
+        accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json" multiple>
+    </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
   <script>
@@ -5321,6 +5419,20 @@
         }
       }
 
+      const raceStart = new Date(2027, 2, 21, 8, 30, 0);
+      function renderRaceCountdown() {
+        const countdown = $("#countdown"); if (!countdown) return;
+        let remaining = Math.max(0, raceStart.getTime() - Date.now());
+        const days = Math.floor(remaining / 86400000); remaining %= 86400000;
+        const hours = Math.floor(remaining / 3600000); remaining %= 3600000;
+        const minutes = Math.floor(remaining / 60000); remaining %= 60000;
+        const seconds = Math.floor(remaining / 1000);
+        const part = (label, value) => `<span class="countdown-part"><span class="countdown-label">${label}-</span><span class="countdown-value">${value}</span></span>`;
+        countdown.classList.add("live-countdown");
+        countdown.innerHTML = `${part("J", days)}${part("H", String(hours).padStart(2, "0"))}${part("MIN", String(minutes).padStart(2, "0"))}${part("SEC", String(seconds).padStart(2, "0"))}`;
+        countdown.setAttribute("aria-label", `Départ dans ${days} jours, ${hours} heures, ${minutes} minutes et ${seconds} secondes`);
+      }
+
       function render() {
         updateGoalTimeDisplays();
         const sorted = [...activities].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
@@ -5330,12 +5442,21 @@
         $("#week-sessions").innerHTML = `${week.length} <em>/ ${plannedThisWeek}</em>`;
         const plannedDaysEl = $("#week-planned-days");
         if (plannedDaysEl) {
-          const dayEntries = [];
+          const daysByDate = new Map();
+          const addPlannedDay = (date, wi, di, disabled) => {
+            const key = isoDay(date), existing = daysByDate.get(key);
+            if (existing) {
+              if (!disabled) {existing.wi = -1; existing.di = -1;}
+              return;
+            }
+            daysByDate.set(key, {wi, di, d: date, label: date.toLocaleDateString("fr-FR", {weekday: "long"})});
+          };
           planWeeks.forEach((w, wi) => w[1].forEach((_, di) => {
             const d = sessionDate(wi, di);
-            if (d >= monday && d < next) dayEntries.push({wi, di, d, label: d.toLocaleDateString("fr-FR", {weekday: "long"})});
+            if (!isSessionDeleted(wi, di) && d >= monday && d < next) addPlannedDay(d, wi, di, isSessionDisabled(wi, di));
           }));
-          customSessions.filter(x => !x.disabled).forEach(x => {const [y, m, d] = x.date.split("-").map(Number); const dt = new Date(y, m - 1, d, 12); if (dt >= monday && dt < next) dayEntries.push({wi: -1, di: -1, d: dt, label: dt.toLocaleDateString("fr-FR", {weekday: "long"})})});
+          customSessions.filter(x => !x.disabled).forEach(x => {const [y, m, d] = x.date.split("-").map(Number); const dt = new Date(y, m - 1, d, 12); if (dt >= monday && dt < next) addPlannedDay(dt, -1, -1, false)});
+          const dayEntries = [...daysByDate.values()];
           dayEntries.sort((a, b) => a.d - b.d);
           plannedDaysEl.innerHTML = dayEntries.length ? dayEntries.map(x => `<span class="${isSessionDisabled(x.wi, x.di) ? "disabled-day" : ""}">${esc(x.label)}</span>`).join('<span aria-hidden="true">·</span>') : "Aucune séance prévue";
         }
@@ -5352,10 +5473,7 @@
         $("#pr-5k-meta").textContent = best5 ? `${best5.manual ? "Record manuel" : dateFmt(best5.date)} · ${best5.pace}/km` : "Date et allure —";
         $("#pr-10k-meta").textContent = best10 ? `${best10.manual ? "Record manuel" : dateFmt(best10.date)} · ${best10.pace}/km` : "Date et allure —";
         renderHrTypeChart();
-        const raceDate = new Date(2027, 2, 21); raceDate.setHours(0, 0, 0, 0);
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        const daysLeft = Math.ceil((raceDate - today) / 86400000);
-        $("#countdown").textContent = daysLeft >= 0 ? `J-${daysLeft}` : `J+${Math.abs(daysLeft)}`;
+        renderRaceCountdown();
         renderPlan();
         renderVolumeChart();
         renderProgress();
@@ -5889,6 +6007,7 @@
       });
       function download(blob, name) {const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1200)}
       $("#activity-add").addEventListener("click", () => $("#file-import").click());
+      $("#page-reload")?.addEventListener("click", () => window.location.reload());
       function activityExportRows() {
         return activities.map(a => ({...a, feeling_10: feelings[String(a.id)] ?? "", feeling_note: feelingNotes[String(a.id)] || "", pace_min_km: Number(a.distance_km) > 0 ? (Number(a.duration_min) / Number(a.distance_km)).toFixed(3) : "", date_iso: a.start_date || ""}));
       }
@@ -6225,6 +6344,8 @@
         currentPlanWeek = Math.max(0, Math.min(planWeeks.length - 1, Math.floor((chosen - calendarStart) / (7 * 86400000))));
         customForm.hidden = true; workoutCarouselIndex = -1; render(); toast("Séance ajoutée au plan.");
       });
+      renderRaceCountdown();
+      window.setInterval(renderRaceCountdown, 1000);
       render();
     })();
   </script>
@@ -6262,10 +6383,10 @@
       }
       let map = null;
       function show() {
-        overlay.hidden = false; document.body.style.overflow = 'hidden'; renderPaces(); drawProfile();
+        overlay.hidden = false; document.body.classList.add('goal-detail-open'); document.body.style.overflow = 'hidden'; renderPaces(); drawProfile();
         if (window.L && !map) {map = L.map('goal-route-map', {zoomControl: false, scrollWheelZoom: false, dragging: true}); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map); window.addEventListener('moapp-map-style-change', () => {if (map) {if (window.__moappGoalRouteTileLayer) map.removeLayer(window.__moappGoalRouteTileLayer); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map);} }); const line = L.polyline(coords, {color: '#ef4444', weight: 4}).addTo(map); L.circleMarker(coords[0], {radius: 5, color: '#c5f36a'}).addTo(map); L.circleMarker(coords[coords.length - 1], {radius: 5, color: '#ef4444'}).addTo(map); map.fitBounds(line.getBounds(), {padding: [16, 16]}); setTimeout(() => map.invalidateSize(), 100);}
       }
-      function hide() {overlay.hidden = true; document.body.style.overflow = '';}
+      function hide() {overlay.hidden = true; document.body.classList.remove('goal-detail-open'); document.body.style.overflow = '';}
       open?.addEventListener('click', show); open?.addEventListener('keydown', e => {if (e.key === 'Enter' || e.key === ' ') {e.preventDefault(); show();} }); close?.addEventListener('click', hide);
       document.addEventListener('keydown', e => {if (e.key === 'Escape' && !overlay.hidden) hide();});
     })();
