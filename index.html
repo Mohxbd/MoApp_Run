@@ -6391,6 +6391,69 @@
       document.addEventListener('keydown', e => {if (e.key === 'Escape' && !overlay.hidden) hide();});
     })();
   </script>
+  <style id="ios-topbar-cleanup">
+    /* Une zone haute opaque évite l'effet de verre flouté derrière la Dynamic Island. */
+    .topbar {
+      background: var(--bg) !important;
+      background-image: none !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+
+    .topbar::before,
+    .topbar::after {
+      content: none !important;
+      display: none !important;
+      background: none !important;
+      background-image: none !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+      filter: none !important;
+    }
+
+    .topbar .moapp-run-title {
+      font-size: 1.12em !important;
+    }
+
+    /* Compte à rebours compact : J/H sur la première ligne, M/S sur la seconde. */
+    #countdown.live-countdown {
+      display: grid !important;
+      grid-template-columns: max-content max-content;
+      grid-template-rows: auto auto;
+      justify-content: end;
+      column-gap: 7px;
+      row-gap: 3px;
+    }
+
+    #countdown.live-countdown .countdown-part:nth-child(1) { grid-area: 1 / 1; }
+    #countdown.live-countdown .countdown-part:nth-child(2) { grid-area: 1 / 2; }
+    #countdown.live-countdown .countdown-part:nth-child(3) { grid-area: 2 / 1; }
+    #countdown.live-countdown .countdown-part:nth-child(4) { grid-area: 2 / 2; }
+
+    #countdown.live-countdown .countdown-part:nth-child(3) .countdown-label,
+    #countdown.live-countdown .countdown-part:nth-child(4) .countdown-label {
+      font-size: 0;
+    }
+
+    #countdown.live-countdown .countdown-part:nth-child(3) .countdown-label::after,
+    #countdown.live-countdown .countdown-part:nth-child(4) .countdown-label::after {
+      color: #fff;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .03em;
+    }
+
+    #countdown.live-countdown .countdown-part:nth-child(3) .countdown-label::after { content: "M-"; }
+    #countdown.live-countdown .countdown-part:nth-child(4) .countdown-label::after { content: "S-"; }
+  </style>
+  <script>
+    /* Cible le libellé sans dépendre de la structure exacte du logo. */
+    document.querySelectorAll('.topbar *').forEach((element) => {
+      if (element.textContent.trim() === 'MoApp Run') {
+        element.classList.add('moapp-run-title');
+      }
+    });
+  </script>
 </body>
 
 </html>
