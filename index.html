@@ -6445,6 +6445,116 @@
 
     #countdown.live-countdown .countdown-part:nth-child(3) .countdown-label::after { content: "M-"; }
     #countdown.live-countdown .countdown-part:nth-child(4) .countdown-label::after { content: "S-"; }
+
+    /* La progression reprend l'espace de la date visée. */
+    .hero-card .hero-bottom {
+      grid-template-columns: auto minmax(150px, 1fr) !important;
+      gap: clamp(14px, 4vw, 38px);
+    }
+
+    .hero-card .hero-bottom > div:nth-child(2) {
+      display: none !important;
+    }
+
+    .hero-card .hero-bottom .hero-progress {
+      margin-left: 0;
+    }
+
+    .hero-card .hero-bottom .progress-track {
+      height: 10px;
+    }
+
+    /* Les éléments de progression participent directement à la grille du bas. */
+    .hero-card .hero-bottom {
+      grid-template-areas:
+        "pace progress-copy"
+        "pace progress-bar";
+      grid-template-rows: auto auto;
+      align-items: center;
+    }
+
+    .hero-card .hero-bottom > div:first-child {
+      grid-area: pace;
+      align-self: stretch;
+      align-items: center;
+    }
+
+    .hero-card .hero-bottom .hero-progress {
+      display: contents !important;
+    }
+
+    .hero-card .hero-bottom .progress-copy {
+      grid-area: progress-copy;
+      display: flex !important;
+      align-self: center;
+    }
+
+    .hero-card .hero-bottom .progress-track {
+      grid-area: progress-bar;
+      display: block !important;
+      align-self: center;
+      width: 100%;
+    }
+
+    .hero-card .hero-bottom > div:first-child > small,
+    .hero-card .hero-bottom .progress-copy strong {
+      font-size: 10px !important;
+      line-height: 1.25;
+    }
+
+    .hero-card .hero-bottom {
+      grid-template-areas:
+        "pace-label progress-copy"
+        "pace-value progress-bar";
+    }
+
+    .hero-card .hero-bottom .hero-pace-label {
+      grid-area: pace-label;
+      align-self: center;
+      font-size: 10px !important;
+      line-height: 1.25;
+      transform: translateY(10px);
+    }
+
+    .hero-card .hero-bottom .hero-pace-value {
+      grid-area: pace-value;
+      align-self: center;
+    }
+
+    .hero-card .hero-bottom .hero-date {
+      display: none !important;
+    }
+
+    .hero-card .hero-bottom .progress-copy {
+      transform: none;
+    }
+
+    #plan-progress-count,
+    #plan-progress-percent {
+      display: inline-block;
+      transform: translateY(10px);
+    }
+
+    /* Bandeau légèrement plus haut, boutons toujours centrés sur le logo. */
+    .topbar {
+      height: 60px !important;
+    }
+
+    .activity-add-glass,
+    .page-reload-glass {
+      top: calc(env(safe-area-inset-top) + 10px) !important;
+    }
+
+    @media (max-width: 599px) {
+      .topbar {
+        height: 56px !important;
+      }
+
+      .activity-add-glass,
+      .page-reload-glass {
+        top: calc(env(safe-area-inset-top) + 8px) !important;
+      }
+    }
   </style>
   <script>
     /* Cible le libellé sans dépendre de la structure exacte du logo. */
@@ -6453,7 +6563,236 @@
         element.classList.add('moapp-run-title');
       }
     });
+
+    const heroBottom = document.querySelector('.hero-card .hero-bottom');
+    const paceBox = heroBottom?.querySelector(':scope > div:first-child');
+    if (paceBox && !paceBox.classList.contains('hero-progress')) {
+      const paceLabel = paceBox.querySelector(':scope > small');
+      const paceValue = paceBox.querySelector(':scope > strong');
+      if (paceLabel && paceValue) {
+        paceLabel.classList.add('hero-pace-label');
+        paceValue.classList.add('hero-pace-value');
+        heroBottom.insertBefore(paceLabel, paceBox);
+        heroBottom.insertBefore(paceValue, paceBox);
+        paceBox.remove();
+      }
+    }
+
+    [...(heroBottom?.children || [])].forEach((element) => {
+      if (element.textContent.includes('Date visée')) {
+        element.classList.add('hero-date');
+      }
+    });
   </script>
+  <script>
+    document.querySelectorAll('h1, h2, h3, h4, p, span, small').forEach((title) => {
+      if (title.textContent.trim() !== 'Volume hebdomadaire') return;
+      const card = title.closest('[class*="volume"], [class*="chart"], [class*="card"], [class*="panel"]');
+      if (card) {
+        card.remove();
+        return;
+      }
+      const heading = title.closest('.section-heading');
+      if (heading) {
+        heading.nextElementSibling?.remove();
+        heading.remove();
+      } else {
+        title.parentElement?.remove();
+      }
+    });
+  </script>
+  <style id="flat-page-background">
+    html,
+    body,
+    #app {
+      background-color: var(--bg) !important;
+      background-image: none !important;
+    }
+
+    main,
+    .page {
+      background-image: none !important;
+    }
+
+    body::before,
+    body::after,
+    #app::before,
+    #app::after,
+    main::before,
+    main::after,
+    .page::before,
+    .page::after {
+      content: none !important;
+      display: none !important;
+      background: none !important;
+      background-image: none !important;
+      filter: none !important;
+    }
+  </style>
+  <style id="liquid-bottom-navigation">
+    .bottom-nav {
+      isolation: isolate;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(48, 54, 50, .66), rgba(17, 22, 20, .54)) !important;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-bottom-color: rgba(255, 255, 255, .07);
+      box-shadow:
+        0 -10px 28px rgba(0, 0, 0, .24),
+        inset 0 1px 0 rgba(255, 255, 255, .18),
+        inset 0 -1px 0 rgba(0, 0, 0, .22);
+      -webkit-backdrop-filter: saturate(165%) blur(20px);
+      backdrop-filter: saturate(165%) blur(20px);
+    }
+
+    .bottom-nav::before {
+      content: "" !important;
+      display: block !important;
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .11), transparent 46%);
+    }
+
+    .bottom-nav {
+      position: fixed !important;
+      left: clamp(16px, 4vw, 34px) !important;
+      right: clamp(16px, 4vw, 34px) !important;
+      bottom: 2px !important;
+      width: auto !important;
+      height: 48px !important;
+      min-height: 48px;
+      padding: 3px 6px !important;
+      border-radius: 999px !important;
+      transform: none;
+    }
+
+    main {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 88px) !important;
+    }
+  </style>
+  <script>
+    const bottomNavLabels = new Set(['Home', 'Maps', 'Record', 'Groups', 'You', 'Accueil', 'Carte', 'Enregistrer', 'Groupes', 'Vous']);
+    document.querySelectorAll('.bottom-nav *').forEach((element) => {
+      if (element.children.length === 0 && bottomNavLabels.has(element.textContent.trim())) {
+        element.style.display = 'inline-block';
+        element.style.transform = 'translateY(-7px)';
+      }
+    });
+  </script>
+  <style id="bottom-nav-item-fit">
+    .bottom-nav button,
+    .bottom-nav a,
+    .bottom-nav .nav-item {
+      box-sizing: border-box;
+      flex: 1 1 0 !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      min-height: 42px !important;
+      padding: 3px 8px !important;
+      border-radius: 999px !important;
+      align-self: stretch !important;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bottom-nav {
+      display: flex !important;
+      align-items: stretch !important;
+      justify-content: center !important;
+      gap: 0 !important;
+    }
+  </style>
+  <script>
+    document.querySelectorAll('.bottom-nav button, .bottom-nav a, .bottom-nav .nav-item').forEach((item) => {
+      item.querySelectorAll('*').forEach((element) => {
+        const label = element.textContent.trim();
+        if (element.children.length === 0 && label.length > 0) {
+          element.style.display = 'inline-block';
+          element.style.transform = 'translateY(-7px)';
+        }
+      });
+    });
+  </script>
+  <style id="bottom-nav-shared-glass-theme">
+    .bottom-nav::before {
+      background: transparent !important;
+    }
+  </style>
+  <script>
+    const glassSource = document.querySelector('.activity-add-glass, #activity-add, .page-reload-glass, #page-reload');
+    const glassNav = document.querySelector('.bottom-nav');
+    if (glassSource && glassNav) {
+      const glassStyle = getComputedStyle(glassSource);
+      glassNav.style.background = glassStyle.background;
+      glassNav.style.border = glassStyle.border;
+      glassNav.style.boxShadow = glassStyle.boxShadow;
+      glassNav.style.backdropFilter = glassStyle.backdropFilter;
+      glassNav.style.webkitBackdropFilter = glassStyle.webkitBackdropFilter;
+    }
+  </script>
+  <style id="strava-like-nav-state">
+    .bottom-nav button,
+    .bottom-nav a,
+    .bottom-nav .nav-item {
+      background: transparent !important;
+      color: #fff !important;
+      transition: background-color .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+
+    .bottom-nav button span,
+    .bottom-nav button small,
+    .bottom-nav a span,
+    .bottom-nav a small,
+    .bottom-nav .nav-item span,
+    .bottom-nav .nav-item small {
+      color: #fff !important;
+    }
+
+    .bottom-nav button:hover,
+    .bottom-nav a:hover,
+    .bottom-nav .nav-item:hover {
+      background: rgba(255, 255, 255, .10) !important;
+    }
+
+    .bottom-nav button:active,
+    .bottom-nav a:active,
+    .bottom-nav .nav-item:active,
+    .bottom-nav .active,
+    .bottom-nav .is-active,
+    .bottom-nav [aria-current="page"] {
+      background: rgba(255, 255, 255, .18) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16) !important;
+    }
+
+    .bottom-nav svg,
+    .bottom-nav i {
+      color: #fff !important;
+      stroke: #fff !important;
+    }
+
+    .bottom-nav svg [stroke] {
+      stroke: #fff !important;
+    }
+
+    .bottom-nav svg [fill]:not([fill="none"]) {
+      fill: #fff !important;
+    }
+
+    .bottom-nav {
+      padding-inline: 3px !important;
+      background: rgba(22, 31, 27, .38) !important;
+    }
+
+    .bottom-nav button,
+    .bottom-nav a,
+    .bottom-nav .nav-item {
+      margin-inline: 0 !important;
+    }
+  </style>
 </body>
 
 </html>
