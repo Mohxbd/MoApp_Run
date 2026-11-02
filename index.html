@@ -4689,6 +4689,12 @@
             <div class="week-summary-value"><strong id="week-sessions">0 <em>/ 3</em></strong><small
                 id="week-planned-days" class="home-planned-days">lundi · mercredi · samedi</small></div>
           </div>
+          <div class="week-volume-divider" aria-hidden="true"></div>
+          <div class="week-volume-trend">
+            <div class="week-volume-trend-heading">Volume des 12 dernières semaines</div>
+            <div id="week-volume-chart" class="week-volume-chart" role="img"
+              aria-label="Volume hebdomadaire des 12 dernières semaines, en kilomètres"></div>
+          </div>
         </article>
         <div class="section-heading">
           <h2>Prochaine séance</h2><span class="muted small" id="next-workout-counter"></span>
@@ -4713,10 +4719,10 @@
       </section>
 
       <section id="activites" class="page">
-        <p id="import-status" class="status-note" role="status"></p>
         <div class="section-heading">
           <h2>Toutes les activités</h2><span id="activity-count" class="muted small">0 sortie</span>
         </div>
+        <p id="import-status" class="status-note" role="status"></p>
         <div id="all-activities" class="activity-list"></div>
         <section id="activity-detail" class="panel activity-detail" hidden>
           <div class="section-heading">
@@ -6079,7 +6085,7 @@
         const title = c.title || (c.isRace ? "Semi-marathon d’Hyères" : (["Endurance facile", "Séance qualité", "Sortie longue"][c.day] || "Séance"));
         const day = new Date(c.date); day.setHours(0, 0, 0, 0);
         const status = c.done ? "✓ Séance validée" : (day < today ? "Séance passée" : "À venir");
-        cardEl.innerHTML = `<div class="workout-date">${esc(date)} · Semaine ${c.week + 1}</div><h3>${esc(title)}</h3><p>${esc(c.desc)}</p><div class="workout-status">${esc(status)}</div>`;
+        cardEl.innerHTML = `<h3>${esc(title)}</h3><p>${esc(c.desc)}</p><div class="workout-footer"><div class="workout-status">${esc(status)}</div><div class="workout-date">${esc(date)} · S${c.week + 1}</div></div>`;
         $("#next-workout-counter").textContent = `${workoutCarouselIndex + 1} / ${cards.length}`;
         $("#workout-prev").disabled = workoutCarouselIndex === 0; $("#workout-next").disabled = workoutCarouselIndex === cards.length - 1;
       }
@@ -6253,6 +6259,40 @@
         const el = $("#weekly-volume-chart"); if (!el) return;
         const current = new Date(); current.setHours(0, 0, 0, 0);
         const thisMonday = new Date(current); thisMonday.setDate(current.getDate() - (current.getDay() + 6) % 7);
+        const summaryChart = $("#week-volume-chart");
+        if (summaryChart) {
+          const recentWeeks = Array.from({length: 12}, (_, index) => {
+            const start = new Date(thisMonday);
+            start.setDate(thisMonday.getDate() - (11 - index) * 7);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 7);
+            const km = activities.filter(a => {const date = new Date(a.start_date); return !Number.isNaN(date.getTime()) && date >= start && date < end;}).reduce((sum, a) => sum + Number(a.distance_km || 0), 0);
+            return {start, km};
+          });
+          const width = 320, height = 94, left = 4, right = 34, top = 7, bottom = 17;
+          const plotWidth = width - left - right, plotHeight = height - top - bottom;
+          const max = Math.max(10, Math.ceil(Math.max(...recentWeeks.map(week => week.km)) / 10) * 10);
+          const x = index => left + index * plotWidth / (recentWeeks.length - 1);
+          const y = km => top + plotHeight - km / max * plotHeight;
+          const points = recentWeeks.map((week, index) => ({...week, x: x(index), y: y(week.km)}));
+          const line = points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+          const area = `${line} L ${points[points.length - 1].x.toFixed(1)} ${(top + plotHeight).toFixed(1)} L ${points[0].x.toFixed(1)} ${(top + plotHeight).toFixed(1)} Z`;
+          const grid = Array.from({length: max / 10 + 1}, (_, index) => index * 10).map(value => {
+            const gy = y(value);
+            return `<line x1="${left}" y1="${gy.toFixed(1)}" x2="${(width - right).toFixed(1)}" y2="${gy.toFixed(1)}" stroke="var(--line)" stroke-width="1"/><text x="${width - 2}" y="${(gy + 3).toFixed(1)}" text-anchor="end" fill="var(--muted)" font-size="8">${value}</text>`;
+          }).join("");
+          const dots = points.map(point => {
+            const value = `${point.km.toLocaleString("fr-FR", {maximumFractionDigits: 1})} km`;
+            const label = `${point.start.toLocaleDateString("fr-FR", {month: "long"})} · ${value}`;
+            return `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="2.5" fill="var(--accent)"><title>${esc(label)}</title></circle>`;
+          }).join("");
+          const months = recentWeeks.map((week, index) => {
+            if (index && recentWeeks[index - 1].start.getMonth() === week.start.getMonth()) return "";
+            const label = week.start.toLocaleDateString("fr-FR", {month: "short"}).replace(".", "").toLocaleUpperCase("fr-FR");
+            return `<text x="${(x(index) + 2).toFixed(1)}" y="${height - 2}" fill="var(--muted)" font-size="8">${label}</text>`;
+          }).join("");
+          summaryChart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilomètres parcourus par semaine sur les 12 dernières semaines"><defs><linearGradient id="week-volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#week-volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>${dots}${months}</svg>`;
+        }
         // Conserver toutes les semaines du plan, y compris les semaines futures sans activité.
         const planStart = new Date(2026, 9, 19); planStart.setHours(0, 0, 0, 0);
         const planEnd = new Date(2027, 2, 21); planEnd.setHours(0, 0, 0, 0);
@@ -6785,11 +6825,11 @@
     .bottom-nav {
       padding-inline: 3px !important;
       background: rgba(22, 31, 27, .38) !important;
-      bottom: 10px !important;
+      bottom: 16px !important;
     }
 
     .topbar {
-      margin-top: 4px !important;
+      margin-top: 6px !important;
     }
 
     .activity-add-glass,
@@ -7047,6 +7087,22 @@
       margin-bottom: 12px;
     }
 
+    #activites > .section-heading {
+      margin: 0 0 8px;
+    }
+
+    #activites > .status-note {
+      margin: 0 0 8px;
+    }
+
+    #plan > .plan-week-switch {
+      margin-top: 0;
+    }
+
+    #plan > .plan-calendar {
+      margin-top: 8px;
+    }
+
     #accueil .hero-card + .section-heading,
     #accueil .week-summary-card + .section-heading {
       margin-bottom: 8px;
@@ -7057,8 +7113,74 @@
       margin-bottom: 12px;
     }
 
+    #accueil .week-volume-divider,
+    #accueil .week-volume-trend {
+      grid-column: 1 / -1;
+    }
+
+    #accueil .week-volume-divider {
+      width: 100%;
+      margin: 10px 0 8px;
+      border-top: 1px solid var(--line);
+    }
+
+    #accueil .week-volume-trend-heading {
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    #accueil .week-volume-chart {
+      width: 100%;
+      min-width: 0;
+    }
+
+    #accueil .week-volume-chart svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
     #accueil .next-workout-card {
       min-height: 136px;
-      padding: 16px;
+      position: relative;
+      padding: 12px 12px 40px;
+    }
+
+    #accueil .next-workout-card .workout-footer {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    #accueil .next-workout-card .workout-date {
+      min-width: 0;
+      font-size: 8px;
+      line-height: 1.2;
+      letter-spacing: .35px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    #accueil .next-workout-card h3 {
+      margin: 0 0 4px;
+    }
+
+    #accueil .next-workout-card p {
+      text-align: justify;
+    }
+
+    #accueil .next-workout-card .workout-status {
+      min-width: 0;
+      margin-top: 0;
+      white-space: nowrap;
     }
 </style>
