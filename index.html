@@ -6785,6 +6785,23 @@
     .bottom-nav {
       padding-inline: 3px !important;
       background: rgba(22, 31, 27, .38) !important;
+      bottom: 10px !important;
+    }
+
+    .topbar {
+      margin-top: 4px !important;
+    }
+
+    .activity-add-glass,
+    .page-reload-glass {
+      top: calc(env(safe-area-inset-top) + 14px) !important;
+    }
+
+    @media (max-width: 599px) {
+      .activity-add-glass,
+      .page-reload-glass {
+        top: calc(env(safe-area-inset-top) + 12px) !important;
+      }
     }
 
     .bottom-nav button,
@@ -7025,4 +7042,23 @@
       grid-row: 1 !important;
     }
     #activity-detail .detail-main-stats .vma-stat[hidden] { display: none !important; }
+
+    #accueil .hero-card {
+      margin-bottom: 12px;
+    }
+
+    #accueil .hero-card + .section-heading,
+    #accueil .week-summary-card + .section-heading {
+      margin-bottom: 8px;
+    }
+
+    #accueil .week-summary-card {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    #accueil .next-workout-card {
+      min-height: 136px;
+      padding: 16px;
+    }
 </style>
