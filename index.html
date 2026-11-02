@@ -2572,13 +2572,33 @@
       padding-top: 4px;
     }
 
+    .page.nav-enter-from-right {
+      animation: page-swipe-from-right .32s var(--ease-out) both;
+    }
+
+    .page.nav-enter-from-left {
+      animation: page-swipe-from-left .32s var(--ease-out) both;
+    }
+
+    @keyframes page-swipe-from-right {
+      from { opacity: .7; transform: translateX(28px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes page-swipe-from-left {
+      from { opacity: .7; transform: translateX(-28px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
     @keyframes premium-enter {
       from {
         opacity: 0;
+        transform: translateY(6px);
       }
 
       to {
         opacity: 1;
+        transform: translateY(0);
       }
     }
 
@@ -4523,7 +4543,8 @@
       overflow: hidden !important;
       clip: rect(0, 0, 0, 0) !important;
       white-space: nowrap !important;
-      border: 0 !important;
+      border: 1px solid rgba(255, 255, 255, .16) !important;
+      border-bottom-color: rgba(255, 255, 255, .07) !important;
       opacity: 0 !important;
       pointer-events: none !important;
     }
@@ -5257,13 +5278,40 @@
       function toast(msg) {const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2800)}
       function save() {localStorage.setItem(KEY, JSON.stringify(activities)); render()}
       const pageOrder = [...document.querySelectorAll(".page")].map(page => page.id);
+      const bottomNav = document.querySelector(".bottom-nav");
+      const navIndicator = bottomNav ? document.createElement("span") : null;
+      if (bottomNav && navIndicator) {
+        navIndicator.className = "nav-active-indicator";
+        navIndicator.setAttribute("aria-hidden", "true");
+        bottomNav.prepend(navIndicator);
+      }
+      function updateNavIndicator() {
+        if (!bottomNav || !navIndicator) return;
+        const activeItem = bottomNav.querySelector(".nav-item.active");
+        if (!activeItem) return;
+        const navRect = bottomNav.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
+        navIndicator.style.width = `${itemRect.width}px`;
+        navIndicator.style.transform = `translateX(${itemRect.left - navRect.left - bottomNav.clientLeft}px)`;
+      }
       function navigate(id) {
         if (!pageOrder.includes(id)) return;
+        const navItems = [...(bottomNav?.querySelectorAll(".nav-item") || [])];
+        const currentNavIndex = navItems.findIndex(item => item.classList.contains("active"));
+        const targetNavIndex = navItems.findIndex(item => item.dataset.go === id);
+        const targetPage = $("#" + id);
+        document.querySelectorAll(".page").forEach(page => page.classList.remove("nav-enter-from-left", "nav-enter-from-right"));
+        if (currentNavIndex >= 0 && targetNavIndex >= 0 && currentNavIndex !== targetNavIndex) {
+          targetPage.classList.add(targetNavIndex > currentNavIndex ? "nav-enter-from-right" : "nav-enter-from-left");
+        }
         document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id));
         document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.go === id));
+        updateNavIndicator();
         history.replaceState(null, "", "#" + id);
         window.scrollTo({top: 0, behavior: "smooth"});
       }
+      window.addEventListener("resize", updateNavIndicator, {passive: true});
+      updateNavIndicator();
       document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => navigate(b.dataset.go)));
       window.addEventListener("hashchange", () => {const id = location.hash.slice(1); if ($("#" + id)?.classList.contains("page")) navigate(id)});
 
@@ -6800,12 +6848,9 @@
 
     .bottom-nav button:active,
     .bottom-nav a:active,
-    .bottom-nav .nav-item:active,
-    .bottom-nav .active,
-    .bottom-nav .is-active,
-    .bottom-nav [aria-current="page"] {
-      background: rgba(255, 255, 255, .18) !important;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16) !important;
+    .bottom-nav .nav-item:active {
+      background: rgba(0, 0, 0, .2) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08) !important;
     }
 
     .bottom-nav svg,
@@ -6824,8 +6869,40 @@
 
     .bottom-nav {
       padding-inline: 3px !important;
-      background: rgba(22, 31, 27, .38) !important;
+      background: rgba(255, 255, 255, .12) !important;
+      border: 1px solid rgba(255, 255, 255, .16) !important;
+      border-bottom-color: rgba(255, 255, 255, .07) !important;
+      box-shadow:
+        0 -10px 28px rgba(0, 0, 0, .24),
+        inset 0 1px 0 rgba(255, 255, 255, .18),
+        inset 0 -1px 0 rgba(0, 0, 0, .22) !important;
       bottom: 16px !important;
+    }
+
+    .bottom-nav button:active,
+    .bottom-nav a:active,
+    .bottom-nav .nav-item:active {
+      background: rgba(0, 0, 0, .3) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+    }
+
+    .bottom-nav .nav-item {
+      position: relative;
+      z-index: 1;
+      transition: background-color .18s ease, box-shadow .18s ease, opacity .18s ease, transform .22s var(--ease-out);
+    }
+
+    .bottom-nav .nav-active-indicator {
+      position: absolute;
+      z-index: 0;
+      top: 3px;
+      bottom: 3px;
+      left: 0;
+      width: 0;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .3);
+      pointer-events: none;
+      transition: transform .32s var(--ease-out), width .32s var(--ease-out);
     }
 
     .topbar {
