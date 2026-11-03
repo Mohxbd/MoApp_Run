@@ -4712,7 +4712,16 @@
           </div>
           <div class="week-volume-divider" aria-hidden="true"></div>
           <div class="week-volume-trend">
-            <div class="week-volume-trend-heading">Volume des 12 dernières semaines</div>
+            <div class="week-volume-heading-row">
+              <div class="week-volume-trend-heading">Volume hebdomadaire</div>
+              <span id="week-activity-streak" class="week-activity-streak" role="img"
+                aria-label="0 semaine d’activité consécutive">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M13.1 1.7c.5 4.4-1.6 6.2-3.3 8.1-.1-1.8-.8-3.1-2-4.2.1 2.7-3.7 5.2-3.7 9.8a7.9 7.9 0 0 0 15.8 0c0-5.3-3-10.3-6.8-13.7Z" />
+                </svg>
+                <span id="week-activity-streak-count">0</span>
+              </span>
+            </div>
             <div id="week-volume-chart" class="week-volume-chart" role="img"
               aria-label="Volume hebdomadaire des 12 dernières semaines, en kilomètres"></div>
           </div>
@@ -5311,7 +5320,10 @@
         window.scrollTo({top: 0, behavior: "smooth"});
       }
       window.addEventListener("resize", updateNavIndicator, {passive: true});
-      updateNavIndicator();
+      window.addEventListener("load", () => {
+        updateNavIndicator();
+        requestAnimationFrame(() => bottomNav?.classList.add("nav-indicator-ready"));
+      }, {once: true});
       document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => navigate(b.dataset.go)));
       window.addEventListener("hashchange", () => {const id = location.hash.slice(1); if ($("#" + id)?.classList.contains("page")) navigate(id)});
 
@@ -6307,15 +6319,34 @@
         const el = $("#weekly-volume-chart"); if (!el) return;
         const current = new Date(); current.setHours(0, 0, 0, 0);
         const thisMonday = new Date(current); thisMonday.setDate(current.getDate() - (current.getDay() + 6) % 7);
+        const activityWeeks = new Map();
+        activities.forEach(activity => {
+          const date = new Date(activity.start_date);
+          if (Number.isNaN(date.getTime())) return;
+          date.setHours(0, 0, 0, 0);
+          date.setDate(date.getDate() - (date.getDay() + 6) % 7);
+          const key = date.getTime();
+          const week = activityWeeks.get(key) || {count: 0, km: 0};
+          week.count++;
+          week.km += Number(activity.distance_km || 0);
+          activityWeeks.set(key, week);
+        });
+        const streakEl = $("#week-activity-streak");
+        if (streakEl) {
+          const lastActiveWeek = activityWeeks.has(thisMonday.getTime())
+            ? new Date(thisMonday)
+            : new Date(thisMonday.getTime() - 7 * 86400000);
+          let streak = 0;
+          for (let week = lastActiveWeek; (activityWeeks.get(week.getTime())?.count || 0) > 0; week.setDate(week.getDate() - 7)) streak++;
+          $("#week-activity-streak-count").textContent = String(streak);
+          streakEl.setAttribute("aria-label", `${streak} semaine${streak === 1 ? "" : "s"} d’activité consécutive${streak === 1 ? "" : "s"}`);
+        }
         const summaryChart = $("#week-volume-chart");
         if (summaryChart) {
           const recentWeeks = Array.from({length: 12}, (_, index) => {
             const start = new Date(thisMonday);
             start.setDate(thisMonday.getDate() - (11 - index) * 7);
-            const end = new Date(start);
-            end.setDate(start.getDate() + 7);
-            const km = activities.filter(a => {const date = new Date(a.start_date); return !Number.isNaN(date.getTime()) && date >= start && date < end;}).reduce((sum, a) => sum + Number(a.distance_km || 0), 0);
-            return {start, km};
+            return {start, km: activityWeeks.get(start.getTime())?.km || 0};
           });
           const width = 320, height = 94, left = 4, right = 34, top = 7, bottom = 17;
           const plotWidth = width - left - right, plotHeight = height - top - bottom;
@@ -6892,6 +6923,12 @@
       transition: background-color .18s ease, box-shadow .18s ease, opacity .18s ease, transform .22s var(--ease-out);
     }
 
+    .bottom-nav .nav-item:hover,
+    .bottom-nav .nav-item:active {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
     .bottom-nav .nav-active-indicator {
       position: absolute;
       z-index: 0;
@@ -6902,6 +6939,9 @@
       border-radius: 999px;
       background: rgba(0, 0, 0, .3);
       pointer-events: none;
+    }
+
+    .bottom-nav.nav-indicator-ready .nav-active-indicator {
       transition: transform .32s var(--ease-out), width .32s var(--ease-out);
     }
 
@@ -7202,10 +7242,46 @@
     }
 
     #accueil .week-volume-trend-heading {
-      margin-bottom: 3px;
       color: var(--muted);
       font-size: 10px;
       line-height: 1.2;
+    }
+
+    #accueil .week-volume-heading-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    #accueil .week-activity-streak {
+      position: relative;
+      display: inline-grid;
+      width: 26px;
+      height: 30px;
+      flex: 0 0 auto;
+      place-items: center;
+      color: var(--accent);
+    }
+
+    #accueil .week-activity-streak svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    #accueil .week-activity-streak > span {
+      position: relative;
+      z-index: 1;
+      color: var(--accent-foreground);
+      font-size: 11px;
+      font-weight: 950;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      transform: translateY(3px);
     }
 
     #accueil .week-volume-chart {
