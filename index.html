@@ -2554,9 +2554,14 @@
       }
     }
 
-    #file-import.activity-file-hidden,
-    input#file-import[type="file"] {
-      display: none !important;
+    #file-import.activity-file-hidden {
+      position: fixed !important;
+      left: -10000px !important;
+      width: 1px !important;
+      height: 1px !important;
+      opacity: 0 !important;
+      overflow: hidden !important;
+      clip-path: inset(50%) !important;
     }
   </style>
 
@@ -5091,8 +5096,8 @@
         </svg></button>
       <button id="plan-header-prev" class="plan-week-glass glass-nav-button plan-week-prev-glass" type="button" aria-label="Semaine précédente" title="Semaine précédente"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6" /></svg></button>
       <button id="plan-header-next" class="plan-week-glass glass-nav-button plan-week-next-glass" type="button" aria-label="Semaine suivante" title="Semaine suivante"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg></button>
-      <input id="file-import" class="activity-file-hidden" type="file"
-        accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json" multiple>
+      <input id="file-import" class="activity-file-hidden" type="file" aria-label="Choisir les fichiers d’activité"
+        tabindex="-1" multiple>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
