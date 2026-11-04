@@ -4500,7 +4500,8 @@
     }
 
     .activity-add-glass,
-    .page-reload-glass {
+    .page-reload-glass,
+    .notification-glass {
       position: fixed;
       z-index: 1100;
       top: calc(env(safe-area-inset-top) + 6px);
@@ -4526,12 +4527,17 @@
       right: 14px;
     }
 
+    .notification-glass {
+      right: 62px;
+    }
+
     .page-reload-glass {
       left: 14px;
     }
 
     .activity-add-glass svg,
-    .page-reload-glass svg {
+    .page-reload-glass svg,
+    .notification-glass svg {
       width: 20px;
       height: 20px;
       display: block;
@@ -4542,7 +4548,8 @@
     }
 
     .activity-add-glass:hover,
-    .page-reload-glass:hover {
+    .page-reload-glass:hover,
+    .notification-glass:hover {
       transform: scale(1.06);
       background: color-mix(in srgb, var(--panel2) 56%, transparent);
       box-shadow: 0 8px 22px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .62);
@@ -4564,10 +4571,228 @@
     }
 
     html[data-theme="light"] .activity-add-glass,
-    html[data-theme="light"] .page-reload-glass {
+    html[data-theme="light"] .page-reload-glass,
+    html[data-theme="light"] .notification-glass {
       background: rgba(255, 255, 255, .48);
       border-color: rgba(255, 255, 255, .72);
       box-shadow: 0 6px 18px rgba(38, 52, 74, .12), inset 0 1px rgba(255, 255, 255, .88);
+    }
+
+    .notification-glass {
+      font-size: 0;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 3px;
+      border: 1px solid var(--bg);
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-foreground);
+      font: 700 10px/14px system-ui, sans-serif;
+      text-align: center;
+    }
+
+    .notifications-list {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .notifications-overlay {
+      position: fixed;
+      z-index: 12000;
+      inset: 0;
+      overflow-y: auto;
+      padding: 0 0 env(safe-area-inset-bottom);
+      background: var(--bg);
+      color: var(--text);
+      overscroll-behavior: contain;
+    }
+
+    .notifications-overlay[hidden] {
+      display: none !important;
+    }
+
+    body.notifications-open {
+      overflow: hidden;
+    }
+
+    .notifications-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      min-height: calc(60px + env(safe-area-inset-top));
+      padding: env(safe-area-inset-top) 14px 0;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+    }
+
+    .notifications-header h2 {
+      margin: 0;
+      font-size: 17px;
+      white-space: nowrap;
+    }
+
+    .notifications-back {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--panel) 64%, transparent);
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .22);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      cursor: pointer;
+    }
+
+    .notifications-back svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .notifications-clear {
+      padding: 8px 10px;
+      border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--line));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--danger) 10%, var(--panel));
+      color: var(--danger);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .notifications-clear:disabled {
+      opacity: .42;
+      cursor: default;
+    }
+
+    .notification-swipe-row {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      touch-action: pan-y;
+    }
+
+    .notification-delete-action {
+      position: absolute;
+      inset: 0 0 0 auto;
+      display: grid;
+      width: 76px;
+      place-items: center;
+      border: 0;
+      border-radius: var(--radius-card);
+      background: #d94b46;
+      color: white;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .16s ease, visibility .16s ease;
+    }
+
+    .notification-swipe-row.swiped-open .notification-delete-action {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .notification-delete-action svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .notification-item {
+      position: relative;
+      z-index: 1;
+      transition: transform .24s cubic-bezier(.2, .75, .25, 1), opacity .2s ease;
+      will-change: transform;
+    }
+
+    .notification-swipe-row.swiped-open .notification-item {
+      transform: translateX(-76px);
+    }
+
+    .notification-swipe-row.removing {
+      max-height: 120px;
+      margin-bottom: -10px;
+      opacity: 0;
+      transform: translateX(-24px);
+      transition: max-height .22s ease, margin .22s ease, opacity .18s ease, transform .22s ease;
+      pointer-events: none;
+    }
+
+    .notification-item {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      align-items: start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      background: linear-gradient(145deg, color-mix(in srgb, var(--panel2) 86%, var(--panel)), var(--panel));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+    }
+
+    .notification-item.unread {
+      border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+      background: linear-gradient(140deg, color-mix(in srgb, var(--accent) 9%, var(--panel2)), var(--panel));
+    }
+
+    .notification-item-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--accent) 18%, var(--panel2));
+      color: var(--accent-text);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .notification-item-content {
+      min-width: 0;
+    }
+
+    .notification-item-content strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .notification-item-content p {
+      margin: 3px 0 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .notification-item-content time {
+      color: var(--muted);
+      font-size: 10px;
     }
 
     body.activity-detail-open .floating-actions,
@@ -5094,18 +5319,34 @@
         title="Importer des activités"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M12 5v14M5 12h14" />
         </svg></button>
+      <button id="notification-open" class="notification-glass" type="button" aria-label="Notifications"
+        title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+          <path d="M10 21h4" />
+        </svg><span id="notification-badge" class="notification-badge" hidden></span></button>
       <button id="plan-header-prev" class="plan-week-glass glass-nav-button plan-week-prev-glass" type="button" aria-label="Semaine précédente" title="Semaine précédente"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6" /></svg></button>
       <button id="plan-header-next" class="plan-week-glass glass-nav-button plan-week-next-glass" type="button" aria-label="Semaine suivante" title="Semaine suivante"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg></button>
       <input id="file-import" class="activity-file-hidden" type="file" aria-label="Choisir les fichiers d’activité"
         tabindex="-1" multiple>
     </div>
+    <section id="notifications-overlay" class="notifications-overlay" role="dialog" aria-modal="true"
+      aria-labelledby="notifications-heading" hidden>
+      <header class="notifications-header">
+        <button id="notifications-back" class="notifications-back" type="button" aria-label="Retour">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <h2 id="notifications-heading">Notifications</h2>
+        <button id="notifications-clear" class="notifications-clear" type="button">Tout supprimer</button>
+      </header>
+      <div id="notifications-list" class="notifications-list" aria-live="polite"></div>
+    </section>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
   <script>
     /* MoApp Run — version simple, sans backend ni secrets. */
     (() => {
       "use strict";
-      const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", NOTE_KEY = "moapp-run-feeling-notes-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1";
+      const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", NOTE_KEY = "moapp-run-feeling-notes-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1", NOTIFICATION_KEY = "moapp-run-notifications-v1";
       const GOAL_TIME_KEY = "moapp-run-goal-time-v1", DEFAULT_GOAL_TIME_MINUTES = 115;
       function readGoalTimeMinutes() {
         try {
@@ -5281,6 +5522,107 @@
         toast("Couleur d’accentuation réinitialisée.");
       });
       function toast(msg) {const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2800)}
+      function readNotifications() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(NOTIFICATION_KEY) || "[]");
+          if (!Array.isArray(stored)) throw new Error("Le stockage des notifications est invalide.");
+          return stored.filter(item => item && typeof item.id === "string" && typeof item.title === "string" && typeof item.message === "string" && typeof item.createdAt === "string").map(item => ({...item, read: item.read === true}));
+        } catch (error) {
+          console.error("Impossible de lire les notifications.", error);
+          toast("Les notifications enregistrées n’ont pas pu être lues.");
+          return [];
+        }
+      }
+      let notifications = readNotifications();
+      function persistNotifications(next) {
+        try {
+          localStorage.setItem(NOTIFICATION_KEY, JSON.stringify(next));
+          notifications = next;
+          renderNotifications();
+          return true;
+        } catch (error) {
+          console.error("Impossible d’enregistrer les notifications.", error);
+          toast("La notification n’a pas pu être enregistrée.");
+          return false;
+        }
+      }
+      function addNotification(type, title, message) {
+        const notification = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          type,
+          title,
+          message,
+          createdAt: new Date().toISOString(),
+          read: false
+        };
+        persistNotifications([notification, ...notifications]);
+      }
+      function renderNotifications() {
+        const list = $("#notifications-list");
+        const badge = $("#notification-badge");
+        const clearButton = $("#notifications-clear");
+        const unreadCount = notifications.filter(item => !item.read).length;
+        if (clearButton) clearButton.disabled = notifications.length === 0;
+        if (badge) {
+          badge.hidden = unreadCount === 0;
+          badge.textContent = unreadCount > 99 ? "99+" : String(unreadCount);
+          $("#notification-open")?.setAttribute("aria-label", unreadCount ? `Notifications, ${unreadCount} non lue${unreadCount === 1 ? "" : "s"}` : "Notifications");
+        }
+        if (!list) return;
+        if (!notifications.length) {
+          list.innerHTML = '<div class="empty-state">Aucune notification pour le moment.</div>';
+          return;
+        }
+        const icons = {activity: "✓", deletion: "−", streak: "↗"};
+        list.innerHTML = notifications.map(item => {
+          const date = new Date(item.createdAt);
+          const time = Number.isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat("fr-FR", {dateStyle: "medium", timeStyle: "short"}).format(date);
+          return `<div class="notification-swipe-row" data-notification-row="${esc(item.id)}"><button class="notification-delete-action" type="button" data-delete-notification="${esc(item.id)}" aria-label="Supprimer la notification « ${esc(item.title)} »" aria-hidden="true" tabindex="-1" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6M14 10v6" /></svg></button><article class="notification-item ${item.read ? "" : "unread"}"><span class="notification-item-icon" aria-hidden="true">${icons[item.type] || "•"}</span><div class="notification-item-content"><strong>${esc(item.title)}</strong><p>${esc(item.message)}</p><time>${esc(time)}</time></div></article></div>`;
+        }).join("");
+      }
+      function deleteNotification(id, animate = true) {
+        const row = [...$("#notifications-list").querySelectorAll(".notification-swipe-row")].find(item => item.dataset.notificationRow === id);
+        if (!animate || !row) {
+          persistNotifications(notifications.filter(item => item.id !== id));
+          return;
+        }
+        if (row.classList.contains("removing")) return;
+        row.classList.add("removing");
+        setTimeout(() => persistNotifications(notifications.filter(item => item.id !== id)), 230);
+      }
+      function setNotificationRowOpen(row, open) {
+        row.classList.toggle("swiped-open", open);
+        const button = row.querySelector(".notification-delete-action");
+        if (!button) return;
+        button.disabled = !open;
+        button.tabIndex = open ? 0 : -1;
+        button.setAttribute("aria-hidden", String(!open));
+      }
+      function markNotificationsRead() {
+        if (!notifications.some(item => !item.read)) return;
+        persistNotifications(notifications.map(item => ({...item, read: true})));
+      }
+      function getActivityWeekStreak(sourceActivities) {
+        const activeWeeks = new Set();
+        sourceActivities.forEach(activity => {
+          const date = new Date(activity.start_date);
+          if (Number.isNaN(date.getTime())) return;
+          date.setHours(0, 0, 0, 0);
+          date.setDate(date.getDate() - (date.getDay() + 6) % 7);
+          activeWeeks.add(date.getTime());
+        });
+        const thisMonday = new Date();
+        thisMonday.setHours(0, 0, 0, 0);
+        thisMonday.setDate(thisMonday.getDate() - (thisMonday.getDay() + 6) % 7);
+        let week = new Date(thisMonday);
+        if (!activeWeeks.has(week.getTime())) week.setDate(week.getDate() - 7);
+        let streak = 0;
+        while (activeWeeks.has(week.getTime())) {
+          streak++;
+          week.setDate(week.getDate() - 7);
+        }
+        return streak;
+      }
       function save() {localStorage.setItem(KEY, JSON.stringify(activities)); render()}
       const pageOrder = [...document.querySelectorAll(".page")].map(page => page.id);
       const bottomNav = document.querySelector(".bottom-nav");
@@ -5309,6 +5651,41 @@
         history.replaceState(null, "", "#" + id);
         window.scrollTo({top: 0, behavior: "auto"});
       }
+      const notificationsOverlay = $("#notifications-overlay");
+      let notificationReturnFocus = null;
+      function openNotifications() {
+        notificationReturnFocus = document.activeElement;
+        notificationsOverlay.hidden = false;
+        document.body.classList.add("notifications-open");
+        markNotificationsRead();
+        renderNotifications();
+        $("#notifications-back").focus();
+      }
+      function closeNotifications() {
+        if (notificationsOverlay.hidden) return;
+        notificationsOverlay.hidden = true;
+        document.body.classList.remove("notifications-open");
+        if (notificationReturnFocus instanceof HTMLElement) notificationReturnFocus.focus();
+        notificationReturnFocus = null;
+      }
+      window.addEventListener("keydown", event => {
+        if (notificationsOverlay.hidden) return;
+        if (event.key === "Escape") {
+          closeNotifications();
+          return;
+        }
+        if (event.key !== "Tab") return;
+        const focusable = [...notificationsOverlay.querySelectorAll('button:not(:disabled):not([tabindex="-1"])')];
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
       window.addEventListener("resize", () => {
         updateNavIndicator();
         if ($("#performances")?.classList.contains("active")) renderHrTypeChart();
@@ -5318,6 +5695,51 @@
         requestAnimationFrame(() => bottomNav?.classList.add("nav-indicator-ready"));
       }, {once: true});
       document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => navigate(b.dataset.go)));
+      $("#notification-open")?.addEventListener("click", openNotifications);
+      $("#notifications-back")?.addEventListener("click", closeNotifications);
+      $("#notifications-clear")?.addEventListener("click", () => persistNotifications([]));
+      $("#notifications-list")?.addEventListener("click", event => {
+        const deleteButton = event.target.closest("[data-delete-notification]");
+        if (deleteButton) {
+          deleteNotification(deleteButton.dataset.deleteNotification);
+          return;
+        }
+        const row = event.target.closest(".notification-swipe-row");
+        if (row) $("#notifications-list").querySelectorAll(".swiped-open").forEach(openRow => {
+          if (openRow !== row) setNotificationRowOpen(openRow, false);
+        });
+      });
+      $("#notifications-list")?.addEventListener("pointerdown", event => {
+        const row = event.target.closest(".notification-swipe-row");
+        if (!row || event.target.closest(".notification-delete-action")) return;
+        row.dataset.swipeStartX = String(event.clientX);
+        row.dataset.swipeStartY = String(event.clientY);
+      });
+      $("#notifications-list")?.addEventListener("pointerup", event => {
+        const row = event.target.closest(".notification-swipe-row");
+        if (!row || row.dataset.swipeStartX == null) return;
+        const deltaX = event.clientX - Number(row.dataset.swipeStartX);
+        const deltaY = event.clientY - Number(row.dataset.swipeStartY);
+        delete row.dataset.swipeStartX;
+        delete row.dataset.swipeStartY;
+        if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+        if (deltaX < 0) {
+          $("#notifications-list").querySelectorAll(".swiped-open").forEach(openRow => {
+            if (openRow !== row) setNotificationRowOpen(openRow, false);
+          });
+          setNotificationRowOpen(row, true);
+        } else {
+          setNotificationRowOpen(row, false);
+        }
+      });
+      $("#notifications-list")?.addEventListener("pointercancel", event => {
+        const row = event.target.closest(".notification-swipe-row");
+        if (row) {
+          delete row.dataset.swipeStartX;
+          delete row.dataset.swipeStartY;
+        }
+      });
+      renderNotifications();
       window.addEventListener("hashchange", () => {const id = location.hash.slice(1); if ($("#" + id)?.classList.contains("page")) navigate(id)});
 
       const now = new Date(); const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() + 6) % 7); monday.setHours(0, 0, 0, 0); const next = new Date(monday); next.setDate(next.getDate() + 7);
@@ -5631,7 +6053,7 @@
             }
             activities = remainingActivities;
             render();
-            toast("Activité supprimée.");
+            addNotification("deletion", "Activité supprimée", `« ${activityDisplayName(activity)} » a bien été supprimée.`);
             return;
           }
         }
@@ -6352,8 +6774,19 @@
           const upgrades = valid.filter(a => {const old = duplicates(a); return old && a.track_samples?.length && !old.track_samples?.length;});
           const ignored = valid.length - fresh.length - upgrades.length;
           if (!confirm(`${valid.length} activité(s) valide(s), ${fresh.length} nouvelle(s), ${upgrades.length} activité(s) existante(s) enrichie(s) avec les points GPS, ${ignored} doublon(s) probable(s). Continuer ?`)) return;
+          const previousStreak = getActivityWeekStreak(activities);
           upgrades.forEach(a => {const old = duplicates(a); if (old) Object.assign(old, a, {id: old.id});});
-          activities.push(...fresh); save(); $("#import-status").textContent = `Import terminé : ${fresh.length} ajoutée(s), ${upgrades.length} activité(s) enrichie(s), ${ignored} doublon(s) ignoré(s).`; toast("Import terminé.");
+          activities.push(...fresh);
+          save();
+          $("#import-status").textContent = "";
+          if (fresh.length || upgrades.length) {
+            const importedCount = fresh.length + upgrades.length;
+            addNotification("activity", importedCount === 1 ? "Activité importée" : "Activités importées", importedCount === 1 ? "L’activité a bien été chargée." : `${importedCount} activités ont bien été chargées.`);
+          }
+          const updatedStreak = getActivityWeekStreak(activities);
+          if (updatedStreak === previousStreak + 1) {
+            addNotification("streak", "Streak hebdomadaire augmenté", `Ton streak a augmenté de 1 : ${updatedStreak} semaine${updatedStreak === 1 ? "" : "s"} consécutive${updatedStreak === 1 ? "" : "s"}.`);
+          }
         } catch (err) {$("#import-status").textContent = `Import impossible : ${err.message}`}
         finally {e.target.value = ""}
       });
@@ -6618,11 +7051,7 @@
         });
         const streakEl = $("#week-activity-streak");
         if (streakEl) {
-          const lastActiveWeek = activityWeeks.has(thisMonday.getTime())
-            ? new Date(thisMonday)
-            : new Date(thisMonday.getTime() - 7 * 86400000);
-          let streak = 0;
-          for (let week = lastActiveWeek; (activityWeeks.get(week.getTime())?.count || 0) > 0; week.setDate(week.getDate() - 7)) streak++;
+          const streak = getActivityWeekStreak(activities);
           $("#week-activity-streak-count").textContent = String(streak);
           streakEl.setAttribute("aria-label", `${streak} semaine${streak === 1 ? "" : "s"} d’activité consécutive${streak === 1 ? "" : "s"}`);
         }
@@ -7087,7 +7516,8 @@
     }
 
     .activity-add-glass,
-    .page-reload-glass {
+    .page-reload-glass,
+    .notification-glass {
       top: calc(env(safe-area-inset-top) + 10px) !important;
     }
 
@@ -7097,7 +7527,8 @@
       }
 
       .activity-add-glass,
-      .page-reload-glass {
+      .page-reload-glass,
+      .notification-glass {
         top: calc(env(safe-area-inset-top) + 8px) !important;
       }
     }
@@ -7372,13 +7803,15 @@
     }
 
     .activity-add-glass,
-    .page-reload-glass {
+    .page-reload-glass,
+    .notification-glass {
       top: calc(env(safe-area-inset-top) + 14px) !important;
     }
 
     @media (max-width: 599px) {
       .activity-add-glass,
-      .page-reload-glass {
+      .page-reload-glass,
+      .notification-glass {
         top: calc(env(safe-area-inset-top) + 12px) !important;
       }
     }
