@@ -118,23 +118,11 @@
 
     .page {
       display: none;
-      animation: enter .2s ease
+      animation: none
     }
 
     .page.active {
       display: block
-    }
-
-    @keyframes enter {
-      from {
-        opacity: .5;
-        transform: translateY(4px)
-      }
-
-      to {
-        opacity: 1;
-        transform: none
-      }
     }
 
     .eyebrow {
@@ -839,8 +827,8 @@
     }
 
     .nav-item span {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       display: grid;
       place-items: center;
       flex: 0 0 24px;
@@ -890,8 +878,7 @@
 
     .hr-type-chart {
       width: 100%;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
+      overflow: hidden;
     }
 
     .hr-type-chart svg {
@@ -903,15 +890,14 @@
 
     .hr-evolution-scroll {
       width: 100%;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      touch-action: pan-x pan-y;
+      overflow: hidden;
     }
 
     .hr-evolution-scroll svg {
       display: block;
       height: auto;
-      max-width: none;
+      width: 100%;
+      max-width: 100%;
     }
 
     .hr-evolution-point {
@@ -920,13 +906,14 @@
     }
 
     .hr-evolution-tooltip-bg {
-      fill: var(--accent);
+      fill: var(--panel2);
+      stroke: var(--line);
+      stroke-width: 1;
     }
 
     .hr-evolution-tooltip-text {
-      fill: var(--accent-foreground);
-      font-size: 15px;
-      font-weight: 800;
+      font-size: 10px;
+      font-weight: 600;
     }
 
     .hr-evolution-legend {
@@ -1773,7 +1760,11 @@
       font-size: 9px;
     }
 
-    /* Le style sombre ne filtre que les tuiles, pas le tracé d'allure ni les marqueurs. */
+    #activity-detail .pace-map .leaflet-control-attribution {
+      right: auto !important;
+      left: 0 !important;
+    }
+
     .moapp-dark-map-tiles {
       filter: invert(1) hue-rotate(180deg) brightness(.78) saturate(.65);
     }
@@ -1828,6 +1819,92 @@
       text-align: center;
     }
 
+    .pace-map-playback {
+      position: absolute;
+      z-index: 600;
+      left: 10px;
+      bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pace-map-playback[hidden] {
+      display: none;
+    }
+
+    .pace-map-play-button {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--panel) 58%, transparent);
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .48);
+      backdrop-filter: blur(18px) saturate(1.55);
+      -webkit-backdrop-filter: blur(18px) saturate(1.55);
+      cursor: pointer;
+    }
+
+    .pace-map-play-button:hover {
+      background: color-mix(in srgb, var(--panel2) 72%, transparent);
+    }
+
+    .pace-map-play-button svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
+    }
+
+    .pace-map-play-button:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+
+    .pace-map-playback-readout {
+      display: grid;
+      justify-items: center;
+      gap: 2px;
+      min-width: 62px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255, 255, 255, .38);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--panel) 76%, transparent);
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .32);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      font: inherit;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .pace-map-playback-readout:hover {
+      background: color-mix(in srgb, var(--panel2) 82%, transparent);
+    }
+
+    .pace-map-playback-time {
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .pace-map-playback-pace {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    html[data-theme="light"] .pace-map-play-button,
+    html[data-theme="light"] .pace-map-playback-readout {
+      border-color: rgba(255, 255, 255, .9);
+      background: rgba(255, 255, 255, .76);
+      box-shadow: 0 4px 14px rgba(38, 52, 74, .16), inset 0 1px 0 rgba(255, 255, 255, .95);
+    }
+
     .feeling-panel {
       margin-top: 24px;
     }
@@ -1861,7 +1938,7 @@
       -webkit-appearance: none;
       outline: none;
       cursor: pointer;
-      background: linear-gradient(90deg, #22c55e 0%, #84cc16 28%, #eab308 58%, #f97316 78%, #ef4444 100%);
+      background: linear-gradient(90deg, #a9d8b8 0%, #c4d9a8 28%, #e3d8a4 58%, #e8c1a6 78%, #e3aaa8 100%);
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, .18);
       touch-action: pan-y;
     }
@@ -1873,7 +1950,7 @@
       height: 24px;
       border-radius: 50%;
       background: var(--panel);
-      border: 3px solid var(--feeling-color, var(--accent));
+      border: 2px solid var(--feeling-color, #d6c9a8);
       box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
     }
 
@@ -1882,7 +1959,7 @@
       height: 18px;
       border-radius: 50%;
       background: var(--panel);
-      border: 3px solid var(--feeling-color, var(--accent));
+      border: 2px solid var(--feeling-color, #d6c9a8);
       box-shadow: 0 2px 8px rgba(0, 0, 0, .22);
     }
 
@@ -2565,41 +2642,11 @@
     }
 
     .page {
-      animation: premium-enter .36s var(--ease-out) both;
+      animation: none;
     }
 
     .page:not(#accueil) {
       padding-top: 4px;
-    }
-
-    .page.nav-enter-from-right {
-      animation: page-swipe-from-right .32s var(--ease-out) both;
-    }
-
-    .page.nav-enter-from-left {
-      animation: page-swipe-from-left .32s var(--ease-out) both;
-    }
-
-    @keyframes page-swipe-from-right {
-      from { opacity: .7; transform: translateX(28px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes page-swipe-from-left {
-      from { opacity: .7; transform: translateX(-28px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes premium-enter {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .eyebrow {
@@ -2891,7 +2938,7 @@
       display: none;
     }
 
-    #reglages > .appearance-panel {
+    #reglages > .accent-setting-panel {
       margin-top: 0;
     }
 
@@ -3385,10 +3432,6 @@
       color: var(--plot-text, var(--accent-text));
     }
 
-    #activity-detail .chart-panel.plot-pace .chart-mode-toggle {
-      color: var(--pace-text-color);
-    }
-
     #activity-detail .detail-stats .stat-card {
       --plot-accent: var(--accent);
       border-color: color-mix(in srgb, var(--plot-accent) 24%, var(--line));
@@ -3675,34 +3718,24 @@
     #close-goal-detail {
       display: grid;
       place-items: center;
-      width: 44px;
-      height: 44px;
-      min-height: 44px;
-      padding: 0;
-      border: 1px solid #ffffff55;
-      border-radius: 50%;
-      background: rgba(30, 30, 30, .34);
-      color: white;
-      box-shadow: 0 6px 24px #0003, inset 0 1px #ffffff55;
-      backdrop-filter: blur(22px) saturate(1.5);
-      -webkit-backdrop-filter: blur(22px) saturate(1.5);
-      cursor: pointer;
-      flex: 0 0 44px;
+      min-height: 40px;
+      flex: 0 0 40px;
     }
 
     #close-goal-detail svg {
       display: block;
-      width: 23px;
-      height: 23px;
       fill: none;
       stroke: currentColor;
-      stroke-width: 2.4;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
     .goal-detail-head .eyebrow {
-      display: none;
+      display: block;
+      flex: 1;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 750;
     }
 
     .goal-detail-stats {
@@ -4372,8 +4405,8 @@
     #all-activities .activity-item {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 34px;
-      grid-template-rows: auto auto;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto;
       align-items: baseline;
       gap: 6px 8px;
       padding: 20px;
@@ -4389,8 +4422,8 @@
     }
 
     #all-activities .activity-open-button {
-      grid-column: 1;
-      grid-row: 1 / span 2;
+      grid-column: 1 / -1;
+      grid-row: 1;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: auto auto;
@@ -4456,31 +4489,7 @@
       margin-top: 0;
     }
 
-    #all-activities .activity-delete-button {
-      grid-column: 2;
-      grid-row: 2;
-      align-self: center;
-      z-index: 1;
-      display: grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      padding: 0;
-      border: 1px solid #ef444455;
-      border-radius: 11px;
-      background: #ef444414;
-      color: #ef4444;
-      cursor: pointer;
-    }
-
-    #all-activities .activity-delete-button svg {
-      display: block;
-      width: 17px;
-      height: 17px;
-    }
-
-    #all-activities .activity-open-button:focus-visible,
-    #all-activities .activity-delete-button:focus-visible {
+    #all-activities .activity-open-button:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px;
     }
@@ -4600,25 +4609,15 @@
     #detail-title {
       display: grid;
       place-items: center;
-      width: 44px;
-      height: 44px;
-      padding: 0 !important;
-      border: 1px solid #ffffff35 !important;
-      border-radius: 50% !important;
-      background: #ffffff18 !important;
-      box-shadow: 0 6px 24px #0002, inset 0 1px #ffffff45;
-      color: var(--text) !important;
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
       font-size: 0 !important;
     }
 
     #detail-title svg {
-      width: 23px;
-      height: 23px;
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: currentColor;
-      stroke-width: 2.4;
+      stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
@@ -4756,55 +4755,83 @@
         <div id="all-activities" class="activity-list"></div>
         <section id="activity-detail" class="panel activity-detail" hidden>
           <div class="section-heading">
-            <h2><button id="detail-title" type="button" aria-label="Retour aux activités" title="Retour">
+            <h2><button id="detail-title" class="glass-nav-button" type="button" aria-label="Retour aux activités" title="Retour">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m15 18-6-6 6-6" />
                 </svg>
-              </button><span id="detail-activity-name"></span></h2>
+              </button><span id="detail-activity-name"></span><span class="detail-actions"><button id="detail-actions-toggle" class="detail-actions-glass" type="button" aria-label="Plus d’options" title="Plus d’options" aria-haspopup="dialog" aria-expanded="false" aria-controls="detail-actions-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button></span></h2>
           </div>
           <p id="detail-meta" class="muted small"></p>
-          <div class="stats-grid detail-stats detail-main-stats">
-            <article class="stat-card distance-stat"><small>Distance</small><strong id="detail-distance">—</strong></article>
-            <article class="stat-card vma-stat" id="detail-vma-card" hidden><small>VMA estimée</small><strong id="detail-vma">—</strong></article>
-            <article class="stat-card"><small>Durée</small><strong id="detail-duration">—</strong></article>
-            <article class="stat-card pace-stat"><small>Allure moyenne</small><strong id="detail-pace">—</strong></article>
+          <div id="detail-actions-menu" class="detail-actions-overlay" hidden>
+            <section class="detail-actions-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-actions-heading">
+              <div id="detail-actions-choices" class="detail-actions-choices">
+                <button type="button" data-detail-action="rename">Renommer l’activité</button>
+                <button type="button" data-detail-action="delete">Supprimer l’activité</button>
+                <button type="button" data-detail-cancel>Annuler</button>
+              </div>
+              <form id="detail-rename-form" class="detail-rename-form" hidden>
+                <label for="detail-rename-input">Nom de l’activité</label>
+                <input id="detail-rename-input" name="activity-name" type="text" maxlength="100" required autocomplete="off">
+                <div class="detail-actions-choices">
+                  <button type="submit">Enregistrer</button>
+                  <button type="button" data-detail-cancel>Annuler</button>
+                </div>
+              </form>
+            </section>
           </div>
           <div class="stat-card pace-map-panel">
-            <h3>Carte d’allure</h3>
             <div class="pace-map-layout">
               <div id="detail-pace-map" class="pace-map" aria-label="Parcours coloré selon l’allure"></div>
+              <div id="pace-map-playback" class="pace-map-playback" hidden>
+                <button id="pace-map-play-button" class="pace-map-play-button" type="button" aria-label="Lire l’animation du parcours"
+                  title="Lire l’animation du parcours"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg></button>
+                <button id="pace-map-playback-readout" class="pace-map-playback-readout" type="button" aria-label="Vitesse d’animation x1, appuyer pour changer">
+                  <span id="pace-map-playback-time" class="pace-map-playback-time">00:00</span>
+                  <span id="pace-map-playback-pace" class="pace-map-playback-pace">— /km</span>
+                </button>
+              </div>
               <div class="pace-map-legend"><span>Lente</span>
                 <div class="pace-gradient" aria-label="Gradient d’allure, du rapide au lent"></div><span>Rapide</span>
               </div>
             </div>
           </div>
-          <div class="stats-grid detail-stats detail-hr-stats">
-            <article class="stat-card"><small>FC max</small><strong id="detail-max-hr">—</strong></article>
-            <article class="stat-card"><small>FC moyenne</small><strong id="detail-avg-hr">—</strong></article>
-          </div>
-          <div class="chart-panel plot-heart-rate">
-            <div class="chart-title-row">
-              <h3>Fréquence cardiaque</h3><button class="text-button chart-mode-toggle" data-chart="hr"
-                type="button">Détails</button>
-            </div>
-            <div id="detail-hr-chart" class="detail-chart"></div>
-          </div>
-          <div class="chart-panel plot-pace">
-            <div class="chart-title-row">
-              <h3>Allure</h3><button class="text-button chart-mode-toggle" data-chart="pace"
-                type="button">Détails</button>
-            </div>
-            <div id="detail-pace-chart" class="detail-chart"></div>
-          </div>
-          <div class="chart-panel zone-panel plot-heart-rate">
-            <h3>Zones de fréquence cardiaque</h3>
-            <div id="detail-hr-zones" class="zone-chart" aria-label="Répartition de la fréquence cardiaque par zones">
+          <div class="detail-overview">
+            <div class="stats-grid detail-stats detail-main-stats">
+              <article class="stat-card distance-stat"><small>Distance</small><strong id="detail-distance">—</strong></article>
+              <article class="stat-card"><small>Durée</small><strong id="detail-duration">—</strong></article>
+              <article class="stat-card pace-stat"><small>Allure moyenne</small><strong id="detail-pace">—</strong></article>
+              <article class="stat-card"><small>Dénivelé positif</small><strong id="detail-elevation-gain">—</strong></article>
+              <article class="stat-card hr-metric"><small>FC moyenne</small><strong id="detail-avg-hr">—</strong></article>
+              <article class="stat-card hr-metric"><small>FC max</small><strong id="detail-max-hr">—</strong></article>
+              <article class="stat-card vma-stat" id="detail-vma-card" hidden><small>VMA estimée</small><strong id="detail-vma">—</strong></article>
             </div>
           </div>
-          <div class="chart-panel zone-panel plot-pace">
-            <h3>Zones d’allure</h3>
-            <div id="detail-pace-zones" class="zone-chart" aria-label="Répartition de l’allure par zones"></div>
-          </div>
+          <section id="detail-hr-section" class="detail-analysis-section plot-heart-rate">
+            <div class="chart-panel">
+              <div class="chart-title-row">
+                <h3>Fréquences cardiaque</h3><button class="text-button chart-mode-toggle" data-chart="hr"
+                  type="button">Détails</button>
+              </div>
+              <div id="detail-hr-chart" class="detail-chart"></div>
+            </div>
+            <div class="chart-panel zone-panel">
+              <h3>Zones de fréquence cardiaque</h3>
+              <div id="detail-hr-zones" class="zone-chart" aria-label="Répartition de la fréquence cardiaque par zones"></div>
+            </div>
+          </section>
+          <section class="detail-analysis-section plot-pace">
+            <div class="chart-panel">
+              <div class="chart-title-row">
+                <h3>Allures</h3><button class="text-button chart-mode-toggle" data-chart="pace"
+                  type="button">Détails</button>
+              </div>
+              <div id="detail-pace-chart" class="detail-chart"></div>
+            </div>
+            <div class="chart-panel zone-panel">
+              <h3>Zones d’allure</h3>
+              <div id="detail-pace-zones" class="zone-chart" aria-label="Répartition de l’allure par zones"></div>
+            </div>
+          </section>
           <section class="chart-panel feeling-panel" aria-labelledby="feeling-title">
             <div class="chart-title-row">
               <h3 id="feeling-title">Ressenti de la séance</h3><strong><span
@@ -4813,7 +4840,6 @@
             <input id="activity-feeling" class="feeling-slider" type="range" min="1" max="10" step="1" value="5"
               aria-label="Ressenti de la séance sur 10">
             <div class="feeling-scale"><span>Très facile</span><span>Très difficile</span></div>
-            <label class="feeling-note-label" for="activity-feeling-note">Note personnelle</label>
             <textarea id="activity-feeling-note" class="feeling-note" rows="3"
               placeholder="Comment tu t’es senti ? Énergie, respiration, jambes, douleurs, météo, sommeil…"></textarea>
           </section>
@@ -4824,25 +4850,35 @@
       <section id="goal-detail-overlay" hidden aria-label="Détail de l’objectif">
         <div class="goal-detail-inner">
           <div class="goal-detail-head">
-            <button type="button" id="close-goal-detail" aria-label="Retour" title="Retour"><svg viewBox="0 0 24 24"
+            <button type="button" id="close-goal-detail" class="glass-nav-button" aria-label="Retour" title="Retour"><svg viewBox="0 0 24 24"
                 aria-hidden="true">
                 <path d="m15 18-6-6 6-6" />
               </svg></button>
-            <span class="eyebrow">OBJECTIF SEMI-MARATHON</span>
+            <span class="eyebrow">Semi-Marathon de Hyères</span>
           </div>
+          <section class="panel goal-detail-panel goal-route-panel">
+            <h2>Carte du parcours</h2>
+            <div class="pace-map-layout goal-map-layout">
+              <div id="goal-route-map" class="pace-map"></div>
+              <div id="goal-route-playback" class="pace-map-playback" hidden>
+                <button id="goal-route-play-button" class="pace-map-play-button" type="button" aria-label="Lire l’animation du parcours"
+                  title="Lire l’animation du parcours"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg></button>
+                <button id="goal-route-playback-readout" class="pace-map-playback-readout" type="button" aria-label="Vitesse d’animation x1, appuyer pour changer">
+                  <span id="goal-route-playback-time" class="pace-map-playback-time">00:00</span>
+                  <span id="goal-route-playback-pace" class="pace-map-playback-pace">— /km</span>
+                </button>
+              </div>
+            </div>
+          </section>
           <div class="goal-detail-stats">
             <article class="stat-card goal-stat"><small>Distance</small><strong>21,1 <em>km</em></strong></article>
-            <article class="stat-card goal-stat"><small>D+</small><strong>48 <em>m</em></strong></article>
-            <article class="stat-card goal-stat"><small>D−</small><strong>40 <em>m</em></strong></article>
+            <article class="stat-card goal-stat"><small>Dénivelé +</small><strong>48 <em>m</em></strong></article>
+            <article class="stat-card goal-stat"><small>Dénivelé −</small><strong>40 <em>m</em></strong></article>
             <article class="stat-card goal-stat"><small>Temps cible</small><strong id="goal-detail-time">1h55</strong>
             </article>
             <article class="stat-card goal-stat"><small>Allure cible</small><strong
                 id="goal-detail-pace">5:27<em>/km</em></strong></article>
           </div>
-          <section class="panel goal-detail-panel">
-            <h2>Carte du parcours</h2>
-            <div id="goal-route-map" class="pace-map"></div>
-          </section>
           <section class="panel goal-detail-panel">
             <h2>Profil altimétrique</h2>
             <div id="goal-elevation-chart" class="detail-chart"></div>
@@ -4878,10 +4914,8 @@
           <article class="stat-card"><small>Meilleur 10 km</small><strong id="pr-10k-display">—</strong><span
               id="pr-10k-meta" class="record-meta">Date et allure —</span></article>
         </div>
-        <article class="panel">
+        <article class="panel predictor-panel">
           <h2>Prédicteur de course</h2>
-          <p class="muted small">Estimation basée sur tes meilleurs kilomètres consécutifs complets détectés dans les
-            activités importées.</p>
           <div class="predictor-grid">
             <div class="predictor-cell"><small>5 km</small><strong id="predict-5k">—</strong></div>
             <div class="predictor-cell"><small>10 km</small><strong id="predict-10k">—</strong></div>
@@ -4907,17 +4941,6 @@
       </section>
 
       <section id="plan" class="page">
-        <div class="plan-week-switch">
-          <button id="plan-week-prev" class="carousel-arrow" type="button" aria-label="Semaine précédente"><svg
-              viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m15 18-6-6 6-6" />
-            </svg></button>
-          <div><strong id="plan-week-counter">Semaine 1 / 22</strong><small id="plan-week-dates"></small></div>
-          <button id="plan-week-next" class="carousel-arrow" type="button" aria-label="Semaine suivante"><svg
-              viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m9 18 6-6-6-6" />
-            </svg></button>
-        </div>
         <div id="plan-calendar" class="plan-calendar"></div>
         <form id="custom-session-form" class="custom-session-form" hidden>
           <strong>Ajouter une séance</strong>
@@ -4950,20 +4973,6 @@
       </section>
 
       <section id="reglages" class="page">
-        <article class="panel appearance-panel">
-          <div class="appearance-copy">
-            <span class="appearance-icon" aria-hidden="true">☼</span>
-            <div>
-              <h2>Apparence</h2>
-              <p class="muted small">Active le thème clair. Ton choix est conservé sur cet appareil.</p>
-            </div>
-          </div>
-          <label class="theme-switch" for="light-theme-toggle">
-            <span class="theme-switch-label">Thème clair</span>
-            <input id="light-theme-toggle" type="checkbox" role="switch" aria-label="Activer le thème clair">
-            <span class="theme-switch-track" aria-hidden="true"></span>
-          </label>
-        </article>
         <article class="panel accent-setting-panel">
           <div>
             <h2>Couleur d’accentuation</h2>
@@ -4979,12 +4988,11 @@
           <h2>Fond de carte</h2>
           <p class="muted small">Choisis le style utilisé sur les cartes des sorties et du parcours. Ton choix est
             conservé sur cet appareil.</p>
-          <label for="map-style-select">Style de carte</label>
           <select id="map-style-select" class="theme-select" aria-label="Choisir le fond de carte">
             <option value="osm">Classique — OpenStreetMap</option>
             <option value="voyager">Voyager — coloré</option>
             <option value="light">Clair — minimaliste</option>
-            <option value="dark">Sombre — anthracite</option>
+            <option value="dark">Sombre — minimaliste</option>
             <option value="topo">Relief — topographique</option>
           </select>
           <p id="map-style-status" class="muted small" role="status" aria-live="polite"></p>
@@ -5000,14 +5008,11 @@
                 aria-describedby="goal-time-hint" required>
               <button class="button primary" type="submit">Enregistrer</button>
             </div>
-            <p id="goal-time-hint" class="muted small">Format heures:minutes · Entre 0:30 et 9:59.</p>
             <p id="goal-time-status" class="muted small" role="status" aria-live="polite"></p>
           </form>
         </article>
         <article class="panel">
           <h2>Records personnels</h2>
-          <p class="muted small">Saisis tes meilleurs temps sur 5 km et 10 km. Un record manuel remplace le record
-            détecté pour la distance concernée.</p>
           <form id="manual-records-form" class="goal-time-form">
             <label for="manual-record-5k">Record 5 km · minutes:secondes</label>
             <div class="goal-time-control">
@@ -5020,8 +5025,6 @@
                 pattern="[0-9]{1,2}:[0-5][0-9]|[0-9]:[0-5][0-9]:[0-5][0-9]" aria-describedby="manual-records-hint">
               <button class="button primary" type="submit">Enregistrer</button>
             </div>
-            <p id="manual-records-hint" class="muted small">Saisis mm:ss ou h:mm:ss. Laisse vide pour utiliser le record
-              détecté dans tes activités importées.</p>
             <p id="manual-records-status" class="muted small" role="status" aria-live="polite"></p>
           </form>
         </article>
@@ -5086,6 +5089,8 @@
         title="Importer des activités"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M12 5v14M5 12h14" />
         </svg></button>
+      <button id="plan-header-prev" class="plan-week-glass glass-nav-button plan-week-prev-glass" type="button" aria-label="Semaine précédente" title="Semaine précédente"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6" /></svg></button>
+      <button id="plan-header-next" class="plan-week-glass glass-nav-button plan-week-next-glass" type="button" aria-label="Semaine suivante" title="Semaine suivante"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6" /></svg></button>
       <input id="file-import" class="activity-file-hidden" type="file"
         accept=".gpx,.csv,.json,application/gpx+xml,text/csv,application/json" multiple>
     </div>
@@ -5197,21 +5202,12 @@
       const dateFmt = v => {const d = new Date(v); return Number.isNaN(+d) ? "Date inconnue" : new Intl.DateTimeFormat("fr-FR", {day: "2-digit", month: "short", year: "numeric"}).format(d)};
       const pace = (km, min) => {if (!(km > 0 && min > 0)) return "—"; const s = Math.round(min * 60 / km); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`};
       const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
-      const THEME_KEY = "moapp-run-theme-v1";
       const ACCENT_KEY = "moapp-run-accent-v1", DEFAULT_ACCENT = "#c5f36a";
-      const themeToggle = $("#light-theme-toggle");
-      function applyTheme(theme, persist = true) {
-        const light = theme === "light";
-        document.documentElement.dataset.theme = light ? "light" : "dark";
-        document.documentElement.style.colorScheme = light ? "light" : "dark";
-        if (themeToggle) themeToggle.checked = light;
-        if (persist) {
-          try {localStorage.setItem(THEME_KEY, light ? "light" : "dark");} catch { }
-        }
-      }
-      let savedTheme = "dark";
-      try {savedTheme = localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";} catch { }
-      applyTheme(savedTheme, false);
+      const savedTheme = "dark";
+      document.documentElement.dataset.theme = savedTheme;
+      document.documentElement.style.colorScheme = savedTheme;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.content = "#10120f";
       const accentInput = $("#accent-color-input"), accentStatus = $("#accent-color-status");
       const defaultAccentForTheme = theme => theme === "light" ? "#4d7f20" : DEFAULT_ACCENT;
       function isValidAccent(value) {return /^#[0-9a-f]{6}$/i.test(value);}
@@ -5219,7 +5215,7 @@
         const rgb = hex.slice(1).match(/../g).map(channel => parseInt(channel, 16));
         const linear = values => values.map(value => {const channel = value / 255; return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;});
         const luminance = values => linear(values).reduce((sum, channel, index) => sum + channel * [.2126, .7152, .0722][index], 0);
-        const background = theme === "light" ? [244, 245, 242] : [11, 13, 11];
+        const background = theme === "light" ? [244, 245, 247] : [11, 13, 11];
         const backgroundLum = luminance(background);
         const contrast = values => {const valueLum = luminance(values); return (Math.max(valueLum, backgroundLum) + .05) / (Math.min(valueLum, backgroundLum) + .05);};
         if (contrast(rgb) >= 4.5) return hex;
@@ -5260,11 +5256,6 @@
         console.error("Impossible de lire la couleur d’accentuation.", error);
       }
       applyAccent(customAccent || defaultAccentForTheme(savedTheme), false);
-      if (themeToggle) themeToggle.addEventListener("change", () => {
-        const nextTheme = themeToggle.checked ? "light" : "dark";
-        applyTheme(nextTheme);
-        applyAccent(customAccent || defaultAccentForTheme(nextTheme), false);
-      });
       accentInput?.addEventListener("input", () => {
         customAccent = accentInput.value;
         applyAccent(customAccent);
@@ -5305,21 +5296,18 @@
       }
       function navigate(id) {
         if (!pageOrder.includes(id)) return;
-        const navItems = [...(bottomNav?.querySelectorAll(".nav-item") || [])];
-        const currentNavIndex = navItems.findIndex(item => item.classList.contains("active"));
-        const targetNavIndex = navItems.findIndex(item => item.dataset.go === id);
-        const targetPage = $("#" + id);
-        document.querySelectorAll(".page").forEach(page => page.classList.remove("nav-enter-from-left", "nav-enter-from-right"));
-        if (currentNavIndex >= 0 && targetNavIndex >= 0 && currentNavIndex !== targetNavIndex) {
-          targetPage.classList.add(targetNavIndex > currentNavIndex ? "nav-enter-from-right" : "nav-enter-from-left");
-        }
         document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id));
         document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.go === id));
+        document.body.classList.toggle("plan-page-active", id === "plan");
         updateNavIndicator();
+        if (id === "performances") renderHrTypeChart();
         history.replaceState(null, "", "#" + id);
-        window.scrollTo({top: 0, behavior: "smooth"});
+        window.scrollTo({top: 0, behavior: "auto"});
       }
-      window.addEventListener("resize", updateNavIndicator, {passive: true});
+      window.addEventListener("resize", () => {
+        updateNavIndicator();
+        if ($("#performances")?.classList.contains("active")) renderHrTypeChart();
+      }, {passive: true});
       window.addEventListener("load", () => {
         updateNavIndicator();
         requestAnimationFrame(() => bottomNav?.classList.add("nav-indicator-ready"));
@@ -5327,35 +5315,9 @@
       document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => navigate(b.dataset.go)));
       window.addEventListener("hashchange", () => {const id = location.hash.slice(1); if ($("#" + id)?.classList.contains("page")) navigate(id)});
 
-      // Navigation par balayage horizontal sur la zone de contenu, sans bouton supplémentaire.
-      (() => {
-        const swipeArea = $("main");
-        if (!swipeArea) return;
-        let startX = 0, startY = 0, startTime = 0, tracking = false;
-        const ignored = "button, a, input, select, textarea, label, [role='button'], [contenteditable='true'], .pace-map, .leaflet-container, .hr-type-chart, .hr-evolution-scroll, .line-chart-scroll, .detail-chart, .volume-chart";
-        swipeArea.addEventListener("touchstart", event => {
-          if (event.touches.length !== 1 || event.target.closest(ignored)) {tracking = false; return;}
-          const touch = event.touches[0];
-          startX = touch.clientX; startY = touch.clientY; startTime = Date.now(); tracking = true;
-        }, {passive: true});
-        swipeArea.addEventListener("touchend", event => {
-          if (!tracking || event.changedTouches.length !== 1) return;
-          tracking = false;
-          const touch = event.changedTouches[0];
-          const dx = touch.clientX - startX, dy = touch.clientY - startY;
-          const elapsed = Date.now() - startTime;
-          if (elapsed > 700 || Math.abs(dx) < 65 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
-          const current = document.querySelector(".page.active");
-          const index = current ? pageOrder.indexOf(current.id) : -1;
-          if (index < 0) return;
-          const nextIndex = dx < 0 ? index + 1 : index - 1;
-          if (nextIndex >= 0 && nextIndex < pageOrder.length) navigate(pageOrder[nextIndex]);
-        }, {passive: true});
-        swipeArea.addEventListener("touchcancel", () => {tracking = false;}, {passive: true});
-      })();
       const now = new Date(); const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() + 6) % 7); monday.setHours(0, 0, 0, 0); const next = new Date(monday); next.setDate(next.getDate() + 7);
       $("#week-range").textContent = `${monday.toLocaleDateString("fr-FR", {day: "numeric", month: "short"})} – ${new Date(+next - 86400000).toLocaleDateString("fr-FR", {day: "numeric", month: "short"})}`;
-      const item = a => `<article class="activity-item"><button class="activity-open-button" type="button" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(a.name || "Course à pied")}"><div class="activity-info"><strong>${esc(a.name || "Course à pied")}</strong><p>${dateFmt(a.start_date)}${a.avg_hr ? ` · ${Math.round(Number(a.avg_hr))} bpm` : ""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2})} km<small>${formatDuration(Number(a.duration_min))} · ${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></button><button class="activity-delete-button" type="button" data-delete-activity="${esc(a.id)}" aria-label="Supprimer l’activité ${esc(a.name || "Course à pied")}" title="Supprimer l’activité"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-11 2 1 12h12l1-12M10 11v6M14 11v6"/></svg></button></article>`;
+      const item = a => {const name = activityDisplayName(a); return `<article class="activity-item"><button class="activity-open-button" type="button" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(name)}"><div class="activity-info"><strong>${esc(name)}</strong><p>${dateFmt(a.start_date)}${a.avg_hr ? ` · ${Math.round(Number(a.avg_hr))} bpm` : ""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2})} km<small>${formatDuration(Number(a.duration_min))} · ${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></button></article>`};
       function bestDistanceTime(targetKm) {
         let best = null;
         for (const activity of activities) {
@@ -5375,10 +5337,9 @@
       }
       const HR_CHART_START = "2026-10-19";
       const HR_CATEGORY_COLORS = {
-        "Endurance facile": "var(--accent)",
-        "Séance qualité": "var(--accent)",
+        "Endurance facile": "#8dbce8",
+        "Séance qualité": "#e59a9a",
         "Sortie longue": "#c4a1ff",
-        "Non planifiée": "#ffbd66"
       };
       function plannedCategoryForDate(day) {
         if (!day || !Array.isArray(planWeeks)) return "Non planifiée";
@@ -5392,6 +5353,30 @@
         }
         return "Non planifiée";
       }
+      function activityDisplayName(activity) {
+        const customName = String(activity.display_name_override || "").trim();
+        if (customName) return customName;
+        if (/\.gpx$/i.test(String(activity.import_file_name || "")) && /cooper/i.test(activity.import_file_name)) return "Test de Cooper";
+        const originalName = String(activity.name || "").trim();
+        const normalizedName = originalName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        if (/cooper|vma|course officielle|semi.?marathon|marathon/.test(normalizedName)) return originalName || "Course";
+        const activityDate = sessionActivityDate(activity);
+        const customSession = customSessions.find(session => session.date === activityDate);
+        const customType = String(customSession?.type || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        if (/cooper|test|course officielle|semi.?marathon|marathon/.test(customType)) return originalName || customSession.type;
+        if (/sortie longue|long run/.test(customType)) return "Sortie longue";
+        if (/qualite|fractionne|vma|seuil|tempo|interval/.test(customType)) return "Séance qualité";
+        if (/endurance|footing|facile/.test(customType)) return "Endurance fondamentale";
+        const plannedCategory = plannedCategoryForDate(activityDate);
+        if (plannedCategory === "Sortie longue") return plannedCategory;
+        if (plannedCategory === "Séance qualité") return plannedCategory;
+        if (plannedCategory === "Endurance facile") return "Endurance fondamentale";
+        if (/sortie longue|long run/.test(normalizedName)) return "Sortie longue";
+        if (/qualite|fractionne|vma|seuil|tempo|interval/.test(normalizedName)) return "Séance qualité";
+        if (Number(activity.distance_km) >= 10 || Number(activity.duration_min) >= 75) return "Sortie longue";
+        if (/endurance|footing|facile/.test(normalizedName)) return "Endurance fondamentale";
+        return "Endurance fondamentale";
+      }
       function activityAverageHR(a) {
         if (Number(a.avg_hr) > 0) return Number(a.avg_hr);
         const samples = (a.track_samples || []).map(s => Number(s.hr)).filter(v => Number.isFinite(v) && v > 0);
@@ -5403,14 +5388,21 @@
         const el = $("#hr-type-chart"); if (!el) return;
         const rows = activities.map(a => {
           const date = sessionActivityDate(a);
-          return {activity: a, date, hr: activityAverageHR(a), category: plannedCategoryForDate(date)};
+          const plannedCategory = plannedCategoryForDate(date);
+          const customSession = customSessions.find(session => session.date === date);
+          const type = String(customSession?.type || activityDisplayName(a)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+          const category = plannedCategory !== "Non planifiée" ? plannedCategory
+            : /sortie longue|long run/.test(type) ? "Sortie longue"
+            : /qualite|fractionne|vma|seuil|tempo|interval|cooper|test|course|marathon/.test(type) ? "Séance qualité"
+            : "Endurance facile";
+          return {activity: a, date, hr: activityAverageHR(a), category};
         }).filter(r => r.date >= HR_CHART_START && r.hr > 0)
           .sort((a, b) => a.date.localeCompare(b.date) || new Date(a.activity.start_date) - new Date(b.activity.start_date));
         if (!rows.length) {
           el.innerHTML = '<div class="chart-empty">Aucune FC moyenne disponible à partir du 19/10/2026. Importe des fichiers GPX ou CSV contenant la fréquence cardiaque.</div>';
           return;
         }
-        const W = Math.max(340, rows.length * 66 + 52), H = 230, L = 42, R = 18, T = 24, B = 48;
+        const W = Math.max(340, el.clientWidth || 340), H = 230, L = 42, R = 24, T = 24, B = 48;
         const iw = W - L - R, ih = H - T - B;
         const minHR = Math.min(...rows.map(r => r.hr)), maxHR = Math.max(...rows.map(r => r.hr));
         const lo = Math.max(40, Math.floor((minHR - 8) / 10) * 10), hi = Math.ceil((maxHR + 8) / 10) * 10;
@@ -5421,34 +5413,40 @@
           const y = T + i * ih / 3, value = hi - i * span / 3;
           return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)"/><text x="${L - 7}" y="${y + 3}" fill="var(--muted)" font-size="10" text-anchor="end">${Math.round(value)}</text>`;
         }).join("");
-        const points = rows.map((r, i) => `${xAt(i).toFixed(1)},${yAt(r.hr).toFixed(1)}`).join(" ");
+        const categories = ["Endurance facile", "Séance qualité", "Sortie longue"];
+        const rowIndexes = new Map(rows.map((row, index) => [row, index]));
+        const lines = categories.map(category => {
+          const categoryRows = rows.filter(row => row.category === category);
+          if (categoryRows.length < 2) return "";
+          const points = categoryRows.map(row => `${xAt(rowIndexes.get(row)).toFixed(1)},${yAt(row.hr).toFixed(1)}`).join(" ");
+          return `<polyline points="${points}" fill="none" stroke="${HR_CATEGORY_COLORS[category]}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+        }).join("");
+        const dateLabelStep = Math.max(1, Math.ceil(rows.length / Math.max(5, Math.floor(iw / 48))));
         const labels = rows.map((r, i) => {
+          if (i % dateLabelStep !== 0 && i !== rows.length - 1) return "";
           const x = xAt(i), label = r.date.slice(8, 10) + "/" + r.date.slice(5, 7);
           return `<text x="${x}" y="${H - 23}" fill="var(--muted)" font-size="9" text-anchor="middle" transform="rotate(-42 ${x} ${H - 23})">${label}</text>`;
         }).join("");
         const dots = rows.map((r, i) => {
-          const x = xAt(i), y = yAt(r.hr), color = HR_CATEGORY_COLORS[r.category] || HR_CATEGORY_COLORS["Non planifiée"];
-          const name = r.activity.name || "Course à pied";
-          const value = `${Math.round(r.hr)} bpm · ${r.category}`;
-          return `<circle class="hr-evolution-point" tabindex="0" role="button" aria-label="${esc(r.date + " · " + name + " · " + value)}" data-value="${esc(value)}" data-detail="${esc(r.date + " · " + name)}" data-x="${x.toFixed(1)}" data-y="${Math.max(15, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${color}" stroke="#10120f" stroke-width="1"><title>${esc(r.date + " · " + name + " · " + value)}</title></circle>`;
+          const x = xAt(i), y = yAt(r.hr), color = HR_CATEGORY_COLORS[r.category];
+          const name = activityDisplayName(r.activity);
+          const value = `${Math.round(r.hr)} bpm`;
+          return `<circle class="hr-evolution-point" tabindex="0" role="button" aria-label="${esc(r.date + " · " + name + " · " + value)}" data-value="${esc(value)}" data-x="${x.toFixed(1)}" data-y="${Math.max(15, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${color}" stroke="#10120f" stroke-width="1"><title>${esc(value)}</title></circle>`;
         }).join("");
         const usedCategories = [...new Set(rows.map(r => r.category))];
-        const legend = `<div class="hr-evolution-legend">${usedCategories.map(c => `<span><i style="background:${HR_CATEGORY_COLORS[c] || HR_CATEGORY_COLORS["Non planifiée"]}"></i>${esc(c)}</span>`).join("")}</div>`;
-        const areaPoints = rows.map((r, i) => `${xAt(i).toFixed(1)},${yAt(r.hr).toFixed(1)}`).join(" ");
-        const area = rows.length ? `${areaPoints} ${xAt(rows.length - 1).toFixed(1)},${(H - 39).toFixed(1)} ${xAt(0).toFixed(1)},${(H - 39).toFixed(1)}` : "";
-        el.innerHTML = `<div class="hr-evolution-scroll"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px" role="img" aria-label="Évolution chronologique de la fréquence cardiaque moyenne en battements par minute"><defs><linearGradient id="hr-evolution-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".32"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".015"/></linearGradient></defs>${grid}<polygon points="${area}" fill="url(#hr-evolution-area-gradient)" stroke="none"/><polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${labels}${dots}</svg></div>${legend}`;
+        const legend = `<div class="hr-evolution-legend">${usedCategories.map(c => `<span><i style="background:${HR_CATEGORY_COLORS[c]}"></i>${esc(c)}</span>`).join("")}</div>`;
+        el.innerHTML = `<div class="hr-evolution-scroll"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution de la fréquence cardiaque moyenne par type d’activité, en battements par minute">${grid}${lines}${labels}${dots}</svg></div>${legend}`;
         const svg = el.querySelector("svg");
         const clearTip = () => svg.querySelector(".hr-evolution-tooltip")?.remove();
         let tipTimer;
         const showTip = point => {
           clearTimeout(tipTimer); clearTip();
-          const x = Number(point.dataset.x), y = Number(point.dataset.y), value = point.dataset.value || "", detail = point.dataset.detail || "";
-          const text = `${detail} · ${value}`;
-          const width = Math.min(245, Math.max(90, text.length * 5.3 + 18));
+          const x = Number(point.dataset.x), y = Number(point.dataset.y), text = point.dataset.value || "";
+          const width = Math.max(48, text.length * 5.2 + 12);
           const tx = Math.max(width / 2 + 4, Math.min(W - width / 2 - 4, x));
           const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "hr-evolution-tooltip");
-          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); rect.setAttribute("class", "hr-evolution-tooltip-bg"); rect.setAttribute("x", tx - width / 2); rect.setAttribute("y", Math.max(1, y - 28)); rect.setAttribute("width", width); rect.setAttribute("height", 22); rect.setAttribute("rx", 4);
-          const txt = document.createElementNS("http://www.w3.org/2000/svg", "text"); txt.setAttribute("class", "hr-evolution-tooltip-text"); txt.setAttribute("x", tx); txt.setAttribute("y", Math.max(15, y - 13)); txt.setAttribute("text-anchor", "middle"); txt.textContent = text.length > 44 ? text.slice(0, 41) + "…" : text;
+          const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); rect.setAttribute("class", "hr-evolution-tooltip-bg"); rect.style.fill = "var(--panel2)"; rect.style.stroke = "var(--line)"; rect.setAttribute("x", tx - width / 2); rect.setAttribute("y", Math.max(1, y - 22)); rect.setAttribute("width", width); rect.setAttribute("height", 17); rect.setAttribute("rx", 4);
+          const txt = document.createElementNS("http://www.w3.org/2000/svg", "text"); txt.setAttribute("class", "hr-evolution-tooltip-text"); txt.style.fill = point.getAttribute("fill"); txt.setAttribute("x", tx); txt.setAttribute("y", Math.max(12, y - 10)); txt.setAttribute("text-anchor", "middle"); txt.textContent = text;
           g.append(rect, txt); svg.append(g); tipTimer = setTimeout(clearTip, 2400);
         };
         svg.querySelectorAll(".hr-evolution-point").forEach(point => {
@@ -5479,7 +5477,7 @@
           delta.textContent = "Données manquantes"; bar.style.width = "0%";
         } else {
           const diff = Math.round(estimate - targetSeconds), abs = Math.abs(diff), time = `${Math.floor(abs / 3600) ? Math.floor(abs / 3600) + " h " : ""}${Math.floor(abs % 3600 / 60)} min`;
-          note.textContent = `Estimation indicative calculée à partir de ${estimates.map(x => x.source).join(" et ")} avec une formule de projection. Le parcours, l’endurance et les conditions peuvent modifier le résultat.`;
+          note.textContent = "";
           delta.textContent = diff <= 0 ? `${time} d’avance estimée` : `${time} au-dessus de l’objectif`;
           bar.style.width = `${Math.max(0, Math.min(100, targetSeconds / estimate * 100))}%`;
         }
@@ -5548,14 +5546,14 @@
       }
       const detailTitle = $("#detail-title");
       const detailOriginalParent = $("#activity-detail").parentElement;
-      const closeActivityDetail = () => {const panel = $("#activity-detail"); panel.hidden = true; document.body.classList.remove("activity-detail-open"); if (detailOriginalParent && panel.parentElement !== detailOriginalParent) detailOriginalParent.append(panel); window.currentDetailActivityId = null;};
+      const closeActivityDetail = () => {stopPacePlayback(); const panel = $("#activity-detail"); panel.hidden = true; document.body.classList.remove("activity-detail-open"); if (detailOriginalParent && panel.parentElement !== detailOriginalParent) detailOriginalParent.append(panel); window.currentDetailActivityId = null;};
       detailTitle.addEventListener("click", e => {e.preventDefault(); e.stopPropagation(); closeActivityDetail();});
       detailTitle.addEventListener("touchend", e => {e.preventDefault(); closeActivityDetail();}, {passive: false});
       const feelingSlider = $("#activity-feeling");
       function feelingColor(value) {
-        if (value == null || value <= 3) return "#22c55e";
-        if (value <= 6) return "#eab308";
-        return "#ef4444";
+        if (value == null || value <= 3) return "#a9d8b8";
+        if (value <= 6) return "#e3d8a4";
+        return "#e3aaa8";
       }
       function updateFeelingDisplay(value) {
         const color = feelingColor(value);
@@ -5582,30 +5580,104 @@
         toast("Ressenti enregistré");
       });
       document.addEventListener("click", e => {
-        const deleteButton = e.target.closest("[data-delete-activity]");
-        if (deleteButton) {
+        const actionsToggle = e.target.closest("#detail-actions-toggle");
+        const actionsMenu = $("#detail-actions-menu");
+        if (actionsToggle) {
           e.preventDefault();
           e.stopPropagation();
-          const id = deleteButton.dataset.deleteActivity;
+          actionsMenu.hidden = !actionsMenu.hidden;
+          $("#detail-actions-choices").hidden = false;
+          $("#detail-rename-form").hidden = true;
+          actionsToggle.setAttribute("aria-expanded", String(!actionsMenu.hidden));
+          return;
+        }
+        if (e.target === actionsMenu || e.target.closest("[data-detail-cancel]")) {
+          e.preventDefault();
+          actionsMenu.hidden = true;
+          $("#detail-actions-toggle").setAttribute("aria-expanded", "false");
+          $("#detail-actions-toggle").focus();
+          return;
+        }
+        const menuAction = e.target.closest("[data-detail-action]");
+        if (menuAction) {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = window.currentDetailActivityId;
           const activity = activities.find(item => String(item.id) === String(id));
-          if (!activity || !confirm(`Supprimer définitivement l’activité « ${activity.name || "Course à pied"} » ?`)) return;
-          const remainingActivities = activities.filter(item => String(item.id) !== String(id));
-          try {
-            localStorage.setItem(KEY, JSON.stringify(remainingActivities));
-          } catch (error) {
-            console.error("Impossible de supprimer l’activité.", error);
-            toast("L’activité n’a pas pu être supprimée.");
+          if (!activity) return;
+          if (menuAction.dataset.detailAction === "rename") {
+            $("#detail-actions-choices").hidden = true;
+            $("#detail-rename-form").hidden = false;
+            $("#detail-rename-input").value = activityDisplayName(activity);
+            $("#detail-rename-input").focus();
             return;
           }
-          activities = remainingActivities;
-          render();
-          toast("Activité supprimée.");
-          return;
+          if (menuAction.dataset.detailAction === "delete") {
+            actionsMenu.hidden = true;
+            $("#detail-actions-toggle").setAttribute("aria-expanded", "false");
+            if (!confirm(`Supprimer définitivement l’activité « ${activityDisplayName(activity)} » ?`)) return;
+            const remainingActivities = activities.filter(item => String(item.id) !== String(id));
+            try {
+              localStorage.setItem(KEY, JSON.stringify(remainingActivities));
+            } catch (error) {
+              console.error("Impossible de supprimer l’activité.", error);
+              toast("L’activité n’a pas pu être supprimée.");
+              return;
+            }
+            activities = remainingActivities;
+            render();
+            toast("Activité supprimée.");
+            return;
+          }
         }
         const activityButton = e.target.closest(".activity-open-button[data-activity-id]");
         if (activityButton) openActivityDetail(activityButton.dataset.activityId);
       });
+      $("#detail-rename-form").addEventListener("submit", e => {
+        e.preventDefault();
+        const id = window.currentDetailActivityId;
+        const activity = activities.find(item => String(item.id) === String(id));
+        const input = $("#detail-rename-input");
+        const trimmedName = input.value.trim();
+        if (!activity) return;
+        if (!trimmedName) {
+          input.setCustomValidity("Le nom de l’activité ne peut pas être vide.");
+          input.reportValidity();
+          return;
+        }
+        input.setCustomValidity("");
+        const previousName = activity.display_name_override;
+        activity.display_name_override = trimmedName;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(activities));
+        } catch (error) {
+          activity.display_name_override = previousName;
+          console.error("Impossible d’enregistrer le nom de l’activité.", error);
+          toast("Le nouveau nom n’a pas pu être enregistré.");
+          return;
+        }
+        $("#detail-activity-name").textContent = trimmedName;
+        const listButton = [...document.querySelectorAll("#all-activities .activity-open-button[data-activity-id]")]
+          .find(button => String(button.dataset.activityId) === String(id));
+        if (listButton) {
+          const activityLabel = listButton.querySelector(".activity-info strong");
+          if (activityLabel) activityLabel.textContent = trimmedName;
+          listButton.setAttribute("aria-label", `Ouvrir le détail de ${trimmedName}`);
+        }
+        $("#detail-actions-menu").hidden = true;
+        $("#detail-actions-toggle").setAttribute("aria-expanded", "false");
+        $("#detail-actions-toggle").focus();
+        renderHrTypeChart();
+        toast("Nom de l’activité mis à jour.");
+      });
+      $("#detail-rename-input").addEventListener("input", e => e.currentTarget.setCustomValidity(""));
       document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && !$("#detail-actions-menu").hidden) {
+          $("#detail-actions-menu").hidden = true;
+          $("#detail-actions-toggle").setAttribute("aria-expanded", "false");
+          $("#detail-actions-toggle").focus();
+          return;
+        }
         if ((e.key === "Enter" || e.key === " ") && e.target.matches(".activity-open-button[data-activity-id]")) {e.preventDefault(); openActivityDetail(e.target.dataset.activityId)}
       });
       function formatDuration(min) {if (!(min > 0)) return "—"; const sec = Math.round(min * 60); return `${Math.floor(sec / 3600)}:${String(Math.floor(sec % 3600 / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`}
@@ -5648,22 +5720,23 @@
         render();
         toast("Records personnels mis à jour.");
       });
-      function chartSVG(values, label, suffix, color) {
+      function chartSVG(values, label) {
         const usable = values.filter(v => Number.isFinite(v.value));
         if (!usable.length) return '<div class="chart-empty">Pas assez de données GPS pour ce graphique. Importe un GPX contenant des points horodatés' + (label.includes("cardiaque") ? ' et des mesures de fréquence cardiaque.' : '.') + '</div>';
+        const plotColor = label.includes("cardiaque") ? "#e59a9a" : "#8dbce8";
         const W = 340, H = 190, L = 34, R = 8, T = 14, B = 30, innerW = W - L - R, innerH = H - T - B;
         const minV = Math.min(...usable.map(v => v.value)), maxV = Math.max(...usable.map(v => v.value));
         const lo = label.includes("cardiaque") ? Math.max(0, Math.floor((minV - 8) / 10) * 10) : Math.max(0, Math.floor((minV - 25) / 30) * 30);
         const hi = label.includes("cardiaque") ? Math.ceil((maxV + 8) / 10) * 10 : Math.ceil((maxV + 25) / 30) * 30;
         const span = Math.max(1, hi - lo), n = usable.length, slot = innerW / n, bw = Math.max(3, slot * .64);
         const axisLabel = val => label.includes("cardiaque") ? `${Math.round(val)}` : `${Math.floor(Math.round(val) / 60)}:${String(Math.round(val) % 60).padStart(2, "0")}`;
-        const grid = [0, 1, 2, 3].map(i => {const y = T + i * innerH / 3; const val = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${L - 5}" y="${y + 3}" fill="var(--muted)" font-size="9" text-anchor="end">${axisLabel(val)}</text>`}).join("");
+        const grid = [0, 1, 2, 3].map(i => {const y = T + i * innerH / 3; const val = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${L - 5}" y="${y + 3}" fill="var(--muted)" font-size="8" text-anchor="end">${axisLabel(val)}</text>`}).join("");
         const bars = usable.map((v, i) => {
           const x = L + i * slot + (slot - bw) / 2;
           const h = Math.max(1, (v.value - lo) / span * innerH);
           const y = T + innerH - h;
           const value = label.includes("cardiaque") ? `${Math.round(v.value)} bpm` : `${Math.floor(Math.round(v.value) / 60)}:${String(Math.round(v.value) % 60).padStart(2, "0")} /km`;
-          return `<rect class="chart-bar" tabindex="0" role="button" aria-label="${esc(`${v.km} km : ${value}`)}" data-value="${esc(value)}" data-x="${(x + bw / 2).toFixed(1)}" data-y="${Math.max(13, y - 7).toFixed(1)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${color}"><title>${v.km} km : ${value}</title></rect><text x="${(x + bw / 2).toFixed(1)}" y="${H - 9}" fill="var(--muted)" font-size="${n > 10 ? 7 : 9}" text-anchor="middle">${v.km}</text>`;
+          return `<rect class="chart-bar" tabindex="0" role="button" aria-label="${esc(`${v.km} km : ${value}`)}" data-value="${esc(value)}" data-x="${(x + bw / 2).toFixed(1)}" data-y="${Math.max(13, y - 7).toFixed(1)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${plotColor}" opacity=".78"><title>${v.km} km : ${value}</title></rect><text x="${(x + bw / 2).toFixed(1)}" y="${H - 9}" fill="var(--muted)" font-size="${n > 10 ? 7 : 8}" text-anchor="middle">${v.km}</text>`;
         }).join("");
         return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">${grid}${bars}</svg>`;
       }
@@ -5673,11 +5746,53 @@
         const show = bar => {
           clearTimeout(timer); clear(); const x = Number(bar.dataset.x), y = Math.max(13, Number(bar.dataset.y)), value = bar.dataset.value || "", width = Math.min(110, Math.max(48, value.length * 6.5 + 16)), tx = Math.max(width / 2 + 3, Math.min(337 - width / 2, x));
           const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "chart-value-tip");
-          const isPace = container.id === "detail-pace-chart";
-          const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "chart-value-bg"); r.style.fill = getComputedStyle(document.documentElement).getPropertyValue(isPace ? "--pace-color" : "--accent").trim(); r.setAttribute("x", tx - width / 2); r.setAttribute("y", Math.max(1, y - 22)); r.setAttribute("width", width); r.setAttribute("height", 19); r.setAttribute("rx", 4);
-          const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("class", "chart-value-label"); t.style.fill = isPace ? "#fff" : "var(--accent-foreground)"; t.setAttribute("x", tx); t.setAttribute("y", Math.max(14, y - 9)); t.setAttribute("text-anchor", "middle"); t.textContent = value; g.append(r, t); svg.append(g); timer = setTimeout(clear, 1600)
+          const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "chart-value-bg"); r.style.fill = "var(--panel)"; r.style.stroke = "var(--line)"; r.setAttribute("x", tx - width / 2); r.setAttribute("y", Math.max(1, y - 22)); r.setAttribute("width", width); r.setAttribute("height", 19); r.setAttribute("rx", 4);
+          const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("class", "chart-value-label"); t.style.fill = "var(--text)"; t.setAttribute("x", tx); t.setAttribute("y", Math.max(14, y - 9)); t.setAttribute("text-anchor", "middle"); t.textContent = value; g.append(r, t); svg.append(g); timer = setTimeout(clear, 1600)
         };
-        svg.querySelectorAll(".chart-bar, .chart-point").forEach(bar => {bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("mouseenter", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => {if (e.key === "Enter" || e.key === " ") {e.preventDefault(); show(bar)} })});
+        svg.querySelectorAll(".chart-bar, .chart-point").forEach(bar => {bar.addEventListener("pointerdown", () => show(bar)); bar.addEventListener("focus", () => show(bar)); bar.addEventListener("keydown", e => {if (e.key === "Enter" || e.key === " ") {e.preventDefault(); show(bar)} })});
+        const scrubHit = svg.querySelector(".chart-scrub-hit");
+        if (scrubHit) {
+          const points = [...svg.querySelectorAll(".chart-point")];
+          const cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          cursor.setAttribute("class", "chart-scrubber-cursor");
+          cursor.setAttribute("y1", scrubHit.getAttribute("y"));
+          cursor.setAttribute("y2", String(Number(scrubHit.getAttribute("y")) + Number(scrubHit.getAttribute("height"))));
+          cursor.setAttribute("stroke", "var(--muted)");
+          cursor.setAttribute("stroke-width", "1");
+          cursor.setAttribute("stroke-dasharray", "3 3");
+          cursor.style.pointerEvents = "none";
+          svg.append(cursor);
+          const update = event => {
+            const matrix = svg.getScreenCTM();
+            if (!matrix) return;
+            const svgPoint = svg.createSVGPoint();
+            svgPoint.x = event.clientX;
+            svgPoint.y = event.clientY;
+            const localX = svgPoint.matrixTransform(matrix.inverse()).x;
+            const point = points.reduce((nearest, candidate) =>
+              Math.abs(Number(candidate.dataset.x) - localX) < Math.abs(Number(nearest.dataset.x) - localX) ? candidate : nearest
+            );
+            if (!point) return;
+            cursor.setAttribute("x1", point.getAttribute("cx"));
+            cursor.setAttribute("x2", point.getAttribute("cx"));
+            point.classList.add("scrubber-active");
+            points.forEach(other => {if (other !== point) other.classList.remove("scrubber-active")});
+            show(point);
+          };
+          let dragging = false;
+          scrubHit.addEventListener("pointerdown", event => {
+            dragging = true;
+            scrubHit.setPointerCapture(event.pointerId);
+            update(event);
+          });
+          scrubHit.addEventListener("pointermove", event => {
+            if (dragging) update(event);
+          });
+          const stopDragging = () => { dragging = false; };
+          scrubHit.addEventListener("pointerup", stopDragging);
+          scrubHit.addEventListener("pointercancel", stopDragging);
+          update({clientX: svg.getBoundingClientRect().left, clientY: svg.getBoundingClientRect().top});
+        }
       }
       function preciseLineSVG(samples, metric) {
         const vals = samples.map(s => ({x: Number(s.distance_km), value: Number(metric === "hr" ? s.hr : s.pace_sec_km)})).filter(v => Number.isFinite(v.x) && Number.isFinite(v.value) && v.value > 0);
@@ -5689,15 +5804,17 @@
         const xAt = i => L + (vals.length < 2 ? 0 : i / (vals.length - 1) * iw);
         const yAt = v => T + (hi - v) / span * ih;
         const label = v => metric === "hr" ? `${Math.round(v)}` : `${Math.floor(Math.round(v) / 60)}:${String(Math.round(v) % 60).padStart(2, "0")}`;
-        const grid = [0, 1, 2, 3].map(i => {const y = T + i * ih / 3, v = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)"/><text x="${L - 7}" y="${y + 3}" fill="var(--muted)" font-size="10" text-anchor="end">${label(v)}</text>`}).join("");
-        const kmMarks = []; for (let km = Math.ceil(vals[0].x); km <= vals[vals.length - 1].x; km++) {const idx = vals.findIndex(v => v.x >= km); if (idx >= 0) {const x = xAt(idx); kmMarks.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${H - B}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${x}" y="${H - 10}" fill="var(--muted)" font-size="10" text-anchor="middle">${km} km</text>`)} }
+        const mean = vals.reduce((sum, v) => sum + v.value, 0) / vals.length;
+        const meanLabel = metric === "hr" ? `Moy. ${Math.round(mean)} bpm` : `Moy. ${label(mean)} /km`;
+        const grid = [0, 1, 2, 3].map(i => {const y = T + i * ih / 3, v = hi - i * span / 3; return `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)"/><text x="${L - 7}" y="${y + 3}" fill="var(--muted)" font-size="8" text-anchor="end">${label(v)}</text>`}).join("");
+        const kmMarks = []; for (let km = Math.ceil(vals[0].x); km <= vals[vals.length - 1].x; km++) {const idx = vals.findIndex(v => v.x >= km); if (idx >= 0) {const x = xAt(idx); kmMarks.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${H - B}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${x}" y="${H - 10}" fill="var(--muted)" font-size="8" text-anchor="middle">${km} km</text>`)} }
         const pts = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
-        const plotColor = metric === "pace" ? "var(--pace-color)" : "var(--accent)";
-        const dots = vals.map((v, i) => {const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${plotColor}" stroke="var(--panel)" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>`}).join("");
+        const plotColor = metric === "hr" ? "#e59a9a" : "#8dbce8";
+        const dots = vals.map((v, i) => {const value = metric === "hr" ? `${Math.round(v.value)} bpm` : `${label(v.value)} /km`; const x = xAt(i), y = yAt(v.value); return `<circle class="chart-point" tabindex="0" role="button" aria-label="${v.x.toFixed(2)} km : ${value}" data-value="${value}" data-distance="${v.x.toFixed(2)}" data-x="${x.toFixed(1)}" data-y="${Math.max(13, y - 4).toFixed(1)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${plotColor}" stroke="var(--panel)" stroke-width=".7"><title>${v.x.toFixed(2)} km · ${value}</title></circle>`}).join("");
         const areaPoints = vals.map((v, i) => `${xAt(i).toFixed(1)},${yAt(v.value).toFixed(1)}`).join(" ");
         const area = `${areaPoints} ${xAt(vals.length - 1).toFixed(1)},${(H - B).toFixed(1)} ${xAt(0).toFixed(1)},${(H - B).toFixed(1)}`;
         const gradientId = `detail-${metric}-area-gradient`;
-        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${plotColor}" stop-opacity=".32"/><stop offset="100%" stop-color="${plotColor}" stop-opacity=".015"/></linearGradient></defs>${grid}${kmMarks.join("")}<polygon points="${area}" fill="url(#${gradientId})" stroke="none"/><polyline points="${pts}" fill="none" stroke="${plotColor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg></div>`;
+        return `<div class="line-chart-scroll" aria-label="Graphique détaillé défilant horizontalement"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${metric === "hr" ? "Fréquence cardiaque" : "Allure"} GPS précise"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${plotColor}" stop-opacity=".1"/><stop offset="100%" stop-color="${plotColor}" stop-opacity="0"/></linearGradient></defs>${grid}${kmMarks.join("")}<polygon points="${area}" fill="url(#${gradientId})" stroke="none"/><polyline points="${pts}" fill="none" stroke="${plotColor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><line class="chart-average-line" x1="${L}" y1="${yAt(mean).toFixed(1)}" x2="${W - R}" y2="${yAt(mean).toFixed(1)}" stroke="${plotColor}" stroke-width="1.2" stroke-dasharray="4 3" opacity=".85" aria-label="${esc(meanLabel)}"/><text class="chart-average-label" x="${W - R - 2}" y="${H - B - 4}" fill="${plotColor}" font-size="8" font-weight="700" text-anchor="end" paint-order="stroke" stroke="var(--panel)" stroke-width="2">${esc(meanLabel)}</text>${dots}<rect class="chart-scrub-hit" x="${L}" y="${T}" width="${iw}" height="${ih}" fill="transparent" style="cursor:ew-resize;touch-action:pan-y"/></svg></div>`;
       }
       document.querySelectorAll(".chart-mode-toggle").forEach(button => button.addEventListener("click", () => {
         // Toujours utiliser l'identifiant de l'activité ouverte : plusieurs activités
@@ -5707,7 +5824,7 @@
         const metric = button.dataset.chart, target = $(metric === "hr" ? "#detail-hr-chart" : "#detail-pace-chart");
         if (target.dataset.mode === "precise") {
           target.dataset.mode = "km";
-          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({km: s.km, value: s.avg_hr})), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({km: s.km, value: s.pace_sec})), "Allure par kilomètre", " s/km", "var(--pace-color)");
+          target.innerHTML = metric === "hr" ? chartSVG((activity.km_splits || []).filter(s => s.avg_hr).map(s => ({km: s.km, value: s.avg_hr})), "Fréquence cardiaque par kilomètre") : chartSVG((activity.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({km: s.km, value: s.pace_sec})), "Allure par kilomètre");
           attachChartInteractions(target); button.textContent = "Détails";
         } else {
           target.dataset.mode = "precise";
@@ -5747,6 +5864,11 @@
         return Math.round(detected);
       }
       function formatPaceSeconds(seconds) {const value = Math.round(seconds); return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, "0")}/km`;}
+      function activityElevationGain(activity) {
+        const value = activity.elevation_gain_m ?? activity.total_elevation_gain ?? activity.total_elevation_gain_m ?? activity.elevation_gain ?? activity["total elevation gain"] ?? activity["elevation gain"];
+        const elevation = typeof value === "string" ? Number(value.replace(",", ".")) : Number(value);
+        return value !== undefined && value !== null && value !== "" && Number.isFinite(elevation) && elevation >= 0 ? elevation : null;
+      }
       function renderActivityZones(activity) {
         const samples = activity.track_samples || [];
         const heartRates = samples.map(sample => Number(sample.hr)).filter(value => Number.isFinite(value) && value > 0 && value <= 250);
@@ -5777,9 +5899,9 @@
       const MAP_STYLE_KEY = "moapp-run-map-style-v1";
       const MAP_TILE_STYLES = {
         osm: {url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19},
-        voyager: {url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Sources: Esri, HERE, Garmin, OpenStreetMap contributors', maxZoom: 19},
-        light: {url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a>', maxZoom: 16},
-        dark: {url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; darkened for MoApp Run', maxZoom: 19, className: "moapp-dark-map-tiles"},
+        voyager: {url: "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20},
+        light: {url: "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20},
+        dark: {url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19, className: "moapp-dark-map-tiles"},
         topo: {url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)', subdomains: "abc", maxZoom: 17}
       };
       function getMapStyle() {
@@ -5792,6 +5914,17 @@
       window.addSelectedMapTiles = addSelectedMapTiles;
       let paceLeafletMap = null;
       let paceMapTileLayer = null;
+      let pacePlaybackFrame = 0;
+      let pacePlaybackStartTimeout = 0;
+      let pacePlaybackCleanup = () => {};
+      function stopPacePlayback() {
+        if (pacePlaybackFrame) cancelAnimationFrame(pacePlaybackFrame);
+        if (pacePlaybackStartTimeout) clearTimeout(pacePlaybackStartTimeout);
+        pacePlaybackFrame = 0;
+        pacePlaybackStartTimeout = 0;
+        pacePlaybackCleanup();
+        pacePlaybackCleanup = () => {};
+      }
       const mapStyleSelect = $("#map-style-select"), mapStyleStatus = $("#map-style-status");
       if (mapStyleSelect) {
         mapStyleSelect.value = getMapStyle();
@@ -5808,6 +5941,8 @@
       }
       function renderPaceMap(activity) {
         const target = $("#detail-pace-map");
+        stopPacePlayback();
+        $("#pace-map-playback").hidden = true;
         if (paceLeafletMap) {
           paceLeafletMap.remove();
           paceLeafletMap = null;
@@ -5838,24 +5973,156 @@
         const paces = samples.map(s => Number(s.pace_sec_km)).sort((a, b) => a - b);
         const fast = paces[Math.floor((paces.length - 1) * .05)];
         const slow = paces[Math.floor((paces.length - 1) * .95)];
-        const stops = [[34, 197, 94], [163, 214, 79], [234, 179, 8], [245, 158, 11], [239, 68, 68]];
+        const accentHex = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+        const accentMatch = /^#([\da-f]{3}|[\da-f]{6})$/i.exec(accentHex);
+        const accentRgb = accentMatch
+          ? (accentMatch[1].length === 3 ? [...accentMatch[1]].map(char => parseInt(char + char, 16)) : [0, 2, 4].map(index => parseInt(accentMatch[1].slice(index, index + 2), 16)))
+          : [197, 243, 106];
         const color = value => {
-          const t = Math.max(0, Math.min(1, (value - fast) / Math.max(.001, slow - fast))) * (stops.length - 1);
-          const i = Math.min(stops.length - 2, Math.floor(t)), f = t - i;
-          const c = stops[i].map((n, j) => Math.round(n + (stops[i + 1][j] - n) * f));
-          return `rgb(${c[0]},${c[1]},${c[2]})`;
+          const paceRatio = Math.max(0, Math.min(1, (value - fast) / Math.max(.001, slow - fast)));
+          const intensity = 1 - paceRatio;
+          const channels = accentRgb.map(channel => Math.round(channel * intensity));
+          return `rgb(${channels[0]} ${channels[1]} ${channels[2]})`;
         };
-        paceLeafletMap = L.map(target, {zoomControl: false, scrollWheelZoom: false, attributionControl: true});
+        paceLeafletMap = L.map(target, {zoomControl: false, scrollWheelZoom: false, attributionControl: true, preferCanvas: true});
         paceMapTileLayer = addSelectedMapTiles(paceLeafletMap);
         const latLngs = samples.map(s => [Number(s.lat), Number(s.lon)]);
-        for (let i = 1; i < samples.length; i++) {
-          const avgPace = (Number(samples[i - 1].pace_sec_km) + Number(samples[i].pace_sec_km)) / 2;
-          L.polyline([latLngs[i - 1], latLngs[i]], {
-            color: color(avgPace), weight: 5, opacity: .95, lineCap: 'round', lineJoin: 'round'
-          }).addTo(paceLeafletMap);
+        const recordedTimes = samples.map(sample => Number(sample.elapsed_sec));
+        const hasRecordedTimes = recordedTimes.every((time, index) =>
+          Number.isFinite(time) && time >= 0 && (index === 0 || time > recordedTimes[index - 1])
+        );
+        const playbackTimes = hasRecordedTimes ? recordedTimes.map(time => time - recordedTimes[0]) : [0];
+        if (!hasRecordedTimes) {
+          for (let i = 1; i < samples.length; i++) {
+            const distance = Math.max(.001, Number(samples[i].distance_km) - Number(samples[i - 1].distance_km));
+            const pace = (Number(samples[i].pace_sec_km) + Number(samples[i - 1].pace_sec_km)) / 2;
+            playbackTimes.push(playbackTimes[i - 1] + (Number.isFinite(pace) && pace > 0 ? distance * pace : 0));
+          }
         }
+        const playbackDuration = playbackTimes[playbackTimes.length - 1];
         L.circleMarker(latLngs[0], {radius: 5, color: '#16a34a', weight: 2, fillColor: '#fff', fillOpacity: 1}).bindTooltip('Départ').addTo(paceLeafletMap);
         L.circleMarker(latLngs[latLngs.length - 1], {radius: 5, color: '#ef4444', weight: 2, fillColor: '#fff', fillOpacity: 1}).bindTooltip('Arrivée').addTo(paceLeafletMap);
+        if (Number.isFinite(playbackDuration) && playbackDuration > 0) {
+          const progressLines = [];
+          for (let i = 1; i < samples.length; i++) {
+            const avgPace = (Number(samples[i - 1].pace_sec_km) + Number(samples[i].pace_sec_km)) / 2;
+            progressLines.push(L.polyline([], {color: color(avgPace), weight: 5, opacity: .98, lineCap: 'round', lineJoin: 'round'}).addTo(paceLeafletMap));
+          }
+          const movingMarker = L.circleMarker(latLngs[0], {radius: 7, color: '#fff', weight: 2, fillColor: '#20261d', fillOpacity: 1, opacity: .95}).addTo(paceLeafletMap);
+          const playback = $("#pace-map-playback"), playButton = $("#pace-map-play-button");
+          const timeReadout = $("#pace-map-playback-time"), paceReadout = $("#pace-map-playback-pace");
+          const playbackReadout = $("#pace-map-playback-readout");
+          const formatPlaybackTime = seconds => {
+            const total = Math.floor(Math.max(0, seconds));
+            return total >= 3600
+              ? `${Math.floor(total / 3600)}:${String(Math.floor(total % 3600 / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`
+              : `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+          };
+          const setPlayState = (playing, finished = false) => {
+            playButton.setAttribute("aria-label", playing ? "Mettre en pause l’animation du parcours" : finished ? "Rejouer l’animation du parcours" : "Lire l’animation du parcours");
+            playButton.title = playing ? "Mettre en pause" : finished ? "Rejouer" : "Lire l’animation";
+            playButton.innerHTML = playing
+              ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM14 5h4v14h-4z" /></svg>'
+              : finished
+                ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-4.9 6H5.05A7 7 0 1 0 12 5z" /></svg>'
+                : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>';
+          };
+          const updateAt = elapsed => {
+            let low = 0, high = playbackTimes.length - 1;
+            while (low < high) {
+              const mid = Math.floor((low + high + 1) / 2);
+              if (playbackTimes[mid] <= elapsed) low = mid;
+              else high = mid - 1;
+            }
+            const index = Math.min(low, playbackTimes.length - 2);
+            const startTime = playbackTimes[index], endTime = playbackTimes[index + 1];
+            const fraction = endTime > startTime ? Math.max(0, Math.min(1, (elapsed - startTime) / (endTime - startTime))) : 1;
+            if (index < lastProgressSegment) {
+              progressLines.forEach(line => line.setLatLngs([]));
+              lastProgressSegment = -1;
+            }
+            for (let segment = Math.max(0, lastProgressSegment); segment < index; segment++) {
+              progressLines[segment].setLatLngs([latLngs[segment], latLngs[segment + 1]]);
+            }
+            lastProgressSegment = Math.max(lastProgressSegment, index);
+            progressLines[index].setLatLngs([latLngs[index], [
+              Number(samples[index].lat) + (Number(samples[index + 1].lat) - Number(samples[index].lat)) * fraction,
+              Number(samples[index].lon) + (Number(samples[index + 1].lon) - Number(samples[index].lon)) * fraction
+            ]]);
+            const position = [
+              Number(samples[index].lat) + (Number(samples[index + 1].lat) - Number(samples[index].lat)) * fraction,
+              Number(samples[index].lon) + (Number(samples[index + 1].lon) - Number(samples[index].lon)) * fraction
+            ];
+            movingMarker.setLatLng(position);
+            movingMarker.setStyle({fillColor: color((Number(samples[index].pace_sec_km) + Number(samples[index + 1].pace_sec_km)) / 2)});
+            paceReadout.textContent = `${formatPaceSeconds(Number(samples[index].pace_sec_km)).replace("/km", "")} /km`;
+          };
+          let startedAt = 0, elapsedBeforePause = 0, lastShownSecond = -1, lastProgressSegment = -1;
+          const playbackRate = Math.max(1, playbackDuration / 20);
+          let playbackSpeed = 1;
+          const tick = now => {
+            if (!startedAt) startedAt = now;
+            const elapsed = Math.min(playbackDuration, elapsedBeforePause + (now - startedAt) / 1000 * playbackRate * playbackSpeed);
+            updateAt(elapsed);
+            if (Math.floor(elapsed) !== lastShownSecond) {
+              timeReadout.textContent = formatPlaybackTime(elapsed);
+              lastShownSecond = Math.floor(elapsed);
+            }
+            if (elapsed >= playbackDuration) {
+              elapsedBeforePause = playbackDuration;
+              pacePlaybackFrame = 0;
+              setPlayState(false, true);
+              return;
+            }
+            pacePlaybackFrame = requestAnimationFrame(tick);
+          };
+          const handlePlaybackClick = () => {
+            if (pacePlaybackStartTimeout) {
+              clearTimeout(pacePlaybackStartTimeout);
+              pacePlaybackStartTimeout = 0;
+            }
+            if (pacePlaybackFrame) {
+              cancelAnimationFrame(pacePlaybackFrame);
+              pacePlaybackFrame = 0;
+              elapsedBeforePause = Math.min(playbackDuration, elapsedBeforePause + (performance.now() - startedAt) / 1000 * playbackRate * playbackSpeed);
+              startedAt = 0;
+              setPlayState(false);
+            } else {
+              if (elapsedBeforePause >= playbackDuration) {
+                elapsedBeforePause = 0;
+                lastShownSecond = -1;
+                updateAt(0);
+              }
+              setPlayState(true);
+              startedAt = performance.now();
+              pacePlaybackFrame = requestAnimationFrame(tick);
+            }
+          };
+          playButton.addEventListener("click", handlePlaybackClick);
+          const handleSpeedChange = () => {
+            if (pacePlaybackFrame) {
+              elapsedBeforePause = Math.min(playbackDuration, elapsedBeforePause + (performance.now() - startedAt) / 1000 * playbackRate * playbackSpeed);
+              startedAt = performance.now();
+            }
+            playbackSpeed = playbackSpeed === 1 ? 2 : playbackSpeed === 2 ? 3 : 1;
+            playbackReadout.setAttribute("aria-label", `Vitesse d’animation x${playbackSpeed}, appuyer pour changer`);
+          };
+          playbackReadout.setAttribute("aria-label", "Vitesse d’animation x1, appuyer pour changer");
+          playbackReadout.addEventListener("click", handleSpeedChange);
+          updateAt(0);
+          setPlayState(false);
+          playback.hidden = false;
+          pacePlaybackCleanup = () => {
+            playback.hidden = true;
+            playButton.removeEventListener("click", handlePlaybackClick);
+            playbackReadout.removeEventListener("click", handleSpeedChange);
+          };
+          const activityMap = paceLeafletMap;
+          pacePlaybackStartTimeout = setTimeout(() => {
+            pacePlaybackStartTimeout = 0;
+            if (paceLeafletMap === activityMap && !playback.hidden) handlePlaybackClick();
+          }, 180);
+        }
         const routeBounds = L.latLngBounds(latLngs);
         paceLeafletMap.fitBounds(routeBounds, {padding: [32, 32], maxZoom: 15});
         setTimeout(() => {
@@ -5876,13 +6143,16 @@
         const activityCard = [...document.querySelectorAll("#all-activities [data-activity-id]")].find(el => String(el.dataset.activityId) === String(a.id));
         document.body.append(detailPanel);
         detailPanel.hidden = false; document.body.classList.add("activity-detail-open");
-        const activityName = a.name || "Course à pied";
+        const activityName = activityDisplayName(a);
         $("#detail-title").dataset.activityName = activityName;
         $("#detail-activity-name").textContent = activityName;
         $("#detail-meta").textContent = `${dateFmt(a.start_date)} · ${a.source_label || "Import manuel"}`;
         $("#detail-distance").textContent = Number(a.distance_km).toLocaleString("fr-FR", {maximumFractionDigits: 2}) + " km";
         $("#detail-duration").textContent = formatDuration(Number(a.duration_min));
         $("#detail-pace").textContent = pace(Number(a.distance_km), Number(a.duration_min)) + "/km";
+        const elevationGain = activityElevationGain(a);
+        $("#detail-elevation-gain").textContent = elevationGain == null ? "" : `${Math.round(elevationGain)} m`;
+        $("#detail-elevation-gain").closest(".stat-card").hidden = elevationGain == null;
         const isCooperFile = /cooper|vma/i.test(String(a.import_file_name || ""));
         // La détection se fait exclusivement sur le nom du fichier importé (pas le titre
         // de la trace, pas le nom affiché et pas la séance prévue à cette date).
@@ -5901,12 +6171,11 @@
         $("#detail-avg-hr").textContent = a.avg_hr ? `${Math.round(a.avg_hr)} bpm` : "—";
         $("#detail-hr-chart").dataset.mode = "km";
         $("#detail-pace-chart").dataset.mode = "km";
-        $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({km: s.km, value: s.avg_hr})), "Fréquence cardiaque par kilomètre", " bpm", "var(--accent)");
-        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({km: s.km, value: s.pace_sec})), "Allure par kilomètre", " s/km", "var(--pace-color)");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
+        $("#detail-hr-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.avg_hr).map(s => ({km: s.km, value: s.avg_hr})), "Fréquence cardiaque par kilomètre");
+        $("#detail-pace-chart").innerHTML = chartSVG((a.km_splits || []).filter(s => s.pace_sec > 0).map(s => ({km: s.km, value: s.pace_sec})), "Allure par kilomètre");[$("#detail-hr-chart"), $("#detail-pace-chart")].forEach(attachChartInteractions);
         const hasHr = Number(a.max_hr) > 0 || Number(a.avg_hr) > 0 || (a.km_splits || []).some(s => Number(s.avg_hr) > 0) || (a.track_samples || []).some(s => Number(s.hr) > 0);
-        $(".detail-hr-stats").hidden = !hasHr;
-        $("#detail-hr-chart").closest(".chart-panel").hidden = !hasHr;
-        $("#detail-hr-zones").closest(".chart-panel").hidden = !hasHr;
+        $("#detail-hr-section").hidden = !hasHr;
+        document.querySelectorAll("#activity-detail .hr-metric").forEach(card => {card.hidden = !hasHr;});
         document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Détails");
         renderActivityZones(a);
         renderPaceMap(a);
@@ -5951,8 +6220,10 @@
         let duration = Number(String(r.duration_min ?? r.moving_time ?? r.elapsed_time ?? r.moving_time_seconds ?? "").replace(",", "."));
         if (r.moving_time !== undefined || r.elapsed_time !== undefined || r.moving_time_seconds !== undefined) duration /= 60;
         const hr = r.average_heartrate ?? r.avg_hr ?? r.average_heart_rate;
+        const maxHr = r.max_heartrate ?? r.max_hr ?? r.max_heart_rate;
+        const elevationGain = r.total_elevation_gain ?? r.total_elevation_gain_m ?? r.elevation_gain_m ?? r.elevation_gain ?? r["total elevation gain"] ?? r["elevation gain"];
         const name = r.name || r.activity_name || "Course à pied";
-        return {id: r.id || r.activity_id || `import-${Date.now()}-${i}`, source_id: r.id || r.activity_id || null, source_label: "Import CSV", name, is_cooper_test: /cooper|vma/i.test(name), start_date: normalizeDate(r), distance_km: km, duration_min: duration, avg_hr: hr ? Number(hr) : null, notes: ""};
+        return {id: r.id || r.activity_id || `import-${Date.now()}-${i}`, source_id: r.id || r.activity_id || null, source_label: "Import CSV", name, is_cooper_test: /cooper|vma/i.test(name), start_date: normalizeDate(r), distance_km: km, duration_min: duration, avg_hr: hr ? Number(hr) : null, max_hr: maxHr ? Number(maxHr) : null, elevation_gain_m: elevationGain !== undefined && elevationGain !== "" ? Number(String(elevationGain).replace(",", ".")) : null, notes: ""};
       }
       function parseGPX(text, fileName, index) {
         const doc = new DOMParser().parseFromString(text, "application/xml");
@@ -5963,9 +6234,10 @@
         const parsed = points.map(p => {
           const lat = Number(p.getAttribute("lat")), lon = Number(p.getAttribute("lon"));
           const t = getChild(p, "time")?.textContent?.trim();
+          const elevationText = getChild(p, "ele")?.textContent?.trim();
           const hrNode = [...p.getElementsByTagNameNS("*", "hr")][0];
           const time = t ? new Date(t) : null;
-          return {lat, lon, time: time && !Number.isNaN(+time) ? time : null, hr: hrNode ? Number(hrNode.textContent) : null};
+          return {lat, lon, time: time && !Number.isNaN(+time) ? time : null, hr: hrNode ? Number(hrNode.textContent) : null, elevation: elevationText ? Number(elevationText) : null};
         }).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
         if (parsed.length < 2) throw Error(`Pas assez de points GPS dans ${fileName}.`);
         const rad = x => x * Math.PI / 180, segments = [];
@@ -5981,6 +6253,14 @@
         if (times.length < 2) throw Error(`Aucun horodatage GPS exploitable dans ${fileName}.`);
         const duration = (times[times.length - 1] - times[0]) / 60000;
         if (!(duration > 0)) throw Error(`Durée invalide dans ${fileName}.`);
+        let elevationGain = 0;
+        let hasElevation = false;
+        for (const seg of segments) {
+          if (Number.isFinite(seg.from.elevation) && Number.isFinite(seg.to.elevation)) {
+            elevationGain += Math.max(0, seg.to.elevation - seg.from.elevation);
+            hasElevation = true;
+          }
+        }
         // Create a precise track sample approximately every 100 m from the original GPS track.
         // Interpolate elapsed time and heart rate at each distance mark, then derive pace over each 100 m interval.
         const rawSamples = []; let cumulativeMeters = 0, elapsedSeconds = 0, nextMark = 100;
@@ -5997,7 +6277,7 @@
         }
         const trackSamples = rawSamples.slice(1).map((sample, i) => {
           const prev = rawSamples[i];
-          return {distance_km: sample.distance_km, pace_sec_km: sample.elapsed_sec > prev.elapsed_sec ? (sample.elapsed_sec - prev.elapsed_sec) * 10 : null, hr: sample.hr, lat: sample.lat, lon: sample.lon};
+          return {distance_km: sample.distance_km, elapsed_sec: sample.elapsed_sec, pace_sec_km: sample.elapsed_sec > prev.elapsed_sec ? (sample.elapsed_sec - prev.elapsed_sec) * 10 : null, hr: sample.hr, lat: sample.lat, lon: sample.lon};
         }).filter(sample => Number.isFinite(sample.pace_sec_km) && sample.pace_sec_km > 0 && sample.pace_sec_km < 1800 || Number.isFinite(sample.hr));
         // Split each GPS segment at exact kilometre boundaries, interpolating elapsed time and heart rate.
         const splits = []; let kmBucket = 0, timeBucket = 0, hrSum = 0, hrCount = 0, hrMax = 0, covered = 0;
@@ -6030,7 +6310,7 @@
         return {
           id: `gpx-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 7)}`,
           source_label: "Import GPX",
-          name: trkName || fileName.replace(/\.gpx$/i, "") || "Course à pied",
+          name: /cooper/i.test(fileName) ? "Test de Cooper" : trkName || fileName.replace(/\.gpx$/i, "") || "Course à pied",
           import_file_name: fileName,
           is_cooper_test: /cooper|vma/i.test(fileName),
           start_date: new Date(start.getTime() - start.getTimezoneOffset() * 60000).toISOString().slice(0, 16),
@@ -6038,6 +6318,7 @@
           duration_min: Math.round(duration * 100) / 100,
           avg_hr: avgHRs.length ? Math.round(avgHRs.reduce((a, b) => a + b, 0) / avgHRs.length) : null,
           max_hr: hrMax || null,
+          elevation_gain_m: hasElevation ? Math.round(elevationGain) : null,
           track_samples: trackSamples,
           km_splits: splits,
           notes: "Distance recalculée à partir des points GPS du GPX."
@@ -6075,7 +6356,7 @@
       $("#activity-add").addEventListener("click", () => $("#file-import").click());
       $("#page-reload")?.addEventListener("click", () => window.location.reload());
       function activityExportRows() {
-        return activities.map(a => ({...a, feeling_10: feelings[String(a.id)] ?? "", feeling_note: feelingNotes[String(a.id)] || "", pace_min_km: Number(a.distance_km) > 0 ? (Number(a.duration_min) / Number(a.distance_km)).toFixed(3) : "", date_iso: a.start_date || ""}));
+        return activities.map(a => ({...a, name: activityDisplayName(a), feeling_10: feelings[String(a.id)] ?? "", feeling_note: feelingNotes[String(a.id)] || "", pace_min_km: Number(a.distance_km) > 0 ? (Number(a.duration_min) / Number(a.distance_km)).toFixed(3) : "", date_iso: a.start_date || ""}));
       }
       function csvCell(value) {const v = value == null ? "" : typeof value === "object" ? JSON.stringify(value) : String(value); return `"${v.replace(/"/g, '""')}"`;}
       $("#export-csv").addEventListener("click", () => {
@@ -6249,9 +6530,8 @@
         [...weekCard.querySelectorAll(".plan-workout")]
           .sort((a, b) => getWorkoutDate(a).localeCompare(getWorkoutDate(b)))
           .forEach(workout => weekCard.insertBefore(workout, addSessionButton));
-        $("#plan-week-counter").textContent = `Semaine ${i + 1} / ${planWeeks.length}`;
-        $("#plan-week-dates").textContent = `${fmtPlan(monday)} – ${fmtPlan(sunday)}`;
-        $("#plan-week-prev").disabled = i === 0; $("#plan-week-next").disabled = i === planWeeks.length - 1;
+        $("#plan-header-prev").disabled = i === 0;
+        $("#plan-header-next").disabled = i === planWeeks.length - 1;
         calendar.querySelectorAll("[data-toggle-session]").forEach(input => input.addEventListener("change", () => {
           const key = input.dataset.toggleSession;
           if (input.checked) disabledSessions.delete(key); else disabledSessions.add(key);
@@ -6289,8 +6569,8 @@
         }));
       }
       function setupPlanWeekSwipe() {
-        $("#plan-week-prev")?.addEventListener("click", () => {currentPlanWeek = Math.max(0, currentPlanWeek - 1); renderPlan()});
-        $("#plan-week-next")?.addEventListener("click", () => {currentPlanWeek = Math.min(planWeeks.length - 1, currentPlanWeek + 1); renderPlan()});
+        $("#plan-header-prev")?.addEventListener("click", () => {currentPlanWeek = Math.max(0, currentPlanWeek - 1); renderPlan()});
+        $("#plan-header-next")?.addEventListener("click", () => {currentPlanWeek = Math.min(planWeeks.length - 1, currentPlanWeek + 1); renderPlan()});
         const el = $("#plan-calendar"); if (!el) return; let sx = null, sy = null;
         el.addEventListener("touchstart", e => {if (!e.touches.length) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY}, {passive: true});
         el.addEventListener("touchend", e => {if (sx === null || !e.changedTouches.length) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {currentPlanWeek = Math.max(0, Math.min(planWeeks.length - 1, currentPlanWeek + (dx < 0 ? 1 : -1))); renderPlan()} sx = sy = null}, {passive: true});
@@ -6500,12 +6780,154 @@
         document.getElementById('goal-km-paces').innerHTML = Array.from({length: 22}, (_, i) => {const km = i + 1, sec = base + (km >= 16 ? 4 : km <= 3 ? 2 : 0); const p = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); return `<div class="goal-km-row"><span>Km ${km === 22 ? '21,1' : km}</span><strong>${p}/km</strong></div>`}).join('');
         document.getElementById('goal-detail-time').textContent = (document.getElementById('goal-time-display')?.textContent || '1h55').replace(/\s+/g, '');
       }
-      let map = null;
-      function show() {
-        overlay.hidden = false; document.body.classList.add('goal-detail-open'); document.body.style.overflow = 'hidden'; renderPaces(); drawProfile();
-        if (window.L && !map) {map = L.map('goal-route-map', {zoomControl: false, scrollWheelZoom: false, dragging: true}); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map); window.addEventListener('moapp-map-style-change', () => {if (map) {if (window.__moappGoalRouteTileLayer) map.removeLayer(window.__moappGoalRouteTileLayer); window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map);} }); const line = L.polyline(coords, {color: '#ef4444', weight: 4}).addTo(map); L.circleMarker(coords[0], {radius: 5, color: '#c5f36a'}).addTo(map); L.circleMarker(coords[coords.length - 1], {radius: 5, color: '#ef4444'}).addTo(map); map.fitBounds(line.getBounds(), {padding: [16, 16]}); setTimeout(() => map.invalidateSize(), 100);}
+      let map = null, routeLine = null, routeMarker = null, playbackFrame = 0, playbackPlaying = false, playbackElapsed = 0, playbackStartedAt = 0, playbackSpeed = 1, playbackDuration = 0;
+      const playback = document.getElementById('goal-route-playback');
+      const playButton = document.getElementById('goal-route-play-button');
+      const playbackReadout = document.getElementById('goal-route-playback-readout');
+      const routeDistances = [0];
+      for (let i = 1; i < coords.length; i++) {
+        const a = coords[i - 1], b = coords[i], r = Math.PI / 180;
+        const dlat = (b[0] - a[0]) * r, dlon = (b[1] - a[1]) * r;
+        const q = Math.sin(dlat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dlon / 2) ** 2;
+        routeDistances.push(routeDistances[i - 1] + 6371000 * 2 * Math.atan2(Math.sqrt(q), Math.sqrt(1 - q)));
       }
-      function hide() {overlay.hidden = true; document.body.classList.remove('goal-detail-open'); document.body.style.overflow = '';}
+      const playbackPaceAt = km => {
+        const raw = paceText().split(':').map(Number);
+        const base = (raw[0] || 5) * 60 + (raw[1] || 27);
+        return base + (km >= 16 ? 4 : km <= 3 ? 2 : 0);
+      };
+      const playbackTimes = [0];
+      for (let i = 1; i < routeDistances.length; i++) {
+        const km = (routeDistances[i] + routeDistances[i - 1]) / 2000;
+        playbackTimes.push(playbackTimes[i - 1] + (routeDistances[i] - routeDistances[i - 1]) / 1000 * playbackPaceAt(km));
+      }
+      playbackDuration = playbackTimes[playbackTimes.length - 1];
+      function formatGoalPlaybackTime(seconds) {
+        const total = Math.floor(seconds);
+        const hours = Math.floor(total / 3600);
+        const minutes = Math.floor(total % 3600 / 60);
+        const remaining = total % 60;
+        return hours ? `${hours}:${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}` : `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
+      }
+      function renderGoalPlayback(elapsed) {
+        let low = 0, high = playbackTimes.length - 1;
+        while (low < high) {
+          const middle = Math.floor((low + high) / 2);
+          if (playbackTimes[middle] < elapsed) low = middle + 1;
+          else high = middle;
+        }
+        const index = Math.max(0, Math.min(playbackTimes.length - 2, low - 1));
+        const segmentDuration = playbackTimes[index + 1] - playbackTimes[index];
+        const ratio = segmentDuration > 0 ? Math.max(0, Math.min(1, (elapsed - playbackTimes[index]) / segmentDuration)) : 0;
+        const position = L.latLng(
+          coords[index][0] + (coords[index + 1][0] - coords[index][0]) * ratio,
+          coords[index][1] + (coords[index + 1][1] - coords[index][1]) * ratio
+        );
+        const distance = routeDistances[index] + (routeDistances[index + 1] - routeDistances[index]) * ratio;
+        routeLine.setLatLngs(coords.slice(0, index + 1).concat([[position.lat, position.lng]]));
+        routeMarker.setLatLng(position);
+        const pace = playbackPaceAt(distance / 1000);
+        playbackReadout.querySelector('#goal-route-playback-time').textContent = formatGoalPlaybackTime(elapsed);
+        playbackReadout.querySelector('#goal-route-playback-pace').textContent = `${Math.floor(pace / 60)}:${String(Math.round(pace % 60)).padStart(2, '0')} /km`;
+      }
+      function setGoalPlaybackIcon(isPlaying) {
+        playButton.innerHTML = isPlaying
+          ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM15 5h4v14h-4z"/></svg>'
+          : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+        const label = isPlaying ? 'Mettre en pause l’animation du parcours' : 'Lire l’animation du parcours';
+        playButton.setAttribute('aria-label', label);
+        playButton.title = label;
+      }
+      function animateGoalPlayback(now) {
+        playbackElapsed = Math.min(playbackDuration, playbackElapsed + (now - playbackStartedAt) / 1000 * (playbackDuration / 20) * playbackSpeed);
+        playbackStartedAt = now;
+        renderGoalPlayback(playbackElapsed);
+        if (playbackElapsed >= playbackDuration) {
+          playbackPlaying = false;
+          playbackFrame = 0;
+          setGoalPlaybackIcon(false);
+          return;
+        }
+        playbackFrame = requestAnimationFrame(animateGoalPlayback);
+      }
+      function startGoalPlayback() {
+        if (!routeLine || !routeMarker) return;
+        if (playbackElapsed >= playbackDuration) {
+          playbackElapsed = 0;
+          renderGoalPlayback(0);
+        }
+        playbackPlaying = true;
+        playbackStartedAt = performance.now();
+        setGoalPlaybackIcon(true);
+        playbackFrame = requestAnimationFrame(animateGoalPlayback);
+      }
+      function toggleGoalPlayback() {
+        if (playbackPlaying) {
+          playbackElapsed = Math.min(playbackDuration, playbackElapsed + (performance.now() - playbackStartedAt) / 1000 * (playbackDuration / 20) * playbackSpeed);
+          playbackPlaying = false;
+          cancelAnimationFrame(playbackFrame);
+          playbackFrame = 0;
+          renderGoalPlayback(playbackElapsed);
+          setGoalPlaybackIcon(false);
+        } else {
+          startGoalPlayback();
+        }
+      }
+      playButton.addEventListener('click', toggleGoalPlayback);
+      playbackReadout.addEventListener('click', () => {
+        if (playbackPlaying) {
+          playbackElapsed = Math.min(playbackDuration, playbackElapsed + (performance.now() - playbackStartedAt) / 1000 * (playbackDuration / 20) * playbackSpeed);
+          playbackStartedAt = performance.now();
+        }
+        playbackSpeed = playbackSpeed === 1 ? 2 : playbackSpeed === 2 ? 3 : 1;
+        playbackReadout.setAttribute('aria-label', `Vitesse d’animation x${playbackSpeed}, appuyer pour changer`);
+      });
+      function show() {
+        overlay.hidden = false;
+        document.body.classList.add('goal-detail-open');
+        document.body.style.overflow = 'hidden';
+        renderPaces();
+        drawProfile();
+        if (window.L && !map) {
+          map = L.map('goal-route-map', {zoomControl: false, scrollWheelZoom: false, dragging: true});
+          window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map);
+          window.addEventListener('moapp-map-style-change', () => {
+            if (map) {
+              if (window.__moappGoalRouteTileLayer) map.removeLayer(window.__moappGoalRouteTileLayer);
+              window.__moappGoalRouteTileLayer = window.addSelectedMapTiles(map);
+            }
+          });
+          const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#c5f36a';
+          const textColor = getComputedStyle(document.documentElement).color || '#fff';
+          const fullRoute = L.polyline(coords);
+          routeLine = L.polyline([coords[0]], {color: accentColor, weight: 4, lineCap: 'round', lineJoin: 'round'}).addTo(map);
+          L.circleMarker(coords[0], {radius: 5, color: accentColor, fillColor: accentColor, fillOpacity: 1}).addTo(map);
+          L.circleMarker(coords[coords.length - 1], {radius: 5, color: textColor, fillColor: accentColor, fillOpacity: 1}).addTo(map);
+          routeMarker = L.circleMarker(coords[0], {radius: 5, color: textColor, weight: 2, fillColor: accentColor, fillOpacity: 1}).addTo(map);
+          map.fitBounds(fullRoute.getBounds(), {padding: [16, 16]});
+        }
+        if (map) {
+          playback.hidden = false;
+          playbackElapsed = 0;
+          playbackSpeed = 1;
+          playbackReadout.setAttribute('aria-label', 'Vitesse d’animation x1, appuyer pour changer');
+          renderGoalPlayback(0);
+          setTimeout(() => {
+            if (map && !overlay.hidden) {
+              map.invalidateSize();
+              startGoalPlayback();
+            }
+          }, 100);
+        }
+      }
+      function hide() {
+        overlay.hidden = true;
+        document.body.classList.remove('goal-detail-open');
+        document.body.style.overflow = '';
+        playbackPlaying = false;
+        cancelAnimationFrame(playbackFrame);
+        playbackFrame = 0;
+      }
       open?.addEventListener('click', show); open?.addEventListener('keydown', e => {if (e.key === 'Enter' || e.key === ' ') {e.preventDefault(); show();} }); close?.addEventListener('click', hide);
       document.addEventListener('keydown', e => {if (e.key === 'Escape' && !overlay.hidden) hide();});
     })();
@@ -6841,18 +7263,6 @@
       background: transparent !important;
     }
   </style>
-  <script>
-    const glassSource = document.querySelector('.activity-add-glass, #activity-add, .page-reload-glass, #page-reload');
-    const glassNav = document.querySelector('.bottom-nav');
-    if (glassSource && glassNav) {
-      const glassStyle = getComputedStyle(glassSource);
-      glassNav.style.background = glassStyle.background;
-      glassNav.style.border = glassStyle.border;
-      glassNav.style.boxShadow = glassStyle.boxShadow;
-      glassNav.style.backdropFilter = glassStyle.backdropFilter;
-      glassNav.style.webkitBackdropFilter = glassStyle.webkitBackdropFilter;
-    }
-  </script>
   <style id="strava-like-nav-state">
     .bottom-nav button,
     .bottom-nav a,
@@ -6900,14 +7310,21 @@
 
     .bottom-nav {
       padding-inline: 3px !important;
-      background: rgba(255, 255, 255, .12) !important;
-      border: 1px solid rgba(255, 255, 255, .16) !important;
-      border-bottom-color: rgba(255, 255, 255, .07) !important;
+      background: color-mix(in srgb, var(--panel) 38%, transparent) !important;
+      border: 1px solid rgba(255, 255, 255, .34) !important;
       box-shadow:
-        0 -10px 28px rgba(0, 0, 0, .24),
-        inset 0 1px 0 rgba(255, 255, 255, .18),
-        inset 0 -1px 0 rgba(0, 0, 0, .22) !important;
+        0 6px 18px rgba(0, 0, 0, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .52),
+        inset 0 -1px 0 rgba(0, 0, 0, .14) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
       bottom: 16px !important;
+    }
+
+    html[data-theme="light"] .bottom-nav {
+      background: rgba(255, 255, 255, .48) !important;
+      border-color: rgba(255, 255, 255, .72) !important;
+      box-shadow: 0 6px 18px rgba(38, 52, 74, .12), inset 0 1px rgba(255, 255, 255, .88) !important;
     }
 
     .bottom-nav button:active,
@@ -6977,8 +7394,8 @@
 
   #activity-detail .section-heading:first-child {
     position: fixed !important;
-    top: calc(env(safe-area-inset-top) + 12px) !important;
-    left: 18px !important;
+    top: calc(env(safe-area-inset-top) + 14px) !important;
+    left: 14px !important;
     z-index: 10010 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -6991,8 +7408,8 @@
   }
 
   #activity-detail .section-heading:first-child {
-    right: 18px !important;
-    width: calc(100% - 36px) !important;
+    right: 14px !important;
+    width: calc(100% - 28px) !important;
   }
 
   #activity-detail .section-heading:first-child h2 {
@@ -7005,6 +7422,7 @@
   }
 
   #activity-detail #detail-activity-name {
+    flex: 1;
     min-width: 0;
     overflow: hidden;
     color: var(--text);
@@ -7014,19 +7432,155 @@
     white-space: nowrap;
   }
 
+  #activity-detail .section-heading:first-child h2 {
+    position: relative;
+  }
+
   #activity-detail #detail-title {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 50% !important;
-    display: grid !important;
-    place-items: center !important;
-    border: 1px solid #ffffff55 !important;
-    background: rgba(30, 30, 30, .34) !important;
-    color: white !important;
-    box-shadow: 0 6px 24px #0003, inset 0 1px #ffffff55 !important;
-    backdrop-filter: blur(22px) saturate(1.5) !important;
-    -webkit-backdrop-filter: blur(22px) saturate(1.5) !important;
     pointer-events: auto !important;
+  }
+
+  #activity-detail .detail-actions {
+    position: relative;
+    flex: 0 0 40px;
+  }
+
+  #activity-detail .detail-actions-glass {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .42);
+    border-radius: 50%;
+    background: rgba(30, 30, 30, .3);
+    color: #fff;
+    box-shadow: 0 6px 24px #0003, inset 0 1px #ffffff55;
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+  }
+
+  #activity-detail .detail-actions-glass svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  #activity-detail .detail-actions-glass:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  #activity-detail .detail-actions-glass:active {
+    transform: scale(.96);
+  }
+
+  #activity-detail .detail-actions-overlay {
+    position: fixed;
+    z-index: 10030;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, .24);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: auto;
+  }
+
+  #activity-detail .detail-actions-overlay[hidden],
+  #activity-detail .detail-actions-choices[hidden],
+  #activity-detail .detail-rename-form[hidden] {
+    display: none !important;
+  }
+
+  #activity-detail .detail-actions-dialog {
+    width: min(320px, 100%);
+    box-sizing: border-box;
+    padding: 22px 18px 18px;
+    border: 1px solid rgba(255, 255, 255, .4);
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--panel) 78%, transparent);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .3), inset 0 1px rgba(255, 255, 255, .42);
+    backdrop-filter: blur(28px) saturate(1.55);
+    -webkit-backdrop-filter: blur(28px) saturate(1.55);
+    text-align: center;
+    pointer-events: auto;
+  }
+
+  #activity-detail .detail-actions-dialog h3 {
+    margin: 0 0 14px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 650;
+    text-align: center;
+  }
+
+  #activity-detail .detail-actions-choices,
+  #activity-detail .detail-rename-form {
+    display: grid;
+    gap: 8px;
+    justify-items: stretch;
+  }
+
+  #activity-detail .detail-actions-choices button {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+    border-radius: 13px;
+    background: color-mix(in srgb, var(--panel2) 65%, transparent);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  #activity-detail .detail-actions-choices button:hover,
+  #activity-detail .detail-actions-choices button:focus-visible {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    outline: none;
+  }
+
+  #activity-detail .detail-actions-choices button[data-detail-action="delete"] {
+    color: #ef7777;
+  }
+
+  #activity-detail .detail-rename-form {
+    text-align: center;
+  }
+
+  #activity-detail .detail-rename-form label {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  #activity-detail #detail-rename-input {
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--panel2) 70%, transparent);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  @media (max-width: 599px) {
+    #activity-detail .section-heading:first-child {
+      top: calc(env(safe-area-inset-top) + 12px) !important;
+    }
   }
 </style>
 
@@ -7336,4 +7890,1445 @@
       margin-top: 0;
       white-space: nowrap;
     }
+</style>
+<style id="activity-detail-flat-redesign">
+  #activity-detail.activity-detail {
+    gap: 0 !important;
+    background: var(--bg) !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail #detail-meta {
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #activity-detail .detail-main-stats,
+  #activity-detail .detail-hr-stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  #activity-detail .detail-main-stats {
+    order: 1;
+    margin-top: 0 !important;
+  }
+
+  #activity-detail .pace-map-panel {
+    order: 2;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail .detail-hr-stats {
+    order: 3;
+  }
+
+  #activity-detail .detail-stats .stat-card {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    min-height: 66px !important;
+    padding: 10px 8px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail .detail-main-stats:not(.cooper-test-detail) .distance-stat {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  #activity-detail .detail-main-stats:not(.cooper-test-detail) > .stat-card:nth-child(3) {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  #activity-detail .detail-main-stats:not(.cooper-test-detail) .pace-stat {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+
+  #activity-detail .detail-main-stats.cooper-test-detail .distance-stat,
+  #activity-detail .detail-main-stats.cooper-test-detail .vma-stat:not([hidden]) {
+    grid-row: 1 !important;
+  }
+
+  #activity-detail .detail-main-stats.cooper-test-detail > .stat-card:nth-child(3) {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+
+  #activity-detail .detail-main-stats.cooper-test-detail .pace-stat {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+
+  #activity-detail .detail-stats .stat-card small {
+    color: var(--muted) !important;
+    font-size: 11px !important;
+  }
+
+  #activity-detail .detail-stats .stat-card strong {
+    font-size: clamp(17px, 4.5vw, 22px) !important;
+  }
+
+  #activity-detail .pace-map {
+    border: 0 !important;
+    border-radius: 10px !important;
+  }
+
+  #activity-detail .chart-panel {
+    flex-shrink: 0;
+    margin: 0 !important;
+    padding: 18px 0 !important;
+    border: 0 !important;
+    border-top: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail .chart-panel .chart-title-row h3,
+  #activity-detail .chart-panel h3 {
+    color: var(--text) !important;
+  }
+
+  #activity-detail .chart-panel .chart-mode-toggle {
+    padding: 6px 0 6px 10px;
+  }
+
+  #activity-detail .detail-chart,
+  #activity-detail .chart-empty {
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  #activity-detail .feeling-panel {
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  #activity-detail #detail-no-gpx:not(:empty) {
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+</style>
+<style id="activity-detail-strava-layout">
+  #activity-detail.activity-detail:not([hidden]) {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #activity-detail .pace-map-panel {
+    order: 0 !important;
+    margin-bottom: 8px !important;
+  }
+
+  #activity-detail .pace-map-panel > .pace-map-layout {
+    height: 220px !important;
+    min-height: 0 !important;
+  }
+
+  #activity-detail .pace-map-panel #detail-pace-map {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  #activity-detail .detail-overview {
+    order: 1;
+    width: 100%;
+  }
+
+  #activity-detail #detail-meta {
+    margin: 0 0 12px !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #activity-detail .detail-main-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--panel);
+  }
+
+  #activity-detail .detail-main-stats .stat-card,
+  #activity-detail .detail-main-stats .stat-card.distance-stat,
+  #activity-detail .detail-main-stats .stat-card.pace-stat,
+  #activity-detail .detail-main-stats .stat-card.vma-stat {
+    align-items: center !important;
+    text-align: center !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    min-height: 64px !important;
+    padding: 9px 6px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail .detail-main-stats .stat-card[hidden] {
+    display: none !important;
+  }
+
+  #activity-detail .detail-main-stats > .stat-card,
+  #activity-detail .detail-main-stats > .stat-card:hover,
+  #activity-detail .detail-main-stats > .stat-card:active {
+    transform: none !important;
+    transition: none !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail .detail-main-stats .stat-card small {
+    font-size: 10px !important;
+  }
+
+  #activity-detail .detail-main-stats .stat-card strong {
+    font-size: clamp(14px, 3.8vw, 17px) !important;
+  }
+
+  #activity-detail .plot-heart-rate {
+    --detail-chart-color: #e59a9a;
+  }
+
+  #activity-detail .plot-pace {
+    --detail-chart-color: #8dbce8;
+  }
+
+  #activity-detail .detail-analysis-section .zone-fill {
+    background: var(--detail-chart-color) !important;
+    opacity: .8;
+  }
+
+  #activity-detail .detail-analysis-section {
+    order: 2;
+    width: 100%;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+
+  #activity-detail .detail-section-heading {
+    margin: 0 0 4px;
+  }
+
+  #activity-detail .detail-section-heading h3 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 750;
+  }
+
+  #activity-detail .detail-analysis-section .chart-panel {
+    margin: 0 !important;
+    padding: 12px 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #activity-detail .detail-analysis-section .chart-panel + .chart-panel {
+    border-top: 1px solid var(--line) !important;
+  }
+
+  #activity-detail .detail-analysis-section .chart-panel h3 {
+    font-size: 14px !important;
+  }
+
+  #activity-detail .detail-analysis-section .zone-chart {
+    gap: 7px;
+  }
+
+  #activity-detail .detail-analysis-section .zone-row {
+    grid-template-columns: 20px minmax(40px, 1fr) 34px minmax(68px, auto);
+    gap: 7px;
+  }
+
+  #activity-detail .detail-analysis-section .zone-label,
+  #activity-detail .detail-analysis-section .zone-value {
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  #activity-detail .detail-analysis-section .zone-range {
+    font-size: 9px;
+  }
+
+  #activity-detail .detail-analysis-section .zone-track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--line);
+  }
+
+  #activity-detail .detail-analysis-section .zone-fill {
+    border-radius: 999px;
+    background: var(--detail-chart-color) !important;
+    opacity: .8;
+  }
+
+  #activity-detail .chart-value-label {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+  }
+
+  #activity-detail .splits-table-wrap {
+    overflow-x: auto;
+  }
+
+  #activity-detail .splits-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  #activity-detail .splits-table th,
+  #activity-detail .splits-table td {
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  #activity-detail .splits-table thead th {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  #activity-detail .splits-table th:first-child,
+  #activity-detail .splits-table td:first-child {
+    text-align: left;
+  }
+
+  #activity-detail .feeling-panel {
+    order: 3;
+    margin-top: 24px !important;
+    border-top: 1px solid var(--line) !important;
+  }
+
+  @media (min-width: 600px) {
+    #activity-detail .pace-map-panel > .pace-map-layout {
+      height: 300px !important;
+    }
+
+    #activity-detail .detail-main-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    #activity-detail .detail-main-stats .stat-card:not(:nth-child(3n)) {border-right: 0 !important;}
+  }
+
+  @media (max-width: 420px) {
+    #activity-detail .pace-map-panel > .pace-map-layout {
+      height: 190px !important;
+    }
+  }
+</style>
+<style id="activity-list-liquid-glass">
+  #all-activities .activity-item {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .32);
+    background: color-mix(in srgb, var(--panel) 62%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .14), inset 0 1px 0 rgba(255, 255, 255, .3);
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #all-activities .activity-item:hover {
+    border-color: rgba(255, 255, 255, .48);
+    background: color-mix(in srgb, var(--panel) 56%, transparent);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .4);
+  }
+
+  #all-activities .activity-open-button {
+    position: relative;
+    z-index: 1;
+  }
+
+  html[data-theme="light"] #all-activities .activity-item {
+    border-color: rgba(255, 255, 255, .82);
+    background: rgba(255, 255, 255, .58);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .1), inset 0 1px 0 rgba(255, 255, 255, .9);
+  }
+
+  html[data-theme="light"] #all-activities .activity-item:hover {
+    border-color: rgba(255, 255, 255, .96);
+    background: rgba(255, 255, 255, .7);
+    box-shadow: 0 12px 32px rgba(38, 52, 74, .14), inset 0 1px 0 #fff;
+  }
+</style>
+<style id="next-workout-liquid-glass">
+  #accueil #next-workout-card {
+    border: 1px solid rgba(255, 255, 255, .34);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .16), transparent 52%),
+      color-mix(in srgb, var(--panel) 58%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .14), inset 0 1px 0 rgba(255, 255, 255, .34);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  }
+
+  #accueil #next-workout-carousel > .carousel-arrow {
+    border: 1px solid rgba(255, 255, 255, .34);
+    background: color-mix(in srgb, var(--panel) 55%, transparent);
+    color: var(--text);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .32);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  }
+
+  #accueil #next-workout-carousel > .carousel-arrow:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, .5);
+    background: color-mix(in srgb, var(--panel2) 58%, transparent);
+    color: var(--text);
+  }
+
+  #accueil #next-workout-carousel > .carousel-arrow:disabled {
+    opacity: .38;
+  }
+
+  html[data-theme="light"] #accueil #next-workout-card {
+    border-color: rgba(255, 255, 255, .86);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .7), transparent 52%),
+      rgba(255, 255, 255, .56);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .1), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #accueil #next-workout-carousel > .carousel-arrow {
+    border-color: rgba(255, 255, 255, .82);
+    background: rgba(255, 255, 255, .56);
+    color: var(--text);
+    box-shadow: 0 6px 18px rgba(38, 52, 74, .1), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #accueil #next-workout-carousel > .carousel-arrow:hover:not(:disabled) {
+    background: rgba(255, 255, 255, .72);
+  }
+</style>
+<style id="settings-liquid-glass">
+  #reglages > .panel {
+    border: 1px solid rgba(255, 255, 255, .3);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .12), transparent 48%),
+      color-mix(in srgb, var(--panel) 64%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .28);
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #reglages > .panel:focus-within {
+    border-color: rgba(255, 255, 255, .42);
+  }
+
+  html[data-theme="light"] #reglages > .panel {
+    border-color: rgba(255, 255, 255, .84);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .72), transparent 48%),
+      rgba(255, 255, 255, .58);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .09), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #reglages > .panel:focus-within {
+    border-color: rgba(255, 255, 255, .98);
+  }
+</style>
+<style id="stats-liquid-glass">
+  #accueil .week-summary-card,
+  #performances .stats-grid > .stat-card,
+  #performances > article.panel,
+  #performances .predictor-cell,
+  #goal-detail-overlay .stats-grid > .stat-card {
+    border: 1px solid rgba(255, 255, 255, .3);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .12), transparent 48%),
+      color-mix(in srgb, var(--panel) 64%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .28);
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #accueil .week-summary-card:hover,
+  #performances .stats-grid > .stat-card:hover,
+  #performances > article.panel:hover,
+  #performances .predictor-cell:hover,
+  #goal-detail-overlay .stats-grid > .stat-card:hover {
+    border-color: rgba(255, 255, 255, .44);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .16), transparent 48%),
+      color-mix(in srgb, var(--panel) 58%, transparent);
+  }
+
+  html[data-theme="light"] #accueil .week-summary-card,
+  html[data-theme="light"] #performances .stats-grid > .stat-card,
+  html[data-theme="light"] #performances > article.panel,
+  html[data-theme="light"] #performances .predictor-cell,
+  html[data-theme="light"] #goal-detail-overlay .stats-grid > .stat-card {
+    border-color: rgba(255, 255, 255, .84);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .72), transparent 48%),
+      rgba(255, 255, 255, .58);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .09), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #accueil .week-summary-card:hover,
+  html[data-theme="light"] #performances .stats-grid > .stat-card:hover,
+  html[data-theme="light"] #performances > article.panel:hover,
+  html[data-theme="light"] #performances .predictor-cell:hover,
+  html[data-theme="light"] #goal-detail-overlay .stats-grid > .stat-card:hover {
+    border-color: rgba(255, 255, 255, .98);
+    background: rgba(255, 255, 255, .7);
+  }
+
+  #performances > .stats-grid > .stat-card {
+    min-height: 0;
+    padding: 10px 12px;
+    gap: 2px;
+  }
+
+  #performances .record-meta {
+    margin-top: 0;
+    line-height: 1.25;
+  }
+
+  #performances .predictor-cell {
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+  }
+
+  #performances .predictor-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    margin-top: 2px;
+  }
+
+  #performances .predictor-cell:last-child {
+    border-bottom: 0 !important;
+  }
+
+  #performances .predictor-cell small,
+  #performances .predictor-cell strong {
+    margin: 0;
+  }
+
+  #performances .predictor-cell small {
+    font-size: 12px;
+  }
+
+  #performances .predictor-panel {
+    padding: 14px 12px !important;
+  }
+
+  #performances .predictor-panel > h2 {
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  #performances .predictor-note {
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  #performances .predictor-panel .objective-progress {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+
+  #performances .predictor-panel .objective-progress .progress-copy {
+    margin-bottom: 3px;
+  }
+
+  html[data-theme="light"] #performances .predictor-cell {
+    border-bottom-color: rgba(38, 52, 74, .12) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+</style>
+<style id="plan-header-week-controls">
+  .glass-nav-button,
+  #activity-detail #detail-title {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .34);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--panel) 38%, transparent);
+    color: var(--text);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .52);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    cursor: pointer;
+  }
+
+  .plan-week-glass {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    top: calc(env(safe-area-inset-top) + 14px);
+    place-items: center;
+  }
+
+  .plan-week-prev-glass {left: 14px;}
+  .plan-week-next-glass {right: 14px;}
+
+  .plan-week-glass svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .plan-week-glass:disabled {
+    opacity: .38;
+    cursor: default;
+  }
+
+  body.plan-page-active .page-reload-glass,
+  body.plan-page-active .activity-add-glass {
+    display: none !important;
+  }
+
+  body.plan-page-active .plan-week-glass {
+    display: grid;
+  }
+
+  #plan > .plan-calendar {
+    margin-top: 0 !important;
+  }
+
+  html[data-theme="light"] .plan-week-glass,
+  html[data-theme="light"] #activity-detail #detail-title {
+    border-color: rgba(255, 255, 255, .72);
+    background: rgba(255, 255, 255, .48);
+    box-shadow: 0 6px 18px rgba(38, 52, 74, .12), inset 0 1px rgba(255, 255, 255, .88);
+  }
+
+  @media (max-width: 599px) {
+    .plan-week-glass {
+      top: calc(env(safe-area-inset-top) + 12px);
+    }
+  }
+</style>
+<style id="plan-liquid-glass">
+  #plan .plan-week {
+    border: 1px solid rgba(255, 255, 255, .3);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .14), transparent 48%),
+      color-mix(in srgb, var(--panel) 62%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .3);
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #plan .plan-week .plan-workout {
+    margin: 0;
+    padding: 15px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  #plan .plan-week .plan-workout + .plan-workout {
+    border-top: 1px solid var(--line);
+  }
+
+  #plan .plan-week .plan-calendar-button,
+  #plan .plan-week .plan-delete-button {
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1), inset 0 1px 0 rgba(255, 255, 255, .28);
+  }
+
+  #plan .plan-week .custom-session-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid rgba(255, 255, 255, .24);
+    border-radius: 12px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--panel) 42%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .24);
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    line-height: 1.2;
+  }
+
+  #plan .plan-week .custom-session-add span {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  #plan .pace-guide {
+    border: 1px solid rgba(255, 255, 255, .3);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .14), transparent 48%),
+      color-mix(in srgb, var(--panel) 62%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .3);
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #plan .pace-guide .pace-row {
+    border-bottom-color: rgba(255, 255, 255, .2);
+  }
+
+  #plan .pace-guide .pace-row:last-of-type {
+    border-bottom: 0;
+  }
+
+  html[data-theme="light"] #plan .plan-week {
+    border-color: rgba(255, 255, 255, .86);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .74), transparent 48%),
+      rgba(255, 255, 255, .58);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .09), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #plan .plan-week .plan-workout {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  html[data-theme="light"] #plan .plan-week .plan-workout + .plan-workout {
+    border-top-color: var(--line);
+  }
+
+  html[data-theme="light"] #plan .plan-week .custom-session-add {
+    border-color: rgba(255, 255, 255, .8);
+    background: rgba(255, 255, 255, .5);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #plan .pace-guide {
+    border-color: rgba(255, 255, 255, .86);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .74), transparent 48%),
+      rgba(255, 255, 255, .58);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .09), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] #plan .pace-guide .pace-row {
+    border-bottom-color: rgba(38, 52, 74, .12);
+  }
+</style>
+<style id="activity-detail-liquid-glass">
+  #activity-detail .pace-map-panel,
+  #activity-detail .detail-main-stats,
+  #activity-detail .detail-analysis-section,
+  #activity-detail .feeling-panel {
+    border: 1px solid rgba(255, 255, 255, .3) !important;
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .13), transparent 48%),
+      color-mix(in srgb, var(--panel) 64%, transparent) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .28) !important;
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #activity-detail .pace-map-panel {
+    padding: 8px !important;
+    border-radius: 20px !important;
+    overflow: hidden;
+  }
+
+  #activity-detail .pace-map-panel > .pace-map-layout,
+  #activity-detail .pace-map-panel #detail-pace-map,
+  #activity-detail .pace-map-panel #detail-pace-map .leaflet-container {
+    border-radius: 15px !important;
+    overflow: hidden;
+  }
+
+  #activity-detail .detail-main-stats {
+    overflow: hidden;
+    border-radius: 18px !important;
+  }
+
+  #activity-detail .detail-analysis-section {
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  #activity-detail .detail-analysis-section .detail-section-heading {
+    margin-bottom: 8px;
+  }
+
+  #activity-detail .detail-analysis-section .chart-panel {
+    border-top: 0 !important;
+  }
+
+  #activity-detail .detail-analysis-section > .chart-panel:first-child {
+    padding-top: 0 !important;
+  }
+
+  #activity-detail .detail-analysis-section .chart-panel + .chart-panel {
+    border-top: 1px solid rgba(255, 255, 255, .18) !important;
+  }
+
+  #activity-detail .detail-analysis-section .detail-section-heading + .chart-panel {
+    border-top: 0 !important;
+  }
+
+  #activity-detail .feeling-panel {
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  #activity-detail .chart-mode-toggle {
+    color: var(--text) !important;
+  }
+
+  #activity-detail .chart-scrubber-cursor {
+    opacity: .8;
+  }
+
+  #activity-detail .chart-point.scrubber-active {
+    r: 4px;
+    stroke-width: 1.5px;
+  }
+
+  #activity-detail .feeling-slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    border-width: 2px;
+    border-color: var(--feeling-color, #d6c9a8);
+  }
+
+  #activity-detail .feeling-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+    border-color: var(--feeling-color, #d6c9a8);
+  }
+
+  html[data-theme="light"] #activity-detail .pace-map-panel,
+  html[data-theme="light"] #activity-detail .detail-main-stats,
+  html[data-theme="light"] #activity-detail .detail-analysis-section,
+  html[data-theme="light"] #activity-detail .feeling-panel {
+    border-color: rgba(255, 255, 255, .86) !important;
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .72), transparent 48%),
+      rgba(255, 255, 255, .58) !important;
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .09), inset 0 1px 0 rgba(255, 255, 255, .92) !important;
+  }
+
+  html[data-theme="light"] #activity-detail .detail-analysis-section .chart-panel {
+    border-top-color: rgba(38, 52, 74, .12) !important;
+  }
+
+  #goal-detail-overlay {
+    background: var(--bg);
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
+  #goal-detail-overlay .goal-detail-inner {
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 54px;
+  }
+
+  #goal-detail-overlay .goal-detail-head {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 14px);
+    left: 14px;
+    right: 14px;
+    z-index: 1210;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    gap: 12px;
+    pointer-events: none;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  #goal-detail-overlay #close-goal-detail {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex-basis: 40px;
+    pointer-events: auto;
+  }
+
+  #goal-detail-overlay #close-goal-detail svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+  }
+
+  #goal-detail-overlay .goal-detail-head .eyebrow {
+    display: block;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    line-height: 1.2;
+    text-transform: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #goal-detail-overlay .goal-route-panel,
+  #goal-detail-overlay .goal-detail-stats,
+  #goal-detail-overlay .goal-detail-panel {
+    border: 1px solid rgba(255, 255, 255, .3);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .13), transparent 48%),
+      color-mix(in srgb, var(--panel) 64%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .13), inset 0 1px 0 rgba(255, 255, 255, .28);
+    backdrop-filter: blur(22px) saturate(1.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  #goal-detail-overlay .goal-route-panel {
+    margin: 0;
+    padding: 8px;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  #goal-detail-overlay .goal-route-panel h2 {
+    display: none;
+  }
+
+  #goal-detail-overlay #goal-route-map,
+  #goal-detail-overlay #goal-route-map .leaflet-container {
+    height: 220px;
+    min-height: 0;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  #goal-detail-overlay #goal-route-map .leaflet-control-attribution {
+    right: auto !important;
+    left: 0 !important;
+  }
+
+  #goal-detail-overlay .goal-detail-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 18px;
+  }
+
+  #goal-detail-overlay .goal-detail-stats .goal-stat,
+  #goal-detail-overlay .goal-detail-stats .goal-stat:nth-child(-n+3),
+  #goal-detail-overlay .goal-detail-stats .goal-stat:nth-child(n+4) {
+    grid-column: auto;
+    align-items: center;
+    min-height: 64px;
+    padding: 9px 6px;
+    border: 0 !important;
+    border-radius: 0;
+    background: transparent;
+    text-align: center;
+  }
+
+  #goal-detail-overlay .goal-detail-stats .goal-stat:first-child {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  #goal-detail-overlay .goal-detail-stats > .goal-stat,
+  #goal-detail-overlay .goal-detail-stats > .goal-stat:hover,
+  #goal-detail-overlay .goal-detail-stats > .goal-stat:active {
+    transform: none !important;
+    transition: none !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #goal-detail-overlay .goal-detail-stats .goal-stat small {
+    font-size: 10px;
+  }
+
+  #goal-detail-overlay .goal-detail-stats .goal-stat strong {
+    font-size: clamp(14px, 3.8vw, 17px);
+  }
+
+  #goal-detail-overlay .goal-detail-panel {
+    margin: 0;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  #goal-detail-overlay .goal-detail-panel h2 {
+    margin: 0 0 10px;
+    font-size: 19px;
+    font-weight: 750;
+  }
+
+  #goal-detail-overlay .goal-km-row {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  #goal-detail-overlay .goal-km-row strong {
+    color: var(--text);
+  }
+
+  #goal-detail-overlay .goal-advice {
+    padding: 14px 0;
+  }
+
+  #goal-detail-overlay #goal-profile-readout {
+    gap: 14px;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  #goal-detail-overlay #goal-profile-readout span {
+    padding: 4px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  html[data-theme="light"] #goal-detail-overlay .goal-route-panel,
+  html[data-theme="light"] #goal-detail-overlay .goal-detail-stats,
+  html[data-theme="light"] #goal-detail-overlay .goal-detail-panel {
+    border-color: rgba(255, 255, 255, .86);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .72), transparent 48%),
+      rgba(255, 255, 255, .58);
+    box-shadow: 0 10px 28px rgba(38, 52, 74, .09), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] {
+    --glass-surface-light: rgba(218, 223, 230, .9);
+    --glass-surface-hover-light: rgba(211, 218, 226, .94);
+    --glass-edge-light: rgba(129, 140, 154, .34);
+  }
+
+  html[data-theme="light"] #all-activities .activity-item,
+  html[data-theme="light"] #accueil .week-summary-card,
+  html[data-theme="light"] #accueil #next-workout-card,
+  html[data-theme="light"] #plan .plan-week,
+  html[data-theme="light"] #plan .pace-guide,
+  html[data-theme="light"] #reglages > .panel,
+  html[data-theme="light"] #performances .stats-grid > .stat-card,
+  html[data-theme="light"] #performances > article.panel,
+  html[data-theme="light"] #activity-detail .pace-map-panel,
+  html[data-theme="light"] #activity-detail .detail-main-stats,
+  html[data-theme="light"] #activity-detail .detail-analysis-section,
+  html[data-theme="light"] #activity-detail .feeling-panel,
+  html[data-theme="light"] #goal-detail-overlay .goal-route-panel,
+  html[data-theme="light"] #goal-detail-overlay .goal-detail-stats,
+  html[data-theme="light"] #goal-detail-overlay .goal-detail-panel {
+    border-color: var(--glass-edge-light) !important;
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .72), transparent 48%),
+      var(--glass-surface-light) !important;
+    box-shadow: 0 12px 28px rgba(38, 48, 62, .15), 0 1px 3px rgba(38, 48, 62, .08), inset 0 1px 0 rgba(255, 255, 255, .88) !important;
+  }
+
+  html[data-theme="light"] #all-activities .activity-item:hover,
+  html[data-theme="light"] #accueil .week-summary-card:hover,
+  html[data-theme="light"] #accueil #next-workout-card:hover,
+  html[data-theme="light"] #performances .stats-grid > .stat-card:hover,
+  html[data-theme="light"] #performances > article.panel:hover {
+    border-color: rgba(255, 255, 255, .94) !important;
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .62), transparent 48%),
+      var(--glass-surface-hover-light) !important;
+  }
+
+  html[data-theme="light"] #plan .plan-week .custom-session-add {
+    border-color: var(--glass-edge-light);
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, .54), transparent 52%),
+      rgba(226, 230, 234, .72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .78);
+  }
+
+  html[data-theme="light"] .glass-nav-button,
+  html[data-theme="light"] .plan-week-glass,
+  html[data-theme="light"] .pace-map-play-button,
+  html[data-theme="light"] .pace-map-playback-readout,
+  html[data-theme="light"] .detail-actions-glass {
+    border-color: var(--glass-edge-light);
+    background: rgba(226, 230, 234, .7);
+    box-shadow: 0 6px 18px rgba(38, 48, 62, .12), inset 0 1px 0 rgba(255, 255, 255, .8);
+  }
+
+  html[data-theme="light"] {
+    --bg: #f4f5f7;
+    --panel: #f8f9fb;
+    --panel2: #e8ebef;
+    --line: #d7dce2;
+    --text: #1c2026;
+    --muted: #68717d;
+    --accent-dark: #e2ecd8;
+    --surface-glass: rgba(218, 223, 230, .9);
+    --glass-surface-light: rgba(218, 223, 230, .9);
+    --glass-surface-hover-light: rgba(211, 218, 226, .94);
+    --glass-edge-light: rgba(129, 140, 154, .34);
+  }
+
+  html[data-theme="light"] body {
+    background:
+      radial-gradient(ellipse at 50% -18%, rgba(255, 255, 255, .82), transparent 54%),
+      var(--bg) !important;
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .topbar {
+    background: rgba(242, 243, 245, .82);
+    border-bottom-color: rgba(70, 80, 94, .1);
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .brand {
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .hero-card {
+    color: var(--text);
+    border: 1px solid rgba(129, 140, 154, .34);
+    background:
+      radial-gradient(ellipse at 90% 0%, color-mix(in srgb, var(--accent) 12%, white), transparent 52%),
+      rgba(218, 223, 230, .94);
+    box-shadow: 0 12px 30px rgba(38, 48, 62, .15), 0 1px 3px rgba(38, 48, 62, .08), inset 0 1px 0 rgba(255, 255, 255, .88);
+  }
+
+  html[data-theme="light"] .hero-top,
+  html[data-theme="light"] .hero-countdown small,
+  html[data-theme="light"] .hero-bottom small {
+    color: var(--muted);
+  }
+
+  html[data-theme="light"] .hero-bottom {
+    border-top-color: rgba(70, 80, 94, .14);
+  }
+
+  html[data-theme="light"] .hero-countdown strong,
+  html[data-theme="light"] .hero-time span,
+  html[data-theme="light"] .hero-bottom .progress-copy strong {
+    color: var(--accent-text);
+  }
+
+  html[data-theme="light"] .tag,
+  html[data-theme="light"] .status-pill,
+  html[data-theme="light"] .feeling-badge {
+    border-color: rgba(95, 106, 120, .18);
+    background: rgba(225, 229, 234, .76);
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .tag.neutral {
+    border-color: rgba(95, 106, 120, .18);
+    background: rgba(225, 229, 234, .76);
+    color: var(--muted);
+  }
+
+  html[data-theme="light"] .custom-session-form,
+  html[data-theme="light"] .empty-state,
+  html[data-theme="light"] .chart-empty,
+  html[data-theme="light"] .zone-empty,
+  html[data-theme="light"] .pace-map-empty {
+    border-color: var(--glass-edge-light);
+    background: rgba(226, 230, 234, .72);
+    color: var(--text);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72);
+  }
+
+  html[data-theme="light"] .custom-session-form label,
+  html[data-theme="light"] .form-grid label,
+  html[data-theme="light"] .panel label {
+    color: var(--text);
+  }
+
+  html[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  html[data-theme="light"] select,
+  html[data-theme="light"] textarea,
+  html[data-theme="light"] .theme-select,
+  html[data-theme="light"] .feeling-note {
+    color: var(--text);
+    background: rgba(248, 249, 251, .86);
+    border-color: var(--line);
+  }
+
+  html[data-theme="light"] input::placeholder,
+  html[data-theme="light"] textarea::placeholder {
+    color: #818a96;
+  }
+
+  html[data-theme="light"] input:focus,
+  html[data-theme="light"] select:focus,
+  html[data-theme="light"] textarea:focus {
+    border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+    outline-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  html[data-theme="light"] .file-label {
+    color: var(--text);
+    border-color: var(--line);
+    background: rgba(226, 230, 234, .72);
+  }
+
+  html[data-theme="light"] .file-label input {
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .button:not(.primary):not(.danger),
+  html[data-theme="light"] button.secondary,
+  html[data-theme="light"] .carousel-arrow,
+  html[data-theme="light"] .plan-calendar-button,
+  html[data-theme="light"] .plan-delete-button,
+  html[data-theme="light"] .text-button {
+    color: var(--text);
+    border-color: var(--glass-edge-light);
+    background: rgba(226, 230, 234, .72);
+    box-shadow: 0 4px 12px rgba(38, 48, 62, .08), inset 0 1px 0 rgba(255, 255, 255, .7);
+  }
+
+  html[data-theme="light"] .button:not(.primary):not(.danger):hover,
+  html[data-theme="light"] button.secondary:hover,
+  html[data-theme="light"] .carousel-arrow:hover:not(:disabled),
+  html[data-theme="light"] .plan-calendar-button:hover,
+  html[data-theme="light"] .plan-delete-button:hover,
+  html[data-theme="light"] .text-button:hover {
+    background: rgba(214, 220, 226, .84);
+    border-color: rgba(255, 255, 255, .96);
+  }
+
+  html[data-theme="light"] .button.primary,
+  html[data-theme="light"] .primary {
+    color: var(--accent-foreground);
+  }
+
+  html[data-theme="light"] .button.danger,
+  html[data-theme="light"] .danger {
+    color: #a93430;
+    border-color: rgba(190, 65, 58, .2);
+    background: rgba(248, 229, 227, .88);
+  }
+
+  html[data-theme="light"] .notice,
+  html[data-theme="light"] .toast {
+    border-color: rgba(106, 125, 83, .2);
+    background: rgba(228, 234, 221, .9);
+    color: #33402d;
+  }
+
+  html[data-theme="light"] .status-note,
+  html[data-theme="light"] .footnote,
+  html[data-theme="light"] .predictor-note,
+  html[data-theme="light"] .performance-summary {
+    color: var(--muted);
+  }
+
+  html[data-theme="light"] .bottom-nav {
+    background: rgba(226, 230, 234, .78) !important;
+    border-color: rgba(255, 255, 255, .84) !important;
+    box-shadow: 0 6px 18px rgba(38, 48, 62, .12), inset 0 1px 0 rgba(255, 255, 255, .82) !important;
+  }
+
+  html[data-theme="light"] .bottom-nav button,
+  html[data-theme="light"] .bottom-nav a,
+  html[data-theme="light"] .bottom-nav .nav-item,
+  html[data-theme="light"] .bottom-nav button span,
+  html[data-theme="light"] .bottom-nav button small,
+  html[data-theme="light"] .bottom-nav a span,
+  html[data-theme="light"] .bottom-nav a small,
+  html[data-theme="light"] .bottom-nav .nav-item span,
+  html[data-theme="light"] .bottom-nav .nav-item small {
+    color: var(--muted) !important;
+  }
+
+  html[data-theme="light"] .bottom-nav svg,
+  html[data-theme="light"] .bottom-nav i,
+  html[data-theme="light"] .bottom-nav svg [stroke] {
+    color: var(--muted) !important;
+    stroke: var(--muted) !important;
+  }
+
+  html[data-theme="light"] .bottom-nav svg [fill]:not([fill="none"]) {
+    fill: var(--muted) !important;
+  }
+
+  html[data-theme="light"] .bottom-nav .nav-item.active,
+  html[data-theme="light"] .bottom-nav .nav-item.active span,
+  html[data-theme="light"] .bottom-nav .nav-item.active small,
+  html[data-theme="light"] .bottom-nav .nav-item.active svg {
+    color: var(--accent-text) !important;
+  }
+
+  html[data-theme="light"] .bottom-nav .nav-item.active svg [stroke] {
+    stroke: var(--accent-text) !important;
+  }
+
+  html[data-theme="light"] .bottom-nav .nav-active-indicator {
+    background: rgba(76, 86, 99, .12);
+  }
+
+  html[data-theme="light"] .pace-map .leaflet-container {
+    background: #e5e8ec;
+  }
+
+  html[data-theme="light"] .pace-map .leaflet-control-attribution,
+  html[data-theme="light"] .pace-map .leaflet-control-attribution a {
+    color: #424b56;
+    background: rgba(242, 243, 245, .76);
+  }
+
+  html[data-theme="light"] .pace-map .moapp-dark-map-tiles {
+    filter: none;
+  }
+
+  html[data-theme="light"] .pace-map-legend {
+    color: var(--text);
+    border-color: var(--glass-edge-light);
+    background: rgba(226, 230, 234, .86);
+  }
+
+  html[data-theme="light"] .detail-actions-dialog,
+  html[data-theme="light"] .detail-actions-choices button {
+    border-color: var(--glass-edge-light);
+    background: rgba(226, 230, 234, .86);
+    color: var(--text);
+  }
+
+  html[data-theme="light"] .detail-actions-choices button:hover,
+  html[data-theme="light"] .detail-actions-choices button:focus-visible {
+    background: rgba(214, 220, 226, .94);
+  }
+
+  html[data-theme="light"] .detail-actions-choices button[data-detail-action="delete"] {
+    color: #a93430;
+  }
+
+  html[data-theme="light"] .zone-track,
+  html[data-theme="light"] .progress-track {
+    background: rgba(98, 110, 125, .16);
+  }
+
+  html[data-theme="light"] .zone-row,
+  html[data-theme="light"] .splits-table th,
+  html[data-theme="light"] .splits-table td,
+  html[data-theme="light"] .plan-week .plan-workout + .plan-workout,
+  html[data-theme="light"] .pace-row {
+    border-color: rgba(85, 96, 110, .16);
+  }
+
+  html[data-theme="light"] .hr-evolution-tooltip-bg {
+    fill: rgba(226, 230, 234, .96);
+    stroke: rgba(85, 96, 110, .24);
+  }
+
+  html[data-theme="light"] .chart-value-label {
+    fill: var(--text);
+  }
+
+  html[data-theme="light"] .chart-value-bg {
+    fill: rgba(226, 230, 234, .96);
+    stroke: rgba(85, 96, 110, .24);
+  }
+
+  html[data-theme="light"] .chart-scrubber-cursor {
+    stroke: #596575;
+  }
+
+  html[data-theme="light"] .theme-switch-track {
+    background: #c4cbd3;
+  }
+
+  html[data-theme="light"] {
+    --glass-surface-light: rgba(202, 211, 222, .97);
+    --glass-surface-hover-light: rgba(194, 204, 216, .98);
+    --glass-edge-light: rgba(111, 125, 143, .46);
+  }
+
+  html[data-theme="light"] #all-activities .activity-item,
+  html[data-theme="light"] #accueil .week-summary-card,
+  html[data-theme="light"] #accueil #next-workout-card,
+  html[data-theme="light"] #plan .plan-week,
+  html[data-theme="light"] #plan .pace-guide,
+  html[data-theme="light"] #reglages > .panel,
+  html[data-theme="light"] #performances .stats-grid > .stat-card,
+  html[data-theme="light"] #performances > article.panel,
+  html[data-theme="light"] #activity-detail .pace-map-panel,
+  html[data-theme="light"] #activity-detail .detail-main-stats,
+  html[data-theme="light"] #activity-detail .detail-analysis-section,
+  html[data-theme="light"] #activity-detail .feeling-panel,
+  html[data-theme="light"] #goal-detail-overlay .goal-route-panel,
+  html[data-theme="light"] #goal-detail-overlay .goal-detail-stats,
+  html[data-theme="light"] #goal-detail-overlay .goal-detail-panel,
+  html[data-theme="light"] .custom-session-form,
+  html[data-theme="light"] .empty-state,
+  html[data-theme="light"] .chart-empty,
+  html[data-theme="light"] .zone-empty,
+  html[data-theme="light"] .pace-map-empty {
+    border-color: var(--glass-edge-light) !important;
+    background:
+      radial-gradient(ellipse at 12% 0%, rgba(255, 255, 255, .76), transparent 56%),
+      linear-gradient(145deg, rgba(216, 223, 232, .98), rgba(197, 207, 220, .97)) !important;
+    box-shadow: 0 12px 28px rgba(38, 48, 62, .18), 0 2px 5px rgba(38, 48, 62, .09), inset 0 1px 0 rgba(255, 255, 255, .92) !important;
+  }
+
+  html[data-theme="light"] .hero-card {
+    border-color: var(--glass-edge-light);
+    background:
+      radial-gradient(ellipse at 12% 0%, color-mix(in srgb, var(--accent) 18%, white), transparent 56%),
+      linear-gradient(145deg, rgba(216, 223, 232, .99), rgba(197, 207, 220, .98));
+    box-shadow: 0 12px 30px rgba(38, 48, 62, .18), 0 2px 5px rgba(38, 48, 62, .09), inset 0 1px 0 rgba(255, 255, 255, .92);
+  }
+
+  html[data-theme="light"] .bottom-nav {
+    background:
+      radial-gradient(ellipse at 12% 0%, rgba(255, 255, 255, .76), transparent 56%),
+      linear-gradient(145deg, rgba(216, 223, 232, .98), rgba(197, 207, 220, .97)) !important;
+    border-color: var(--glass-edge-light) !important;
+    box-shadow: 0 8px 22px rgba(38, 48, 62, .18), inset 0 1px 0 rgba(255, 255, 255, .92) !important;
+  }
+
 </style>
