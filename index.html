@@ -6052,6 +6052,7 @@
               return;
             }
             activities = remainingActivities;
+            closeActivityDetail();
             render();
             addNotification("deletion", "Activité supprimée", `« ${activityDisplayName(activity)} » a bien été supprimée.`);
             return;
@@ -6784,8 +6785,9 @@
             addNotification("activity", importedCount === 1 ? "Activité importée" : "Activités importées", importedCount === 1 ? "L’activité a bien été chargée." : `${importedCount} activités ont bien été chargées.`);
           }
           const updatedStreak = getActivityWeekStreak(activities);
-          if (updatedStreak === previousStreak + 1) {
-            addNotification("streak", "Streak hebdomadaire augmenté", `Ton streak a augmenté de 1 : ${updatedStreak} semaine${updatedStreak === 1 ? "" : "s"} consécutive${updatedStreak === 1 ? "" : "s"}.`);
+          if (updatedStreak > previousStreak) {
+            const increase = updatedStreak - previousStreak;
+            addNotification("streak", "Streak hebdomadaire augmenté", `Ton streak a augmenté de ${increase} : ${updatedStreak} semaine${updatedStreak === 1 ? "" : "s"} consécutive${updatedStreak === 1 ? "" : "s"}.`);
           }
         } catch (err) {$("#import-status").textContent = `Import impossible : ${err.message}`}
         finally {e.target.value = ""}
@@ -7034,7 +7036,7 @@
         $("#plan-progress-bar").style.width = `${pct}%`;
       }
       function renderVolumeChart() {
-        const el = $("#weekly-volume-chart"); if (!el) return;
+        const el = $("#weekly-volume-chart");
         const current = new Date(); current.setHours(0, 0, 0, 0);
         const thisMonday = new Date(current); thisMonday.setDate(current.getDate() - (current.getDay() + 6) % 7);
         const activityWeeks = new Map();
@@ -7086,6 +7088,7 @@
           }).join("");
           summaryChart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilomètres parcourus par semaine sur les 12 dernières semaines"><defs><linearGradient id="week-volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#week-volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>${dots}${months}</svg>`;
         }
+        if (!el) return;
         // Conserver toutes les semaines du plan, y compris les semaines futures sans activité.
         const planStart = new Date(2026, 9, 19); planStart.setHours(0, 0, 0, 0);
         const planEnd = new Date(2027, 2, 21); planEnd.setHours(0, 0, 0, 0);
