@@ -6424,7 +6424,8 @@
         topo: { url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)', subdomains: "abc", maxZoom: 17 }
       };
       function getMapStyle() {
-        try { const saved = localStorage.getItem(MAP_STYLE_KEY); return MAP_TILE_STYLES[saved] ? saved : "osm"; } catch { return "osm"; }
+        const defaultStyle = document.documentElement.dataset.theme === "light-mono" ? "light" : "osm";
+        try { const saved = localStorage.getItem(MAP_STYLE_KEY); return MAP_TILE_STYLES[saved] ? saved : defaultStyle; } catch { return defaultStyle; }
       }
       function addSelectedMapTiles(map) {
         const style = MAP_TILE_STYLES[getMapStyle()];
@@ -10166,6 +10167,128 @@
 
   html[data-theme="light-mono"] .theme-switch input:checked + .theme-switch-track {
     background: var(--accent);
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item {
+    color: var(--text) !important;
+    border: 1px solid var(--line) !important;
+    background: linear-gradient(145deg, #ffffff, #eeeeee) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .08), inset 0 1px 0 rgba(255, 255, 255, .9) !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item span,
+  html[data-theme="light-mono"] .bottom-nav .nav-item small,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg [stroke],
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg [fill]:not([fill="none"]) {
+    color: var(--text) !important;
+    stroke: var(--text) !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg path,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg rect,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg circle,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg line {
+    fill: none !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg path,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg rect,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg circle,
+  html[data-theme="light-mono"] .bottom-nav .nav-item svg line,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg path,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg rect,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg circle,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg line {
+    color: #111111 !important;
+    stroke: #111111 !important;
+    stroke-width: 2.2 !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active {
+    z-index: 3 !important;
+    color: #111111 !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active span,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active small,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg [stroke],
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active svg [fill]:not([fill="none"]) {
+    color: #111111 !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item:hover {
+    background: linear-gradient(145deg, #ffffff, #e5e5e5) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .11), inset 0 1px 0 rgba(255, 255, 255, .94) !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:hover,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:focus-visible {
+    color: #111111 !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:hover span,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:hover small,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:hover svg,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:focus-visible span,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:focus-visible small,
+  html[data-theme="light-mono"] .bottom-nav .nav-item.active:focus-visible svg {
+    color: #111111 !important;
+  }
+
+  html[data-theme="light-mono"] .bottom-nav .nav-active-indicator {
+    z-index: 2;
+    background: #ff9500;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .1), inset 0 1px 0 rgba(255, 255, 255, .42);
+  }
+
+  html[data-theme="light-mono"] .plan-session-switch .switch-track::after,
+  html[data-theme="light-mono"] .plan-session-switch input:checked + .switch-track::after {
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .28);
+  }
+
+  html[data-theme="light-mono"] #activity-detail .detail-actions-glass {
+    color: var(--text) !important;
+    border-color: var(--line) !important;
+    background: rgba(255, 255, 255, .88) !important;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, .12), inset 0 1px 0 rgba(255, 255, 255, .96) !important;
+  }
+
+  html[data-theme="light-mono"] #activity-detail .detail-actions-dialog,
+  html[data-theme="light-mono"] #activity-detail .detail-actions-choices button {
+    color: var(--text) !important;
+    border-color: var(--line) !important;
+    background: rgba(255, 255, 255, .96) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .14), inset 0 1px 0 rgba(255, 255, 255, .96) !important;
+  }
+
+  html[data-theme="light-mono"] #activity-detail .detail-actions-choices button:hover,
+  html[data-theme="light-mono"] #activity-detail .detail-actions-choices button:focus-visible {
+    background: #eeeeee !important;
+  }
+
+  html[data-theme="light-mono"] #activity-detail .detail-actions-choices button[data-detail-action="delete"] {
+    color: #a93430 !important;
+  }
+
+  html[data-theme="light-mono"] .hero-card .hero-bottom .progress-track {
+    background: #c6c6c6 !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .14);
+  }
+
+  html[data-theme="light-mono"] .countdown-label,
+  html[data-theme="light-mono"] #countdown.live-countdown .countdown-part:nth-child(3) .countdown-label::after,
+  html[data-theme="light-mono"] #countdown.live-countdown .countdown-part:nth-child(4) .countdown-label::after {
+    color: var(--text) !important;
   }
 
 </style>
