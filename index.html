@@ -5664,7 +5664,7 @@
           list.innerHTML = '<div class="empty-state">Aucune notification pour le moment.</div>';
           return;
         }
-        const icons = { activity: "✓", deletion: "−", streak: "↗" };
+        const icons = { activity: "✓", copy: "⧉", deletion: "−", streak: "↗" };
         list.innerHTML = notifications.map(item => {
           const date = new Date(item.createdAt);
           const time = Number.isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(date);
@@ -7070,12 +7070,37 @@
         const day = new Date(c.date); day.setHours(0, 0, 0, 0);
         const status = c.done ? "✓ Séance validée" : (day < today ? "Séance passée" : "À venir");
         cardEl.innerHTML = `<h3>${esc(title)}</h3><p>${esc(c.desc)}</p><div class="workout-footer"><div class="workout-status">${esc(status)}</div><div class="workout-date">${esc(date)} · S${c.week + 1}</div></div>`;
+        cardEl.tabIndex = 0;
+        cardEl.setAttribute("role", "button");
+        cardEl.setAttribute("aria-label", `${title}, séance du ${c.date.toLocaleDateString("fr-FR")}. Appuyer pour copier la description.`);
         $("#next-workout-counter").textContent = `${workoutCarouselIndex + 1} / ${cards.length}`;
         $("#workout-prev").disabled = workoutCarouselIndex === 0; $("#workout-next").disabled = workoutCarouselIndex === cards.length - 1;
+      }
+      async function copyNextWorkoutDescription() {
+        const cards = getWorkoutCards();
+        const workout = cards[workoutCarouselIndex];
+        if (!workout) return;
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error("L’API presse-papiers n’est pas disponible.");
+          await navigator.clipboard.writeText(workout.desc);
+          const date = `${String(workout.date.getDate()).padStart(2, "0")}/${String(workout.date.getMonth() + 1).padStart(2, "0")}/${workout.date.getFullYear()}`;
+          addNotification("copy", `Séance du ${date} copiée`, "La description a été copiée dans le presse-papiers.");
+        } catch (error) {
+          console.error("Impossible de copier la description de la séance.", error);
+          toast("La description n’a pas pu être copiée. Vérifie l’autorisation du presse-papiers.");
+        }
       }
       function setupWorkoutCarousel() {
         $("#workout-prev")?.addEventListener("click", () => { workoutCarouselIndex = Math.max(0, workoutCarouselIndex - 1); renderNextWorkout() });
         $("#workout-next")?.addEventListener("click", () => { const cards = getWorkoutCards(); workoutCarouselIndex = Math.min(cards.length - 1, workoutCarouselIndex + 1); renderNextWorkout() });
+        const card = $("#next-workout-card");
+        card?.addEventListener("click", copyNextWorkoutDescription);
+        card?.addEventListener("keydown", event => {
+          if ((event.key === "Enter" || event.key === " ") && !event.repeat) {
+            event.preventDefault();
+            copyNextWorkoutDescription();
+          }
+        });
         const el = $("#next-workout-carousel"); if (!el) return; let startX = null, startY = null;
         el.addEventListener("touchstart", e => { const t = e.changedTouches[0]; startX = t.clientX; startY = t.clientY }, { passive: true });
         el.addEventListener("touchend", e => { if (startX === null) return; const t = e.changedTouches[0], dx = t.clientX - startX, dy = t.clientY - startY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { const cards = getWorkoutCards(); workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex + (dx < 0 ? 1 : -1))); renderNextWorkout() } startX = null; startY = null }, { passive: true });
@@ -10289,6 +10314,27 @@
   html[data-theme="light-mono"] #countdown.live-countdown .countdown-part:nth-child(3) .countdown-label::after,
   html[data-theme="light-mono"] #countdown.live-countdown .countdown-part:nth-child(4) .countdown-label::after {
     color: var(--text) !important;
+  }
+
+  #accueil #next-workout-card[role="button"] {
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+
+  #accueil #next-workout-card[role="button"]:active {
+    transform: scale(.99);
+  }
+
+  #accueil #next-workout-card[role="button"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #accueil #next-workout-card[role="button"] {
+      transition: none;
+    }
   }
 
 </style>
