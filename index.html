@@ -4476,14 +4476,34 @@
       display: contents;
     }
 
-    #all-activities .activity-info strong {
+    #all-activities .activity-info .activity-title-row {
       grid-column: 1;
       grid-row: 1;
+      display: flex;
+      align-items: center;
+      gap: 7px;
       align-self: baseline;
       min-width: 0;
+    }
+
+    #all-activities .activity-info .activity-title-row strong {
+      min-width: 0;
+      margin: 0;
       white-space: normal;
       font-size: 18px;
       line-height: 1.25;
+    }
+
+    #all-activities .activity-week-label {
+      flex: 0 0 auto;
+      padding: 3px 7px;
+      border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--line));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+      color: var(--accent-text);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.2;
     }
 
     #all-activities .activity-info p {
@@ -5001,6 +5021,11 @@
         <div class="section-heading">
           <h2>Toutes les activités</h2><span id="activity-count" class="muted small">0 sortie</span>
         </div>
+        <div id="activity-search-panel" class="activity-search-panel" role="search" hidden>
+          <input id="activity-search-input" type="text" inputmode="search" placeholder="Rechercher une activité"
+            aria-label="Rechercher une activité">
+          <button id="activity-search-clear" class="button secondary" type="button" aria-label="Effacer la recherche">×</button>
+        </div>
         <p id="import-status" class="status-note" role="status"></p>
         <div id="all-activities" class="activity-list"></div>
         <section id="activity-detail" class="panel activity-detail" hidden>
@@ -5371,6 +5396,13 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M19 12a7 7 0 1 1-2.05-4.95" />
           <path d="M19 4v5h-5" />
+        </svg>
+      </button>
+      <button id="activity-search-open" class="activity-search-glass" type="button" aria-label="Rechercher une activité"
+        title="Rechercher une activité" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="10.8" cy="10.8" r="6.8" />
+          <path d="m16 16 4.5 4.5" />
         </svg>
       </button>
       <button id="activity-add" class="activity-add-glass" type="button" aria-label="Importer des activités"
@@ -5786,6 +5818,40 @@
         requestAnimationFrame(() => bottomNav?.classList.add("nav-indicator-ready"));
       }, { once: true });
       document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => navigate(b.dataset.go)));
+      const activitySearchOpen = $("#activity-search-open");
+      const activitySearchPanel = $("#activity-search-panel");
+      const activitySearchInput = $("#activity-search-input");
+      function setActivitySearchOpen(open) {
+        activitySearchPanel.hidden = !open;
+        activitySearchOpen.setAttribute("aria-expanded", String(open));
+        if (open) {
+          navigate("activites");
+          activitySearchInput.focus();
+        } else {
+          activitySearchQuery = "";
+          activitySearchInput.value = "";
+          renderActivitySearch();
+        }
+      }
+      activitySearchOpen.addEventListener("click", () => {
+        setActivitySearchOpen(activitySearchPanel.hidden);
+      });
+      activitySearchInput.addEventListener("input", () => {
+        activitySearchQuery = activitySearchInput.value;
+        renderActivitySearch();
+      });
+      $("#activity-search-clear").addEventListener("click", () => {
+        activitySearchInput.value = "";
+        activitySearchQuery = "";
+        renderActivitySearch();
+        activitySearchInput.focus();
+      });
+      activitySearchInput.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+          setActivitySearchOpen(false);
+          activitySearchOpen.focus();
+        }
+      });
       $("#notification-open")?.addEventListener("click", openNotifications);
       $("#notifications-back")?.addEventListener("click", closeNotifications);
       $("#notifications-clear")?.addEventListener("click", () => persistNotifications([]));
@@ -5835,7 +5901,49 @@
 
       const now = new Date(); const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() + 6) % 7); monday.setHours(0, 0, 0, 0); const next = new Date(monday); next.setDate(next.getDate() + 7);
       $("#week-range").textContent = `${monday.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} – ${new Date(+next - 86400000).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`;
-      const item = a => { const name = activityDisplayName(a); return `<article class="activity-item"><button class="activity-open-button" type="button" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(name)}"><div class="activity-info"><strong>${esc(name)}</strong><p>${dateFmt(a.start_date)}${a.avg_hr ? ` · ${Math.round(Number(a.avg_hr))} bpm` : ""}</p></div><div class="activity-metric">${Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 })} km<small>${formatDuration(Number(a.duration_min))} · ${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></button></article>` };
+      let activitySearchQuery = "";
+      function normalizeActivitySearch(value) {
+        return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("fr-FR").trim();
+      }
+      function renderActivitySearch() {
+        const query = normalizeActivitySearch(activitySearchQuery);
+        const rows = [...$("#all-activities").querySelectorAll(".activity-item")];
+        let visibleCount = 0;
+        $("#all-activities").querySelector("[data-search-empty]")?.remove();
+        rows.forEach(row => {
+          const matches = !query || normalizeActivitySearch(row.dataset.searchText).includes(query);
+          row.hidden = !matches;
+          if (matches) visibleCount++;
+        });
+        const count = $("#activity-count");
+        count.textContent = query
+          ? `${visibleCount} / ${activities.length} activité${activities.length > 1 ? "s" : ""}`
+          : `${activities.length} sortie${activities.length > 1 ? "s" : ""}`;
+        if (query && activities.length > 0 && visibleCount === 0) {
+          $("#all-activities").insertAdjacentHTML("beforeend", '<div class="empty-state" data-search-empty>Aucune activité ne correspond à cette recherche.</div>');
+        }
+      }
+      function activityPlanWeekLabel(activity) {
+        const activityDate = sessionActivityDate(activity);
+        if (!activityDate) return "";
+        for (let weekIndex = 0; weekIndex < planWeeks.length; weekIndex++) {
+          if (planWeeks[weekIndex][1].some((_, dayIndex) => !isSessionDeleted(weekIndex, dayIndex) && isoDay(sessionDate(weekIndex, dayIndex)) === activityDate)) {
+            return `S${weekIndex + 1}`;
+          }
+        }
+        const [year, month, day] = activityDate.split("-").map(Number);
+        const activityDay = Date.UTC(year, month - 1, day);
+        const planStartDay = Date.UTC(calendarStart.getFullYear(), calendarStart.getMonth(), calendarStart.getDate());
+        const weekIndex = Math.floor((activityDay - planStartDay) / (7 * 86400000));
+        return weekIndex >= 0 && weekIndex < planWeeks.length ? `S${weekIndex + 1}` : "";
+      }
+      const item = a => {
+        const name = activityDisplayName(a), weekLabel = activityPlanWeekLabel(a);
+        const date = dateFmt(a.start_date);
+        const distance = Number(a.distance_km).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+        const searchText = [name, weekLabel, a.name, a.import_file_name, date, a.start_date, distance, formatDuration(Number(a.duration_min))].filter(Boolean).join(" ");
+        return `<article class="activity-item" data-search-text="${esc(searchText)}"><button class="activity-open-button" type="button" data-activity-id="${esc(a.id)}" aria-label="Ouvrir le détail de ${esc(name)}"><div class="activity-info"><div class="activity-title-row"><strong>${esc(name)}</strong>${weekLabel ? `<span class="activity-week-label">${weekLabel}</span>` : ""}</div><p>${date}${a.avg_hr ? ` · ${Math.round(Number(a.avg_hr))} bpm` : ""}</p></div><div class="activity-metric">${distance} km<small>${formatDuration(Number(a.duration_min))} · ${pace(Number(a.distance_km), Number(a.duration_min))}/km</small></div></button></article>`;
+      };
       function bestDistanceTime(targetKm) {
         let best = null;
         for (const activity of activities) {
@@ -6046,6 +6154,7 @@
         const detailPanel = $("#activity-detail");
         if (detailPanel) { detailPanel.hidden = true; $("#activites").append(detailPanel); }
         $("#all-activities").innerHTML = sorted.map(item).join("") || '<div class="empty-state">Aucune activité enregistrée.</div>';
+        renderActivitySearch();
         const detected5 = bestDistanceTime(5), detected10 = bestDistanceTime(10);
         const best5 = manualRecords.fiveKm == null ? detected5 : { seconds: manualRecords.fiveKm, date: null, pace: pace(5, manualRecords.fiveKm / 60), manual: true };
         const best10 = manualRecords.tenKm == null ? detected10 : { seconds: manualRecords.tenKm, date: null, pace: pace(10, manualRecords.tenKm / 60), manual: true };
@@ -10331,10 +10440,184 @@
     outline-offset: 3px;
   }
 
+  .activity-search-panel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: 7px 10px 7px 16px;
+    margin: 0 0 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .32);
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--panel) 62%, transparent);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .14), inset 0 1px 0 rgba(255, 255, 255, .3);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+    backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  .activity-search-panel[hidden] {
+    display: none !important;
+  }
+
+  .activity-search-panel input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 0;
+    border: 0 !important;
+    outline: none;
+    background: transparent !important;
+    color: var(--text);
+    font: inherit;
+    box-shadow: none !important;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .activity-search-panel input::-webkit-search-cancel-button,
+  .activity-search-panel input::-webkit-search-decoration,
+  .activity-search-panel input::-webkit-search-results-button,
+  .activity-search-panel input::-webkit-search-results-decoration {
+    display: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .activity-search-panel .button {
+    flex: 0 0 38px;
+    width: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--panel2) 76%, transparent) !important;
+    box-shadow: none !important;
+    font-size: 21px;
+    line-height: 1;
+  }
+
+  html[data-theme="light-mono"] .activity-search-panel {
+    border-color: var(--line);
+    background: linear-gradient(145deg, #ffffff, #eeeeee);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .08), inset 0 1px 0 rgba(255, 255, 255, .9);
+  }
+
+  html[data-theme="light-mono"] .activity-search-panel .button {
+    color: var(--text) !important;
+    background: #e5e5e5 !important;
+  }
+
+  #all-activities .activity-item[hidden] {
+    display: none !important;
+  }
+
+  .activity-search-glass {
+    position: fixed;
+    z-index: 1100;
+    top: calc(env(safe-area-inset-top) + 14px);
+    left: 62px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .34);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--panel) 38%, transparent);
+    color: var(--text);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .52), inset 0 -1px 0 rgba(0, 0, 0, .14);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .2s var(--ease-out), background .2s ease, box-shadow .2s ease;
+  }
+
+  .activity-search-glass svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+
+  .activity-search-glass:hover {
+    transform: scale(1.06);
+    background: color-mix(in srgb, var(--panel2) 56%, transparent);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .62);
+  }
+
+  .activity-search-glass:active {
+    transform: scale(.92);
+  }
+
+  .activity-search-glass:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  html[data-theme="light-mono"] .activity-search-glass {
+    border-color: var(--line);
+    background: rgba(255, 255, 255, .88);
+    color: var(--text);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, .12), inset 0 1px 0 rgba(255, 255, 255, .96);
+  }
+
+  @media (max-width: 599px) {
+    .activity-search-glass {
+      top: calc(env(safe-area-inset-top) + 12px);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    #accueil #next-workout-card[role="button"] {
+    #accueil #next-workout-card[role="button"],
+    .activity-search-glass {
       transition: none;
     }
   }
 
+</style>
+<style id="top-banner-position">
+  :root {
+    --top-banner-offset: 4px;
+  }
+
+  .topbar,
+  .notifications-header {
+    transform: translateY(var(--top-banner-offset));
+  }
+
+  .activity-add-glass,
+  .page-reload-glass,
+  .notification-glass,
+  .plan-week-glass,
+  .activity-search-glass {
+    top: calc(env(safe-area-inset-top) + 18px) !important;
+  }
+
+  #activity-detail .section-heading:first-child {
+    top: calc(env(safe-area-inset-top) + 18px) !important;
+  }
+
+  #goal-detail-overlay .goal-detail-head {
+    top: calc(env(safe-area-inset-top) + 18px) !important;
+  }
+
+  @media (max-width: 599px) {
+    .activity-add-glass,
+    .page-reload-glass,
+    .notification-glass,
+    .plan-week-glass,
+    .activity-search-glass {
+      top: calc(env(safe-area-inset-top) + 16px) !important;
+    }
+
+    #activity-detail .section-heading:first-child {
+      top: calc(env(safe-area-inset-top) + 16px) !important;
+    }
+  }
 </style>
