@@ -5840,6 +5840,10 @@
         activitySearchQuery = activitySearchInput.value;
         renderActivitySearch();
       });
+      activitySearchInput.addEventListener("blur", event => {
+        if (event.relatedTarget === $("#activity-search-clear")) return;
+        setActivitySearchOpen(false);
+      });
       $("#activity-search-clear").addEventListener("click", () => {
         activitySearchInput.value = "";
         activitySearchQuery = "";
