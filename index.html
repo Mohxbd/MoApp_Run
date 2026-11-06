@@ -7451,7 +7451,7 @@
           const dots = points.map((point, index) => {
             const value = `${point.km.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
             const label = `${point.start.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} · ${value}`;
-            return `<circle class="week-volume-point" data-week-index="${index}" tabindex="0" role="button" aria-pressed="${index === currentWeekIndex}" aria-label="Sélectionner la semaine du ${esc(label)}" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${index === currentWeekIndex ? 4 : 3}" fill="var(--accent)" stroke="var(--panel)" stroke-width="1"><title>${esc(label)}</title></circle>`;
+            return `<g class="week-volume-point" data-week-index="${index}" tabindex="0" role="button" aria-pressed="${index === currentWeekIndex}" aria-label="Sélectionner la semaine du ${esc(label)}"><circle class="week-volume-point-hit" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="12" fill="transparent"/><circle class="week-volume-point-dot" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${index === currentWeekIndex ? 4 : 3}" fill="var(--accent)" stroke="var(--panel)" stroke-width="1" pointer-events="none"/><title>${esc(label)}</title></g>`;
           }).join("");
           const months = recentWeeks.map((week, index) => {
             if (index && recentWeeks[index - 1].start.getMonth() === week.start.getMonth()) return "";
@@ -7459,6 +7459,7 @@
             return `<text x="${(x(index) + 2).toFixed(1)}" y="${height - 2}" fill="var(--muted)" font-size="8">${label}</text>`;
           }).join("");
           summaryChart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="group" aria-label="Sélectionner une semaine sur le graphique du volume hebdomadaire"><defs><linearGradient id="week-volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#week-volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>${dots}${months}</svg>`;
+          const svg = summaryChart.querySelector("svg");
           const selectedDistance = $("#week-selected-distance");
           const selectedDuration = $("#week-selected-duration");
           const selectedElevation = $("#week-selected-elevation");
@@ -7477,7 +7478,7 @@
             svg.querySelectorAll(".week-volume-point").forEach(candidate => {
               const isSelected = candidate === point;
               candidate.setAttribute("aria-pressed", String(isSelected));
-              candidate.setAttribute("r", isSelected ? "4" : "3");
+              candidate.querySelector(".week-volume-point-dot").setAttribute("r", isSelected ? "4" : "3");
             });
           };
           svg.querySelectorAll(".week-volume-point").forEach(point => {
@@ -8763,9 +8764,28 @@
     touch-action: manipulation;
   }
 
-  #accueil .week-volume-point:focus-visible {
+  #accueil .week-volume-point-hit {
+    pointer-events: all;
+  }
+
+  #accueil .week-volume-point:focus-visible .week-volume-point-dot {
     stroke: var(--text);
     stroke-width: 2;
+  }
+
+  .plan-date-picker input[type="date"] {
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 9px 12px;
+    font: 500 16px/1.3 system-ui, sans-serif;
+    color: var(--text);
+    color-scheme: dark;
+    touch-action: manipulation;
+  }
+
+  html[data-theme="light"] .plan-date-picker input[type="date"],
+  html[data-theme="light-mono"] .plan-date-picker input[type="date"] {
+    color-scheme: light;
   }
 
   #accueil .next-workout-card {
