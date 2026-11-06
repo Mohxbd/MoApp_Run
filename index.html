@@ -4990,8 +4990,14 @@
                 </svg>
                 <span id="week-activity-streak-count">0</span>
               </span>
+              <div id="week-selected-stats" class="week-selected-stats" aria-live="polite"
+                aria-label="Statistiques de la semaine sélectionnée">
+                <span><small>Distance</small><strong id="week-selected-distance">0 km</strong></span>
+                <span><small>Temps</small><strong id="week-selected-duration">0h00m</strong></span>
+                <span><small>D+</small><strong id="week-selected-elevation">— m</strong></span>
+              </div>
             </div>
-            <div id="week-volume-chart" class="week-volume-chart" role="img"
+            <div id="week-volume-chart" class="week-volume-chart" role="group"
               aria-label="Volume hebdomadaire des 12 dernières semaines, en kilomètres"></div>
           </div>
         </article>
@@ -6170,9 +6176,9 @@
         renderHrTypeChart();
         renderRaceCountdown();
         renderPlan();
+        renderNextWorkout();
         renderVolumeChart();
         renderProgress();
-        renderNextWorkout();
         renderHrTypeChart();
       }
       const detailTitle = $("#detail-title");
@@ -7174,7 +7180,18 @@
       }
       function renderNextWorkout() {
         const cardEl = $("#next-workout-card"); if (!cardEl) return;
-        const cards = getWorkoutCards(); if (!cards.length) return;
+        const cards = getWorkoutCards();
+        if (!cards.length) {
+          workoutCarouselIndex = -1;
+          cardEl.innerHTML = "<h3>Aucune séance disponible</h3><p>Ajoute ou réactive une séance dans le plan pour la voir ici.</p>";
+          cardEl.tabIndex = -1;
+          cardEl.removeAttribute("role");
+          cardEl.removeAttribute("aria-label");
+          $("#next-workout-counter").textContent = "0 / 0";
+          $("#workout-prev").disabled = true;
+          $("#workout-next").disabled = true;
+          return;
+        }
         const today = new Date(); today.setHours(0, 0, 0, 0);
         if (workoutCarouselIndex < 0) { const upcoming = cards.findIndex(c => { const d = new Date(c.date); d.setHours(0, 0, 0, 0); return d >= today }); workoutCarouselIndex = upcoming < 0 ? cards.length - 1 : upcoming }
         workoutCarouselIndex = Math.max(0, Math.min(cards.length - 1, workoutCarouselIndex));
@@ -7387,9 +7404,15 @@
           date.setHours(0, 0, 0, 0);
           date.setDate(date.getDate() - (date.getDay() + 6) % 7);
           const key = date.getTime();
-          const week = activityWeeks.get(key) || { count: 0, km: 0 };
+          const week = activityWeeks.get(key) || { count: 0, km: 0, durationMin: 0, elevationGainM: 0, hasElevation: false };
           week.count++;
           week.km += Number(activity.distance_km || 0);
+          week.durationMin += Number(activity.duration_min || 0);
+          const elevationGain = activityElevationGain(activity);
+          if (elevationGain != null) {
+            week.elevationGainM += elevationGain;
+            week.hasElevation = true;
+          }
           activityWeeks.set(key, week);
         });
         const streakEl = $("#week-activity-streak");
@@ -7403,11 +7426,19 @@
           const recentWeeks = Array.from({ length: 12 }, (_, index) => {
             const start = new Date(thisMonday);
             start.setDate(thisMonday.getDate() - (11 - index) * 7);
-            return { start, km: activityWeeks.get(start.getTime())?.km || 0 };
+            const week = activityWeeks.get(start.getTime());
+            return {
+              start,
+              km: week?.km || 0,
+              durationMin: week?.durationMin || 0,
+              elevationGainM: week?.elevationGainM || 0,
+              hasElevation: week?.hasElevation || false
+            };
           });
           const width = 320, height = 94, left = 4, right = 34, top = 7, bottom = 17;
           const plotWidth = width - left - right, plotHeight = height - top - bottom;
           const max = Math.max(10, Math.ceil(Math.max(...recentWeeks.map(week => week.km)) / 10) * 10);
+          const currentWeekIndex = Math.max(0, recentWeeks.findIndex(week => week.start.getTime() === thisMonday.getTime()));
           const x = index => left + index * plotWidth / (recentWeeks.length - 1);
           const y = km => top + plotHeight - km / max * plotHeight;
           const points = recentWeeks.map((week, index) => ({ ...week, x: x(index), y: y(week.km) }));
@@ -7417,17 +7448,51 @@
             const gy = y(value);
             return `<line x1="${left}" y1="${gy.toFixed(1)}" x2="${(width - right).toFixed(1)}" y2="${gy.toFixed(1)}" stroke="var(--line)" stroke-width="1"/><text x="${width - 2}" y="${(gy + 3).toFixed(1)}" text-anchor="end" fill="var(--muted)" font-size="8">${value}</text>`;
           }).join("");
-          const dots = points.map(point => {
+          const dots = points.map((point, index) => {
             const value = `${point.km.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
-            const label = `${point.start.toLocaleDateString("fr-FR", { month: "long" })} · ${value}`;
-            return `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="2.5" fill="var(--accent)"><title>${esc(label)}</title></circle>`;
+            const label = `${point.start.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} · ${value}`;
+            return `<circle class="week-volume-point" data-week-index="${index}" tabindex="0" role="button" aria-pressed="${index === currentWeekIndex}" aria-label="Sélectionner la semaine du ${esc(label)}" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${index === currentWeekIndex ? 4 : 3}" fill="var(--accent)" stroke="var(--panel)" stroke-width="1"><title>${esc(label)}</title></circle>`;
           }).join("");
           const months = recentWeeks.map((week, index) => {
             if (index && recentWeeks[index - 1].start.getMonth() === week.start.getMonth()) return "";
             const label = week.start.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "").toLocaleUpperCase("fr-FR");
             return `<text x="${(x(index) + 2).toFixed(1)}" y="${height - 2}" fill="var(--muted)" font-size="8">${label}</text>`;
           }).join("");
-          summaryChart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Kilomètres parcourus par semaine sur les 12 dernières semaines"><defs><linearGradient id="week-volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#week-volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>${dots}${months}</svg>`;
+          summaryChart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="group" aria-label="Sélectionner une semaine sur le graphique du volume hebdomadaire"><defs><linearGradient id="week-volume-area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#week-volume-area-gradient)" stroke="none"/><path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>${dots}${months}</svg>`;
+          const selectedDistance = $("#week-selected-distance");
+          const selectedDuration = $("#week-selected-duration");
+          const selectedElevation = $("#week-selected-elevation");
+          const selectedStats = $("#week-selected-stats");
+          const formatWeekDuration = minutes => {
+            const totalMinutes = Math.max(0, Math.round(minutes));
+            return `${Math.floor(totalMinutes / 60)}h${String(totalMinutes % 60).padStart(2, "0")}m`;
+          };
+          const selectWeek = point => {
+            const week = recentWeeks[Number(point.dataset.weekIndex)];
+            if (!week) return;
+            selectedDistance.textContent = `${week.km.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} km`;
+            selectedDuration.textContent = formatWeekDuration(week.durationMin);
+            selectedElevation.textContent = week.hasElevation ? `${Math.round(week.elevationGainM)} m` : "— m";
+            selectedStats.setAttribute("aria-label", `Semaine du ${week.start.toLocaleDateString("fr-FR")}: distance ${selectedDistance.textContent}, temps ${selectedDuration.textContent}, dénivelé positif ${selectedElevation.textContent}`);
+            svg.querySelectorAll(".week-volume-point").forEach(candidate => {
+              const isSelected = candidate === point;
+              candidate.setAttribute("aria-pressed", String(isSelected));
+              candidate.setAttribute("r", isSelected ? "4" : "3");
+            });
+          };
+          svg.querySelectorAll(".week-volume-point").forEach(point => {
+            point.addEventListener("click", () => selectWeek(point));
+            point.addEventListener("pointerdown", () => selectWeek(point));
+            point.addEventListener("mouseenter", () => selectWeek(point));
+            point.addEventListener("focus", () => selectWeek(point));
+            point.addEventListener("keydown", event => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                selectWeek(point);
+              }
+            });
+          });
+          selectWeek(svg.querySelector(`.week-volume-point[data-week-index="${currentWeekIndex}"]`));
         }
         if (!el) return;
         // Conserver toutes les semaines du plan, y compris les semaines futures sans activité.
@@ -8608,8 +8673,46 @@
   #accueil .week-volume-heading-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px 8px;
     margin-bottom: 3px;
+  }
+
+  #accueil .week-selected-stats {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    flex: 0 1 auto;
+    min-width: 0;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 10.625%;
+  }
+
+  #accueil .week-selected-stats>span {
+    display: grid;
+    min-width: 0;
+    gap: 1px;
+    line-height: 1.15;
+    padding: 0 2px;
+  }
+
+  #accueil .week-selected-stats small {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #accueil .week-selected-stats strong {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 9px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   #accueil .week-activity-streak {
@@ -8652,6 +8755,17 @@
     width: 100%;
     height: auto;
     overflow: visible;
+  }
+
+  #accueil .week-volume-point {
+    cursor: pointer;
+    outline: none;
+    touch-action: manipulation;
+  }
+
+  #accueil .week-volume-point:focus-visible {
+    stroke: var(--text);
+    stroke-width: 2;
   }
 
   #accueil .next-workout-card {
