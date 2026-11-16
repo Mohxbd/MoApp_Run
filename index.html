@@ -3430,6 +3430,46 @@
       border-radius: 14px;
     }
 
+    #detail-laps-chart {
+      overflow: hidden;
+    }
+
+    #detail-laps-chart svg {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100%;
+    }
+
+    #detail-laps-chart .lap-chart-bar {
+      fill: var(--accent);
+    }
+
+    #detail-laps-chart .lap-chart-bar:nth-of-type(even) {
+      fill: color-mix(in srgb, var(--accent) 72%, #000);
+    }
+
+    #detail-laps-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #detail-laps-toggle:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    #detail-laps-toggle-label {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
     #activity-detail .chart-panel {
       flex-shrink: 0;
       padding: 14px;
@@ -5056,6 +5096,7 @@
               aria-labelledby="detail-actions-heading">
               <div id="detail-actions-choices" class="detail-actions-choices">
                 <button type="button" data-detail-action="rename">Renommer l’activité</button>
+                <button type="button" data-detail-action="laps">Tours</button>
                 <button type="button" data-detail-action="delete">Supprimer l’activité</button>
                 <button type="button" data-detail-cancel>Annuler</button>
               </div>
@@ -5070,6 +5111,7 @@
               </form>
             </section>
           </div>
+          <input id="detail-laps-file" type="file" accept=".txt,.tsv,text/plain,text/tab-separated-values" hidden>
           <div class="stat-card pace-map-panel">
             <div class="pace-map-layout">
               <div id="detail-pace-map" class="pace-map" aria-label="Parcours coloré selon l’allure"></div>
@@ -5131,6 +5173,18 @@
             <div class="chart-panel zone-panel">
               <h3>Zones d’allure</h3>
               <div id="detail-pace-zones" class="zone-chart" aria-label="Répartition de l’allure par zones"></div>
+            </div>
+          </section>
+          <section id="detail-laps-section" class="detail-analysis-section plot-pace" hidden>
+            <div class="chart-panel">
+              <div id="detail-laps-toggle" class="chart-title-row" role="button" tabindex="0" aria-expanded="false"
+                aria-controls="detail-laps-list" aria-label="Afficher les détails des tours">
+                <h3>Tours</h3>
+                <small id="detail-laps-source" class="muted small"></small>
+                <span id="detail-laps-toggle-label">Afficher les détails</span>
+              </div>
+              <div id="detail-laps-chart" class="detail-chart" aria-live="polite"></div>
+              <div id="detail-laps-list" class="splits-table-wrap" hidden></div>
             </div>
           </section>
           <section class="chart-panel feeling-panel" aria-labelledby="feeling-title">
@@ -5454,6 +5508,7 @@
       "use strict";
       const $ = s => document.querySelector(s), KEY = "moapp-run-activities-v1", NOTE_KEY = "moapp-run-feeling-notes-v1", PR_KEY = "moapp-run-records-v1", PLAN_KEY = "moapp-run-plan-shifts-v1", FEELING_KEY = "moapp-run-feelings-v1", NOTIFICATION_KEY = "moapp-run-notifications-v1";
       const GOAL_TIME_KEY = "moapp-run-goal-time-v1", DEFAULT_GOAL_TIME_MINUTES = 115;
+      const LAPS_KEY = "moapp-run-activity-laps-v1";
       function readGoalTimeMinutes() {
         try {
           const minutes = Number(localStorage.getItem(GOAL_TIME_KEY));
@@ -5534,6 +5589,16 @@
       const isSessionDisabled = (w, j) => disabledSessions.has(`${w}-${j}`);
       const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]") } catch { return [] } };
       let activities = read();
+      function readActivityLaps() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(LAPS_KEY) || "{}");
+          return stored && typeof stored === "object" && !Array.isArray(stored) ? stored : {};
+        } catch (error) {
+          console.error("Impossible de lire les tours enregistrés.", error);
+          return {};
+        }
+      }
+      let activityLaps = readActivityLaps();
       function readManualRecords() {
         try {
           const records = JSON.parse(localStorage.getItem(PR_KEY) || "{}");
@@ -6242,6 +6307,15 @@
           const id = window.currentDetailActivityId;
           const activity = activities.find(item => String(item.id) === String(id));
           if (!activity) return;
+          if (menuAction.dataset.detailAction === "laps") {
+            const fileInput = $("#detail-laps-file");
+            fileInput.dataset.activityId = String(id);
+            fileInput.value = "";
+            actionsMenu.hidden = true;
+            $("#detail-actions-toggle").setAttribute("aria-expanded", "false");
+            fileInput.click();
+            return;
+          }
           if (menuAction.dataset.detailAction === "rename") {
             $("#detail-actions-choices").hidden = true;
             $("#detail-rename-form").hidden = false;
@@ -6270,6 +6344,30 @@
         }
         const activityButton = e.target.closest(".activity-open-button[data-activity-id]");
         if (activityButton) openActivityDetail(activityButton.dataset.activityId);
+      });
+      $("#detail-laps-file").addEventListener("change", async event => {
+        const file = event.currentTarget.files?.[0];
+        const activityId = event.currentTarget.dataset.activityId;
+        if (!file || activityId == null) return;
+        let parsed;
+        try {
+          parsed = parseLapFile(await file.text());
+        } catch (error) {
+          console.error("Impossible de lire le fichier des tours.", error);
+          toast(error.message || "Le fichier des tours n’a pas pu être lu.");
+          return;
+        }
+        const nextActivityLaps = { ...activityLaps, [activityId]: { fileName: file.name, laps: parsed.laps } };
+        try {
+          localStorage.setItem(LAPS_KEY, JSON.stringify(nextActivityLaps));
+        } catch (error) {
+          console.error("Impossible d’enregistrer les tours de l’activité.", error);
+          toast("Les tours n’ont pas pu être enregistrés sur cet appareil.");
+          return;
+        }
+        activityLaps = nextActivityLaps;
+        if (String(window.currentDetailActivityId) === activityId) renderLapChart(activityId);
+        toast(parsed.invalidRows ? `${parsed.laps.length} tours importés; ${parsed.invalidRows} ligne(s) ignorée(s).` : `${parsed.laps.length} tours importés.`);
       });
       $("#detail-rename-form").addEventListener("submit", e => {
         e.preventDefault();
@@ -6432,6 +6530,136 @@
           update({ clientX: svg.getBoundingClientRect().left, clientY: svg.getBoundingClientRect().top });
         }
       }
+      function parseLapFile(text) {
+        const parseTime = value => {
+          const input = String(value || "").trim();
+          const secondsMatch = input.match(/^(\d+(?:[.,]\d+)?)\s*s$/i);
+          if (secondsMatch) return Number(secondsMatch[1].replace(",", "."));
+          const minutesMatch = input.match(/^(\d+(?:[.,]\d+)?)\s*min(?:ute)?s?$/i);
+          if (minutesMatch) return Number(minutesMatch[1].replace(",", ".")) * 60;
+          if (!/^\d+(?::\d{1,2}){1,2}$/.test(input)) return null;
+          const parts = input.split(":").map(Number);
+          if (parts.slice(1).some(part => part >= 60)) return null;
+          return parts.reduce((total, part) => total * 60 + part, 0);
+        };
+        const laps = [];
+        let invalidRows = 0;
+        for (const line of String(text).split(/\r?\n/)) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          const fields = (trimmed.includes("\t") ? trimmed.split("\t") : trimmed.split(";")).map(value => value.trim()).filter(Boolean);
+          if (!/^\d+$/.test(fields[0] || "")) continue;
+          const distanceMatch = (fields[1] || "").match(/^(\d+(?:[.,]\d+)?)\s*km$/i);
+          const durationSec = parseTime(fields[2]);
+          const paceMatch = (fields[3] || "").match(/^(\d+(?::\d{1,2}){1,2})\s*\/\s*km$/i);
+          const distanceKm = distanceMatch ? Number(distanceMatch[1].replace(",", ".")) : NaN;
+          const paceSecKm = paceMatch ? parseTime(paceMatch[1]) : null;
+          if (!Number.isFinite(distanceKm) || distanceKm <= 0 || !Number.isFinite(durationSec) || durationSec <= 0) {
+            invalidRows++;
+            continue;
+          }
+          laps.push({
+            number: Number(fields[0]),
+            distanceKm,
+            durationSec,
+            paceSecKm: Number.isFinite(paceSecKm) && paceSecKm > 0 ? paceSecKm : durationSec / distanceKm,
+            elevationM: Number((fields[4] || "").match(/^(-?\d+(?:[.,]\d+)?)\s*m$/i)?.[1]?.replace(",", ".")) || null,
+            avgHr: Number((fields[5] || "").match(/^(\d+(?:[.,]\d+)?)\s*bpm$/i)?.[1]?.replace(",", ".")) || null
+          });
+        }
+        if (!laps.length) throw new Error("Aucun tour exploitable trouvé. Vérifie que le fichier contient les colonnes Tour, Distance et Temps.");
+        return { laps, invalidRows };
+      }
+      function formatLapPace(seconds) {
+        const rounded = Math.round(seconds);
+        return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, "0")}/km`;
+      }
+      function renderLapChart(activityId) {
+        const section = $("#detail-laps-section");
+        const chart = $("#detail-laps-chart");
+        const lapList = $("#detail-laps-list");
+        const lapToggle = $("#detail-laps-toggle");
+        const source = $("#detail-laps-source");
+        const record = activityLaps[String(activityId)];
+        if (!record?.laps?.length) {
+          section.hidden = true;
+          chart.innerHTML = "";
+          lapList.innerHTML = "";
+          lapList.hidden = true;
+          lapToggle.hidden = true;
+          lapToggle.setAttribute("aria-expanded", "false");
+          $("#detail-laps-toggle-label").textContent = "Afficher les détails";
+          lapToggle.setAttribute("aria-label", "Afficher les détails des tours");
+          source.textContent = "";
+          return;
+        }
+        section.hidden = false;
+        lapList.hidden = true;
+        lapToggle.hidden = false;
+        lapToggle.setAttribute("aria-expanded", "false");
+        $("#detail-laps-toggle-label").textContent = "Afficher les détails";
+        lapToggle.setAttribute("aria-label", "Afficher les détails des tours");
+        source.textContent = `${record.laps.length} tours · ${record.fileName}`;
+        const laps = record.laps;
+        const W = 340, H = 208, L = 42, R = 12, T = 18, B = 34;
+        const innerW = W - L - R, innerH = H - T - B;
+        const minBarWidth = Math.min(12, innerW / laps.length);
+        const barWidths = Array(laps.length).fill(0);
+        let remainingIndexes = laps.map((_, index) => index);
+        let remainingWidth = innerW;
+        while (remainingIndexes.length) {
+          const remainingDuration = remainingIndexes.reduce((sum, index) => sum + laps[index].durationSec, 0);
+          const tooNarrow = remainingIndexes.filter(index => laps[index].durationSec / remainingDuration * remainingWidth < minBarWidth);
+          if (!tooNarrow.length) {
+            remainingIndexes.forEach(index => {
+              barWidths[index] = laps[index].durationSec / remainingDuration * remainingWidth;
+            });
+            break;
+          }
+          tooNarrow.forEach(index => {
+            barWidths[index] = minBarWidth;
+            remainingWidth -= minBarWidth;
+          });
+          remainingIndexes = remainingIndexes.filter(index => !tooNarrow.includes(index));
+        }
+        const minPace = Math.min(...laps.map(lap => lap.paceSecKm));
+        const maxPace = Math.max(...laps.map(lap => lap.paceSecKm));
+        const padding = Math.max(15, (maxPace - minPace) * .15);
+        const lo = Math.max(0, minPace - padding), hi = maxPace + padding;
+        const span = Math.max(1, hi - lo);
+        const yAt = value => T + (value - lo) / span * innerH;
+        const grid = [0, 1, 2, 3].map(index => {
+          const y = T + index * innerH / 3;
+          const paceValue = lo + index * span / 3;
+          return `<line x1="${L}" y1="${y.toFixed(1)}" x2="${W - R}" y2="${y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/><text x="${L - 6}" y="${(y + 3).toFixed(1)}" fill="var(--muted)" font-size="9" text-anchor="end">${formatLapPace(paceValue).replace("/km", "")}</text>`;
+        }).join("");
+        let x = L;
+        const bars = laps.map((lap, index) => {
+          const width = barWidths[index];
+          const y = yAt(lap.paceSecKm);
+          const tooltip = `Tour ${lap.number} · ${lap.distanceKm.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} km · ${formatRaceTime(lap.durationSec)} · ${formatLapPace(lap.paceSecKm)}`;
+          const visibleLabel = width >= 24 ? `<text x="${(x + width / 2).toFixed(1)}" y="${H - 10}" fill="var(--muted)" font-size="9" text-anchor="middle">${lap.number}</text>` : "";
+          const bar = `<rect class="chart-bar lap-chart-bar" tabindex="0" role="button" aria-label="${esc(tooltip)}" data-value="${esc(`${formatLapPace(lap.paceSecKm)} · ${formatRaceTime(lap.durationSec)}`)}" data-x="${(x + width / 2).toFixed(1)}" data-y="${Math.max(13, y - 7).toFixed(1)}" x="${x.toFixed(2)}" y="${y.toFixed(1)}" width="${width.toFixed(2)}" height="${(T + innerH - y).toFixed(1)}" rx="2" opacity=".78"><title>${esc(tooltip)}</title></rect>${visibleLabel}`;
+          x += width;
+          return bar;
+        }).join("");
+        chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Allure par tour; barres ajustées à la bulle, avec une largeur minimale pour les tours courts">${grid}${bars}</svg>`;
+        attachChartInteractions(chart);
+        lapList.innerHTML = `<table class="splits-table"><thead><tr><th scope="col">Tour</th><th scope="col">Distance</th><th scope="col">Temps</th><th scope="col">Allure</th></tr></thead><tbody>${laps.map(lap => `<tr><th scope="row">${lap.number}</th><td>${lap.distanceKm.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} km</td><td>${formatRaceTime(lap.durationSec)}</td><td>${formatLapPace(lap.paceSecKm)}</td></tr>`).join("")}</tbody></table>`;
+      }
+      function toggleLapDetails(element) {
+        const expanded = element.getAttribute("aria-expanded") !== "true";
+        $("#detail-laps-list").hidden = !expanded;
+        element.setAttribute("aria-expanded", String(expanded));
+        element.setAttribute("aria-label", `${expanded ? "Masquer" : "Afficher"} les détails des tours`);
+        $("#detail-laps-toggle-label").textContent = expanded ? "Masquer les détails" : "Afficher les détails";
+      }
+      $("#detail-laps-toggle").addEventListener("click", event => toggleLapDetails(event.currentTarget));
+      $("#detail-laps-toggle").addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        toggleLapDetails(event.currentTarget);
+      });
       function preciseLineSVG(samples, metric) {
         const vals = samples.map(s => ({ x: Number(s.distance_km), value: Number(metric === "hr" ? s.hr : s.pace_sec_km) })).filter(v => Number.isFinite(v.x) && Number.isFinite(v.value) && v.value > 0);
         if (vals.length < 2) return '<div class="chart-empty">Pas de données GPS assez détaillées pour cette mesure. Réimporte le fichier GPX pour générer la vue précise.</div>';
@@ -6818,6 +7046,7 @@
         document.querySelectorAll(".chart-mode-toggle").forEach(b => b.textContent = "Détails");
         renderActivityZones(a);
         renderPaceMap(a);
+        renderLapChart(a.id);
         $("#detail-no-gpx").textContent = "";
         detailPanel.scrollTop = 0;
         requestAnimationFrame(() => { if (paceLeafletMap) paceLeafletMap.invalidateSize(); });
