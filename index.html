@@ -5421,6 +5421,7 @@
         </article>
       </section>
     </main>
+    <div class="bottom-screen-blur" aria-hidden="true"></div>
     <nav class="bottom-nav" aria-label="Navigation principale">
       <button class="nav-item active" data-go="accueil"><span><svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m3 10 9-7 9 7" />
@@ -8674,6 +8675,42 @@
   @media (max-width: 599px) {
     #activity-detail .section-heading:first-child {
       top: calc(env(safe-area-inset-top) + 12px) !important;
+    }
+  }
+</style>
+
+<style id="bottom-screen-blur">
+  /* Extends the navigation's frosted-glass treatment into the lower viewport. */
+  .bottom-screen-blur {
+    position: fixed;
+    z-index: 999;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: calc(180px + env(safe-area-inset-bottom));
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg) 0%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 10%, transparent) 46%,
+      color-mix(in srgb, var(--bg) 68%, transparent) 100%
+    );
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+    backdrop-filter: blur(18px) saturate(125%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .26) 42%, #000 76%);
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .26) 42%, #000 76%);
+  }
+
+  @media (max-width: 599px) {
+    .bottom-screen-blur {
+      height: calc(150px + env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .bottom-screen-blur {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
     }
   }
 </style>
